@@ -208,6 +208,7 @@ logs/
 .claude/
 .vscode/
 *.sh
+!scripts/experiments/**/*.sh
 **/.mypy_cache/**
 **/__pycache__/**
 **/*.pyc
