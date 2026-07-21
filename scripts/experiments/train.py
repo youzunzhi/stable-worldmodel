@@ -1,6 +1,7 @@
 import argparse
 import os
 from pathlib import Path
+import sys
 
 from registry import get_experiment
 
@@ -40,3 +41,34 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     args.dataset = dataset
     args.overrides = tuple(args.overrides)
     return args
+
+
+def build_command(args: argparse.Namespace) -> list[str]:
+    """Build the upstream training command without executing it."""
+    repo_root_value = os.environ.get('REPO_ROOT')
+    if not repo_root_value:
+        raise RuntimeError('REPO_ROOT is not set')
+
+    repo_root = Path(repo_root_value).resolve()
+    train_script = repo_root / args.experiment.train_script
+    if not train_script.is_file():
+        raise FileNotFoundError(f'Training script not found: {train_script}')
+
+    command = [
+        sys.executable,
+        str(train_script),
+        *args.experiment.train_defaults,
+        f'seed={args.seed}',
+        f'run_name={args.run_name}',
+        f'data.dataset.name={args.dataset}',
+    ]
+    if args.max_steps is not None:
+        command.extend(
+            (
+                'trainer.max_epochs=1',
+                f'+trainer.limit_train_batches={args.max_steps}',
+                '+trainer.limit_val_batches=1',
+            )
+        )
+    command.extend(args.overrides)
+    return command

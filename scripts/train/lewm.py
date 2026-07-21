@@ -29,9 +29,9 @@ def get_img_preprocessor(source: str, target: str, img_size: int = 224):
 class SaveCkptCallback(Callback):
     """Callback to save model checkpoint after each epoch using save_pretrained."""
 
-    def __init__(self, run_name, cfg, epoch_interval: int = 1):
+    def __init__(self, run_dir: Path, cfg, epoch_interval: int = 1):
         super().__init__()
-        self.run_name = run_name
+        self.run_dir = run_dir
         self.cfg = cfg
         self.epoch_interval = epoch_interval
 
@@ -49,7 +49,7 @@ class SaveCkptCallback(Callback):
     def _save(self, model, epoch):
         save_pretrained(
             model,
-            run_name=self.run_name,
+            output_dir=self.run_dir,
             config=self.cfg,
             filename=f'weights_epoch_{epoch}.pt',
         )
@@ -173,9 +173,9 @@ def run(cfg):
     ##       training       ##
     ##########################
 
-    run_id = cfg.get('subdir') or ''
+    run_name = cfg.run_name
     run_dir = Path(
-        swm.data.utils.get_cache_dir(sub_folder='checkpoints'), run_id
+        swm.data.utils.get_cache_dir(sub_folder='checkpoints'), run_name
     )
 
     logger = None
@@ -188,7 +188,7 @@ def run(cfg):
         OmegaConf.save(cfg, f)
 
     save_ckpt_callback = SaveCkptCallback(
-        run_name=cfg.output_model_name,
+        run_dir=run_dir,
         cfg=cfg.model,
         epoch_interval=1,
     )
@@ -201,7 +201,7 @@ def run(cfg):
         enable_checkpointing=True,
     )
 
-    ckpt_path = run_dir / f'{cfg.output_model_name}_weights.ckpt'
+    ckpt_path = run_dir / 'training_state.ckpt'
     manager = spt.Manager(
         trainer=trainer,
         module=world_model,

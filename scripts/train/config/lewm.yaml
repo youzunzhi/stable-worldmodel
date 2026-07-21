@@ -3,8 +3,7 @@ defaults:
   - launcher: local
   - data: pusht
 
-output_model_name: lewm
-subdir: ${hydra:job.id}
+run_name: ${hydra:job.id}
 
 num_workers: 6
 train_split: 0.9

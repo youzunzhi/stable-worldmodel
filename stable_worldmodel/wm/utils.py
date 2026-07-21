@@ -12,15 +12,23 @@ from stable_worldmodel.data import get_cache_dir, ensure_dir_exists
 
 def save_pretrained(
     model: torch.nn.Module,
-    run_name: str,
+    run_name: str | None = None,
     config: dict | None = None,
     config_key: str | None = None,
     filename: str = 'weights.pt',
     cache_dir: str = None,
+    output_dir: str | Path | None = None,
 ):
     from omegaconf import OmegaConf
 
-    ckpt_dir = get_cache_dir(cache_dir, sub_folder='checkpoints') / run_name
+    if output_dir is not None:
+        if run_name is not None:
+            raise ValueError('Pass output_dir or run_name, not both')
+        ckpt_dir = Path(output_dir)
+    else:
+        if run_name is None:
+            raise ValueError('output_dir or run_name is required')
+        ckpt_dir = get_cache_dir(cache_dir, sub_folder='checkpoints') / run_name
     ensure_dir_exists(ckpt_dir)
 
     checkpoint_path = ckpt_dir / filename
