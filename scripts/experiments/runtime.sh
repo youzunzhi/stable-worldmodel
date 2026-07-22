@@ -3,6 +3,7 @@ set -euo pipefail
 EXPERIMENTS_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 # shellcheck source=paths.env
 source "$EXPERIMENTS_DIR/paths.env"
+export PYTHONPATH="$REPO_ROOT${PYTHONPATH:+:$PYTHONPATH}"
 
 run_python() {
     local script_name=$1
