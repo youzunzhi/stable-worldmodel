@@ -1,5 +1,7 @@
 import argparse
+import os
 from pathlib import Path
+import sys
 
 from cli import add_experiment_arguments, validate_experiment_arguments
 
@@ -37,3 +39,36 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     args.checkpoint = checkpoint
     args.overrides = tuple(args.overrides)
     return args
+
+
+def build_eval_command(args: argparse.Namespace) -> list[str]:
+    """Build the upstream evaluation command without executing it."""
+    repo_root_value = os.environ.get('REPO_ROOT')
+    run_root_value = os.environ.get('RUN_ROOT')
+    if not repo_root_value:
+        raise RuntimeError('REPO_ROOT is not set')
+    if not run_root_value:
+        raise RuntimeError('RUN_ROOT is not set')
+
+    repo_root = Path(repo_root_value).resolve()
+    eval_script = repo_root / args.experiment.eval_script
+    if not eval_script.is_file():
+        raise FileNotFoundError(f'Evaluation script not found: {eval_script}')
+
+    output_dir = (
+        Path(run_root_value).resolve() / 'evaluations' / args.run_name
+    )
+    command = [
+        sys.executable,
+        str(eval_script),
+        *args.experiment.eval_defaults,
+        f'policy={args.checkpoint}',
+        f'eval.dataset_name={args.dataset}',
+        f'seed={args.seed}',
+        f'output.dir={output_dir}',
+        'output.filename=results.txt',
+    ]
+    if args.num_trajectories is not None:
+        command.append(f'eval.num_eval={args.num_trajectories}')
+    command.extend(args.overrides)
+    return command

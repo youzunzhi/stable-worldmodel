@@ -47,4 +47,5 @@ compile: false
 bf16: false
 
 output:
+  dir: null
   filename: pusht_results.txt

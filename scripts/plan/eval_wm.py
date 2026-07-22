@@ -134,13 +134,14 @@ def run(cfg: DictConfig):
     else:
         policy = swm.policy.RandomPolicy()
 
-    results_path = (
-        Path(
+    if cfg.output.dir:
+        results_path = Path(cfg.output.dir).expanduser()
+    elif cfg.policy != 'random':
+        results_path = Path(
             swm.data.utils.get_cache_dir(sub_folder='checkpoints'), cfg.policy
         ).parent
-        if cfg.policy != 'random'
-        else Path(__file__).parent
-    )
+    else:
+        results_path = Path(__file__).parent
 
     # sample the episodes and the starting indices
     episode_len = get_episodes_length(dataset, ep_indices)
