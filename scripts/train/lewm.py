@@ -55,6 +55,34 @@ class SaveCkptCallback(Callback):
         )
 
 
+class SaveTrainingStateCallback(Callback):
+    """Atomically save all state needed to resume training."""
+
+    def __init__(self, path: Path, data_generator: torch.Generator):
+        super().__init__()
+        self.path = path
+        self.data_generator = data_generator
+
+    def state_dict(self):
+        return {'data_generator_state': self.data_generator.get_state()}
+
+    def load_state_dict(self, state_dict):
+        self.data_generator.set_state(state_dict['data_generator_state'])
+
+    def on_train_epoch_end(self, trainer, pl_module):
+        if not trainer.is_global_zero:
+            return
+
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        partial = self.path.with_suffix(self.path.suffix + '.partial')
+        if partial.exists():
+            raise RuntimeError(
+                f'Refusing ambiguous partial training state: {partial}'
+            )
+        trainer.save_checkpoint(partial, weights_only=False)
+        os.replace(partial, self.path)
+
+
 def lejepa_forward(self, batch, stage, cfg):
     """encode observations, predict next states, compute losses."""
 
@@ -90,6 +118,8 @@ def lejepa_forward(self, batch, stage, cfg):
 
 @hydra.main(version_base=None, config_path='./config', config_name='lewm')
 def run(cfg):
+    pl.seed_everything(cfg.seed, workers=True)
+
     #########################
     ##       dataset       ##
     #########################
@@ -192,21 +222,29 @@ def run(cfg):
         cfg=cfg.model,
         epoch_interval=1,
     )
+    training_state_path = run_dir / 'training_state.ckpt'
+    callbacks = [
+        save_ckpt_callback,
+        SaveTrainingStateCallback(training_state_path, rnd_gen),
+    ]
 
     trainer = pl.Trainer(
         **cfg.trainer,
-        callbacks=[save_ckpt_callback],
+        callbacks=callbacks,
         num_sanity_val_steps=1,
         logger=logger,
         enable_checkpointing=True,
     )
 
-    ckpt_path = run_dir / 'training_state.ckpt'
     manager = spt.Manager(
         trainer=trainer,
         module=world_model,
         data=data_module,
-        ckpt_path=ckpt_path if ckpt_path.exists() else None,
+        seed=cfg.seed,
+        ckpt_path=(
+            training_state_path if training_state_path.exists() else None
+        ),
+        weights_only=False,
     )
 
     manager()
