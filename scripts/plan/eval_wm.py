@@ -64,6 +64,28 @@ def get_dataset(cfg, dataset_name):
     return dataset
 
 
+def prepare_results_path(cfg):
+    """Choose the output path and reserve explicit evaluation directories."""
+    if cfg.output.dir:
+        results_path = Path(cfg.output.dir).expanduser().resolve()
+        try:
+            results_path.mkdir(parents=True)
+        except FileExistsError as error:
+            raise FileExistsError(
+                f'Evaluation output directory already exists: {results_path}'
+            ) from error
+        return results_path
+
+    if cfg.policy != 'random':
+        results_path = Path(
+            swm.data.utils.get_cache_dir(sub_folder='checkpoints'), cfg.policy
+        ).parent
+    else:
+        results_path = Path(__file__).parent
+    results_path.mkdir(parents=True, exist_ok=True)
+    return results_path
+
+
 @hydra.main(version_base=None, config_path='./config', config_name='pusht')
 def run(cfg: DictConfig):
     """Run evaluation of dinowm vs random policy."""
@@ -71,6 +93,7 @@ def run(cfg: DictConfig):
         cfg.plan_config.horizon * cfg.plan_config.action_block
         <= cfg.eval.eval_budget
     ), 'Planning horizon must be smaller than or equal to eval_budget'
+    results_path = prepare_results_path(cfg)
 
     # create world environment
     cfg.world.max_episode_steps = 2 * cfg.eval.eval_budget
@@ -135,15 +158,6 @@ def run(cfg: DictConfig):
     else:
         policy = swm.policy.RandomPolicy()
 
-    if cfg.output.dir:
-        results_path = Path(cfg.output.dir).expanduser()
-    elif cfg.policy != 'random':
-        results_path = Path(
-            swm.data.utils.get_cache_dir(sub_folder='checkpoints'), cfg.policy
-        ).parent
-    else:
-        results_path = Path(__file__).parent
-
     # sample the episodes and the starting indices
     episode_len = get_episodes_length(dataset, ep_indices)
     max_start_idx = episode_len - cfg.eval.goal_offset_steps - 1
@@ -196,7 +210,6 @@ def run(cfg: DictConfig):
     policy.get_action = clipped_get_action
     world.set_policy(policy)
 
-    results_path.mkdir(parents=True, exist_ok=True)
     print(
         f'[eval] saving videos to {results_path.resolve()} '
         '(one env_{i}.mp4 per env)'
