@@ -1,5 +1,6 @@
 """Script to evaluate a World Model using MPC on a dataset of episodes."""
 
+import json
 import os
 
 os.environ['MUJOCO_GL'] = 'egl'
@@ -238,16 +239,49 @@ def run(cfg: DictConfig):
     results_path = results_path / cfg.output.filename
     results_path.parent.mkdir(parents=True, exist_ok=True)
 
-    with results_path.open('a') as f:
-        f.write('\n')  # separate from previous runs
+    with results_path.open('x') as stream:
+        stream.write('==== CONFIG ====\n')
+        stream.write(OmegaConf.to_yaml(cfg))
+        stream.write('\n')
 
-        f.write('==== CONFIG ====\n')
-        f.write(OmegaConf.to_yaml(cfg))
-        f.write('\n')
+        stream.write('==== RESULTS ====\n')
+        stream.write(f'metrics: {metrics}\n')
+        stream.write(f'evaluation_time: {end_time - start_time} seconds\n')
 
-        f.write('==== RESULTS ====\n')
-        f.write(f'metrics: {metrics}\n')
-        f.write(f'evaluation_time: {end_time - start_time} seconds\n')
+    def jsonable(value):
+        if isinstance(value, dict):
+            return {str(key): jsonable(item) for key, item in value.items()}
+        if isinstance(value, (list, tuple)):
+            return [jsonable(item) for item in value]
+        if isinstance(value, np.ndarray):
+            return value.tolist()
+        if isinstance(value, np.generic):
+            return value.item()
+        return value
+
+    completed = len(metrics['episode_successes'])
+    structured = {
+        'checkpoint': str(Path(cfg.policy).resolve()),
+        'dataset': str(Path(cfg.eval.dataset_name).resolve()),
+        'seed': int(cfg.seed),
+        'requested_trajectories': int(cfg.eval.num_eval),
+        'completed_trajectories': completed,
+        'sampled_flat_indices': random_episode_indices.tolist(),
+        'sampled_episode_indices': eval_episodes.tolist(),
+        'sampled_start_steps': eval_start_idx.tolist(),
+        'metrics': jsonable(metrics),
+        'evaluation_time_seconds': end_time - start_time,
+        'evaluation_time_per_trajectory_seconds': (
+            (end_time - start_time) / completed
+        ),
+        'resolved_config': OmegaConf.to_container(cfg, resolve=True),
+    }
+    structured_path = results_path.with_suffix(results_path.suffix + '.json')
+    with structured_path.open('x') as stream:
+        json.dump(structured, stream, indent=2, sort_keys=True)
+        stream.write('\n')
+
+    world.close()
 
 
 if __name__ == '__main__':
