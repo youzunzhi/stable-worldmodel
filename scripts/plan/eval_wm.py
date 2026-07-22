@@ -86,6 +86,36 @@ def prepare_results_path(cfg):
     return results_path
 
 
+def sample_evaluation_starts(
+    dataset, episode_ids, goal_offset_steps, num_samples, seed
+):
+    """Sample dataset rows whose future goal remains in the same episode."""
+    episode_lengths = get_episodes_length(dataset, episode_ids)
+    max_start_steps = episode_lengths - goal_offset_steps - 1
+    max_start_by_episode = dict(zip(episode_ids, max_start_steps))
+
+    episode_column = episode_col(dataset)
+    row_episode_ids = dataset.get_col_data(episode_column)
+    row_max_start_steps = np.array(
+        [max_start_by_episode[episode_id] for episode_id in row_episode_ids]
+    )
+    valid_mask = dataset.get_col_data('step_idx') <= row_max_start_steps
+    valid_indices = np.flatnonzero(valid_mask)
+    print(len(valid_indices), 'valid starting points found for evaluation.')
+
+    if len(valid_indices) < num_samples:
+        raise ValueError(
+            f'Requested {num_samples} trajectories, but the dataset has only '
+            f'{len(valid_indices)} valid starting points.'
+        )
+
+    generator = np.random.default_rng(seed)
+    sampled_positions = generator.choice(
+        len(valid_indices), size=num_samples, replace=False
+    )
+    return np.sort(valid_indices[sampled_positions])
+
+
 @hydra.main(version_base=None, config_path='./config', config_name='pusht')
 def run(cfg: DictConfig):
     """Run evaluation of dinowm vs random policy."""
@@ -158,31 +188,13 @@ def run(cfg: DictConfig):
     else:
         policy = swm.policy.RandomPolicy()
 
-    # sample the episodes and the starting indices
-    episode_len = get_episodes_length(dataset, ep_indices)
-    max_start_idx = episode_len - cfg.eval.goal_offset_steps - 1
-    max_start_idx_dict = {
-        ep_id: max_start_idx[i] for i, ep_id in enumerate(ep_indices)
-    }
-    # Map each dataset row’s episode_idx to its max_start_idx
-    col_name = episode_col(dataset)
-    max_start_per_row = np.array(
-        [max_start_idx_dict[ep_id] for ep_id in dataset.get_col_data(col_name)]
+    random_episode_indices = sample_evaluation_starts(
+        dataset=dataset,
+        episode_ids=ep_indices,
+        goal_offset_steps=cfg.eval.goal_offset_steps,
+        num_samples=cfg.eval.num_eval,
+        seed=cfg.seed,
     )
-
-    # remove all the lines of dataset for which dataset['step_idx'] > max_start_per_row
-    valid_mask = dataset.get_col_data('step_idx') <= max_start_per_row
-    valid_indices = np.nonzero(valid_mask)[0]
-    print(valid_mask.sum(), 'valid starting points found for evaluation.')
-
-    g = np.random.default_rng(cfg.seed)
-    random_episode_indices = g.choice(
-        len(valid_indices) - 1, size=cfg.eval.num_eval, replace=False
-    )
-
-    # sort increasingly to avoid issues with HDF5Dataset indexing
-    random_episode_indices = np.sort(valid_indices[random_episode_indices])
-
     print(random_episode_indices)
 
     # Index the full index columns directly: the Lance reader excludes
@@ -190,11 +202,6 @@ def run(cfg: DictConfig):
     # exposes them (and both are already cached from the checks above).
     eval_episodes = dataset.get_col_data(col_name)[random_episode_indices]
     eval_start_idx = dataset.get_col_data('step_idx')[random_episode_indices]
-
-    if len(eval_episodes) < cfg.eval.num_eval:
-        raise ValueError(
-            'Not enough episodes with sufficient length for evaluation.'
-        )
 
     # The planner operates in normalized dataset coordinates and may produce
     # values outside the environment's declared action space after inverse
