@@ -182,6 +182,18 @@ def run(cfg: DictConfig):
             'Not enough episodes with sufficient length for evaluation.'
         )
 
+    # The planner operates in normalized dataset coordinates and may produce
+    # values outside the environment's declared action space after inverse
+    # normalization. Clip only the final action sent to the environment.
+    original_get_action = policy.get_action
+    action_low = world.envs.single_action_space.low
+    action_high = world.envs.single_action_space.high
+
+    def clipped_get_action(info_dict, **kwargs):
+        action = original_get_action(info_dict, **kwargs)
+        return np.clip(action, action_low, action_high)
+
+    policy.get_action = clipped_get_action
     world.set_policy(policy)
 
     results_path.mkdir(parents=True, exist_ok=True)
