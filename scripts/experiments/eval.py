@@ -1,6 +1,7 @@
 import argparse
 import os
 from pathlib import Path
+import subprocess
 import sys
 
 from cli import add_experiment_arguments, validate_experiment_arguments
@@ -72,3 +73,27 @@ def build_eval_command(args: argparse.Namespace) -> list[str]:
         command.append(f'eval.num_eval={args.num_trajectories}')
     command.extend(args.overrides)
     return command
+
+
+def run_evaluation(args: argparse.Namespace) -> None:
+    """Run evaluation in the foreground using the experiment output root."""
+    run_root_value = os.environ.get('RUN_ROOT')
+    if not run_root_value:
+        raise RuntimeError('RUN_ROOT is not set')
+
+    environment = os.environ.copy()
+    environment['STABLEWM_HOME'] = str(Path(run_root_value).resolve())
+    subprocess.run(
+        build_eval_command(args),
+        cwd=os.environ['REPO_ROOT'],
+        env=environment,
+        check=True,
+    )
+
+
+def main() -> None:
+    run_evaluation(parse_args())
+
+
+if __name__ == '__main__':
+    main()
