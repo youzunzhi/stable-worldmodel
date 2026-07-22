@@ -1,6 +1,8 @@
 import argparse
 import os
 from pathlib import Path
+import re
+import subprocess
 import sys
 
 from registry import get_experiment
@@ -27,8 +29,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
     if args.max_steps is not None and args.max_steps < 1:
         parser.error('--max-steps must be at least 1')
-    if not args.run_name.strip():
-        parser.error('Run name cannot be empty')
+    if not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._-]*', args.run_name):
+        parser.error(
+            'Run name must contain only letters, digits, dot, dash, '
+            'or underscore'
+        )
 
     data_root = os.environ.get('DATA_ROOT')
     if not data_root:
@@ -43,7 +48,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     return args
 
 
-def build_command(args: argparse.Namespace) -> list[str]:
+def build_train_command(args: argparse.Namespace) -> list[str]:
     """Build the upstream training command without executing it."""
     repo_root_value = os.environ.get('REPO_ROOT')
     if not repo_root_value:
@@ -72,3 +77,32 @@ def build_command(args: argparse.Namespace) -> list[str]:
         )
     command.extend(args.overrides)
     return command
+
+
+def run_training(args: argparse.Namespace) -> None:
+    """Run training in the foreground using an isolated runtime cache."""
+    run_root_value = os.environ.get('RUN_ROOT')
+    if not run_root_value:
+        raise RuntimeError('RUN_ROOT is not set')
+
+    run_root = Path(run_root_value).resolve()
+    environment = os.environ.copy()
+    environment['STABLEWM_HOME'] = str(run_root)
+    environment['SPT_CACHE_DIR'] = str(
+        run_root / 'spt_cache' / args.run_name
+    )
+
+    subprocess.run(
+        build_train_command(args),
+        cwd=os.environ['REPO_ROOT'],
+        env=environment,
+        check=True,
+    )
+
+
+def main() -> None:
+    run_training(parse_args())
+
+
+if __name__ == '__main__':
+    main()
