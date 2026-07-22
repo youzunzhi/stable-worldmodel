@@ -1,19 +1,16 @@
 import argparse
 import os
 from pathlib import Path
-import re
 import subprocess
 import sys
 
-from registry import get_experiment
+from cli import add_experiment_arguments, validate_experiment_arguments
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description='Train a world model.')
-    parser.add_argument('--model', required=True)
-    parser.add_argument('--task', required=True)
+    add_experiment_arguments(parser)
     parser.add_argument('--seed', required=True, type=int)
-    parser.add_argument('--run-name', required=True)
     parser.add_argument(
         '--max-steps', type=int, help='Maximum optimizer steps.'
     )
@@ -21,24 +18,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         'overrides', nargs='*', help='Extra Hydra overrides.'
     )
     args = parser.parse_args(argv)
-
-    try:
-        experiment = get_experiment(args.model, args.task)
-    except ValueError as error:
-        parser.error(str(error))
+    experiment, data_root = validate_experiment_arguments(parser, args)
 
     if args.max_steps is not None and args.max_steps < 1:
         parser.error('--max-steps must be at least 1')
-    if not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._-]*', args.run_name):
-        parser.error(
-            'Run name must contain only letters, digits, dot, dash, '
-            'or underscore'
-        )
 
-    data_root = os.environ.get('DATA_ROOT')
-    if not data_root:
-        parser.error('DATA_ROOT is not set')
-    dataset = (Path(data_root) / experiment.train_dataset).resolve()
+    dataset = data_root / experiment.train_dataset
     if not dataset.exists():
         parser.error(f'Training dataset does not exist: {dataset}')
 
