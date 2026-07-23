@@ -8,6 +8,7 @@ the fixed start-goal manifest and external task-completion predicates.
 
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 
@@ -53,3 +54,31 @@ def load_manifest(path: str | Path) -> dict:
     if any(pair.get('initial_success') for pair in pairs):
         raise ValueError('CLEAR robust manifests cannot contain pre-solved pairs')
     return manifest
+
+
+def manifest_sha256(path: str | Path) -> str:
+    return hashlib.sha256(Path(path).expanduser().resolve().read_bytes()).hexdigest()
+
+
+def metadata_fingerprint(path: str | Path) -> str:
+    """Match CLEAR-LeWM's metadata-only HDF5 fingerprint."""
+    import h5py
+
+    dataset_path = Path(path)
+    with h5py.File(dataset_path, 'r') as dataset:
+        schema = []
+        for key in sorted(dataset.keys()):
+            value = dataset[key]
+            if isinstance(value, h5py.Dataset):
+                schema.append(
+                    {
+                        'key': key,
+                        'shape': list(value.shape),
+                        'dtype': str(value.dtype),
+                    }
+                )
+    payload = {'size_bytes': dataset_path.stat().st_size, 'schema': schema}
+    encoded = json.dumps(
+        payload, sort_keys=True, separators=(',', ':')
+    ).encode()
+    return hashlib.sha256(encoded).hexdigest()
