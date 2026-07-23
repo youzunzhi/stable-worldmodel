@@ -573,6 +573,30 @@ def test_worldmodel_policy_selective_replan():
     assert torch.equal(policy._next_init[1], next_init_before[1])
 
 
+def test_worldmodel_policy_excludes_terminated_envs_from_planning():
+    """Terminated envs do not consume CEM planning work."""
+    solver = MockSolver()
+    config = PlanConfig(horizon=2, receding_horizon=1)
+    policy = WorldModelPolicy(solver=solver, config=config)
+
+    mock_env = MagicMock()
+    mock_env.num_envs = 2
+    mock_env.action_space = gym_spaces.Box(low=-1, high=1, shape=(2, 2))
+    mock_env.single_action_space = gym_spaces.Box(low=-1, high=1, shape=(2,))
+    policy.set_env(mock_env)
+
+    info = {
+        'pixels': np.zeros((2, 1, 8, 8, 3), dtype=np.float32),
+        'goal': np.zeros((2, 1, 8, 8, 3), dtype=np.float32),
+        'terminated': np.array([True, False]),
+    }
+    action = policy.get_action(info)
+
+    assert solver.last_batch_size == 1
+    assert np.isnan(action[0]).all()
+    assert np.isfinite(action[1]).all()
+
+
 def test_worldmodel_policy_no_warm_start():
     """Test WorldModelPolicy without warm start."""
     solver = MockSolver()
