@@ -12,6 +12,15 @@ PUSHT_EVAL_DATASET = (
     / 'pusht_expert_train.h5'
 )
 
+CUBE_DATA_REVISION = '02a19a67a0dc8c9d6215f89c19e0a597691e152a'
+# Cube ships as one immutable HDF5 dataset, so both entrypoints use the
+# same pinned artifact rather than a derived training conversion.
+CUBE_DATASET = (
+    Path('hf/datasets/quentinll--lewm-cube')
+    / CUBE_DATA_REVISION
+    / 'cube_single_expert.h5'
+)
+
 
 @dataclass(frozen=True)
 class ExperimentSpec:
@@ -31,6 +40,17 @@ EXPERIMENTS = {
         eval_dataset=PUSHT_EVAL_DATASET,
         train_defaults=('data=pusht', 'launcher=local'),
         eval_defaults=('--config-name=pusht',),
+    ),
+    ('lewm', 'cube'): ExperimentSpec(
+        train_script=Path('scripts/train/lewm.py'),
+        eval_script=Path('scripts/plan/eval_wm.py'),
+        train_dataset=CUBE_DATASET,
+        eval_dataset=CUBE_DATASET,
+        train_defaults=('data=ogb', 'launcher=local'),
+        eval_defaults=(
+            '--config-name=cube',
+            'solver.n_steps=10',
+        ),
     ),
 }
 

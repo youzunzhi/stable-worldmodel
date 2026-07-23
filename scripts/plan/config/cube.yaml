@@ -56,4 +56,5 @@ eval:
           value: goal_privileged_block_0_quat
 
 output:
+  dir: null
   filename: ogb_cube_results.txt
