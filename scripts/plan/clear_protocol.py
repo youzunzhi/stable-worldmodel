@@ -12,6 +12,8 @@ import hashlib
 import json
 from pathlib import Path
 
+import numpy as np
+
 
 CLEAR_LEWM_REVISION = 'f06b66b358f5e42aa582e4a5599d3356c29edcf4'
 CLEAR_MANIFEST_SCHEMA = 'clear-lewm-manifest-v1'
@@ -82,3 +84,43 @@ def metadata_fingerprint(path: str | Path) -> str:
         payload, sort_keys=True, separators=(',', ':')
     ).encode()
     return hashlib.sha256(encoded).hexdigest()
+
+
+def validate_dataset(dataset, manifest: dict) -> Path:
+    """Verify the HDF5 identity recorded by the manifest."""
+    dataset_path = Path(dataset.h5_path).resolve()
+    expected = manifest['dataset']['fingerprint']
+    if expected['kind'] != 'metadata-sha256':
+        raise ValueError(
+            f"Unsupported CLEAR dataset fingerprint kind: {expected['kind']}"
+        )
+    actual = metadata_fingerprint(dataset_path)
+    if actual != expected['value']:
+        raise ValueError(
+            'Evaluation dataset does not match the CLEAR manifest: '
+            f"{actual} != {expected['value']}"
+        )
+    return dataset_path
+
+
+def resolve_manifest_pairs(
+    dataset, manifest: dict
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Resolve fixed rows and verify their episode/step identity."""
+    rows = np.asarray(
+        [pair['start_row'] for pair in manifest['pairs']], dtype=np.int64
+    )
+    episode_key = manifest['dataset']['episode_column']
+    episodes = np.asarray(dataset.get_col_data(episode_key))[rows]
+    steps = np.asarray(dataset.get_col_data('step_idx'))[rows]
+    expected_episodes = np.asarray(
+        [pair['episode_id'] for pair in manifest['pairs']]
+    )
+    expected_steps = np.asarray(
+        [pair['start_step'] for pair in manifest['pairs']]
+    )
+    if not np.array_equal(episodes, expected_episodes):
+        raise ValueError('CLEAR manifest episode IDs do not match dataset rows')
+    if not np.array_equal(steps, expected_steps):
+        raise ValueError('CLEAR manifest start steps do not match dataset rows')
+    return rows, episodes, steps
