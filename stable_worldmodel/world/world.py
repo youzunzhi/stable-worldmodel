@@ -359,6 +359,7 @@ class World:
         mode: str = 'auto',
         on_step=None,
         on_done=None,
+        render_pixels: str = 'always',
     ) -> None:
         """Drive the policy. Thin wrapper around :meth:`_run_iter` that
         invokes ``on_done(env_idx, ep_idx, world)`` for each completion."""
@@ -369,6 +370,7 @@ class World:
             options=options,
             mode=mode,
             on_step=on_step,
+            render_pixels=render_pixels,
         ):
             if on_done:
                 on_done(env_idx, ep_count, self)
@@ -381,12 +383,15 @@ class World:
         options: dict | None = None,
         mode: str = 'auto',
         on_step=None,
+        render_pixels: str = 'always',
     ):
         """Drive the policy and yield ``(env_idx, ep_count)`` on each
         episode completion. Letting callers consume completions as a
         generator is what makes streaming writes possible without threading.
         """
         assert mode in RESET_MODES, f'reset_mode must be one of {RESET_MODES}'
+        if render_pixels not in ('always', 'policy'):
+            raise ValueError("render_pixels must be 'always' or 'policy'")
 
         if self.policy is None:
             raise RuntimeError('No policy set.')
@@ -402,6 +407,14 @@ class World:
 
         for t in range(max_steps if max_steps is not None else 2**63):
             actions = self._get_actions()
+            render_mask = None
+            if render_pixels == 'policy':
+                needs_pixels = getattr(
+                    self.policy, 'needs_pixels_after_action', None
+                )
+                if callable(needs_pixels):
+                    render_mask = needs_pixels()
+            self.envs.set_render_on_step(render_mask)
 
             mask = alive if not alive.all() else None
             _, self.rewards, self.terminateds, self.truncateds, self.infos = (
@@ -479,6 +492,7 @@ class World:
             mode=mode,
             on_step=on_step,
             on_done=on_done,
+            render_pixels='always' if video else 'policy',
         )
 
         results['success_rate'] = (
@@ -547,7 +561,12 @@ class World:
                     frame = f[-1] if f.ndim > 3 else f
                     frames[i].append(np.asarray(frame).copy())
 
-        self._run(max_steps=eval_budget, mode=mode, on_step=on_step)
+        self._run(
+            max_steps=eval_budget,
+            mode=mode,
+            on_step=on_step,
+            render_pixels='always' if video else 'policy',
+        )
 
         results['success_rate'] = (
             float(results['episode_successes'].sum()) / n * 100.0
