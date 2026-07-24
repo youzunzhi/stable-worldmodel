@@ -17,6 +17,12 @@ from sklearn import preprocessing
 from torchvision.transforms import v2 as transforms
 import stable_worldmodel as swm
 
+from clear_protocol import (
+    load_manifest,
+    seed_runtime,
+    validate_solver_config,
+)
+
 
 def img_transform(cfg, dtype=torch.float32):
     transform = transforms.Compose(
@@ -119,6 +125,27 @@ def sample_evaluation_starts(
 @hydra.main(version_base=None, config_path='./config', config_name='pusht')
 def run(cfg: DictConfig):
     """Run evaluation of dinowm vs random policy."""
+    clear_manifest_path = cfg.eval.get('manifest')
+    clear_manifest = (
+        load_manifest(clear_manifest_path) if clear_manifest_path else None
+    )
+    if clear_manifest is not None:
+        expected_env = {
+            'pusht': 'swm/PushT-v1',
+            'cube': 'swm/OGBCube-v0',
+        }[clear_manifest['task']]
+        if cfg.world.env_name != expected_env:
+            raise ValueError(
+                f"CLEAR manifest task {clear_manifest['task']!r} requires "
+                f'{expected_env}, got {cfg.world.env_name}'
+            )
+        protocol = clear_manifest['protocol']
+        cfg.eval.num_eval = len(clear_manifest['pairs'])
+        cfg.eval.goal_offset_steps = int(protocol['goal_offset'])
+        cfg.eval.eval_budget = int(protocol['eval_budget'])
+        validate_solver_config(cfg.solver)
+        seed_runtime(int(cfg.seed))
+
     assert (
         cfg.plan_config.horizon * cfg.plan_config.action_block
         <= cfg.eval.eval_budget
