@@ -320,6 +320,7 @@ class WorldModelPolicy(BasePolicy):
         self.transform = transform or {}
         self._action_buffer: list[deque[torch.Tensor]] | None = None
         self._next_init: torch.Tensor | None = None
+        self._last_dead: np.ndarray | None = None
 
     @property
     def flatten_receding_horizon(self) -> int:
@@ -340,6 +341,7 @@ class WorldModelPolicy(BasePolicy):
         self._action_buffer = [
             deque(maxlen=self.flatten_receding_horizon) for _ in range(n_envs)
         ]
+        self._last_dead = np.zeros(n_envs, dtype=bool)
 
         assert isinstance(self.solver, Solver), (
             'Solver must implement the Solver protocol'
@@ -357,13 +359,15 @@ class WorldModelPolicy(BasePolicy):
         """
         assert hasattr(self, 'env'), 'Environment not set for the policy'
 
-        info_dict = self._prepare_info(info_dict)
         n_envs = self.env.num_envs
 
-        needs_flush = info_dict.pop('_needs_flush', None)
+        needs_flush = info_dict.get('_needs_flush')
         if needs_flush is not None:
+            needs_flush = np.asarray(needs_flush, dtype=bool).reshape(
+                n_envs, -1
+            )
             for i in range(n_envs):
-                if needs_flush[i]:
+                if needs_flush[i].any():
                     self._action_buffer[i].clear()
                     if self._next_init is not None:
                         self._next_init[i] = 0
@@ -371,9 +375,12 @@ class WorldModelPolicy(BasePolicy):
         terminated = info_dict.get('terminated')
         dead = (
             np.asarray(terminated, dtype=bool)
+            .reshape(n_envs, -1)
+            .any(axis=1)
             if terminated is not None
             else np.zeros(n_envs, dtype=bool)
         )
+        self._last_dead = dead
 
         replan_idx = [
             i
@@ -385,6 +392,8 @@ class WorldModelPolicy(BasePolicy):
             idx_tensor = torch.as_tensor(replan_idx, dtype=torch.long)
             sliced = {}
             for k, v in info_dict.items():
+                if k == '_needs_flush':
+                    continue
                 if torch.is_tensor(v):
                     sliced[k] = v[idx_tensor]
                 elif isinstance(v, np.ndarray):
@@ -393,6 +402,7 @@ class WorldModelPolicy(BasePolicy):
                     sliced[k] = [v[i] for i in replan_idx]
                 else:
                     sliced[k] = v
+            sliced = self._prepare_info(sliced)
 
             sliced_init = (
                 self._next_init[idx_tensor]
@@ -443,6 +453,28 @@ class WorldModelPolicy(BasePolicy):
             action = self.process['action'].inverse_transform(action)
 
         return action
+
+    def needs_pixels_after_action(self) -> np.ndarray:
+        """Return envs whose next observation will be used for replanning.
+
+        This is queried after :meth:`get_action`, once the selected action has
+        been popped from each buffer. Environments with a non-empty buffer can
+        safely reuse their previous pixels on the following step.
+        """
+        if self._action_buffer is None:
+            raise RuntimeError('Environment not set for the policy')
+        dead = (
+            self._last_dead
+            if self._last_dead is not None
+            else np.zeros(len(self._action_buffer), dtype=bool)
+        )
+        return np.asarray(
+            [
+                len(action_buffer) == 0 and not dead[i]
+                for i, action_buffer in enumerate(self._action_buffer)
+            ],
+            dtype=bool,
+        )
 
 
 # Alias for backward compatibility and type hinting
