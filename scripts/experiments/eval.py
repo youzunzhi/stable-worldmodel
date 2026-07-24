@@ -10,10 +10,21 @@ from cli import add_experiment_arguments, validate_experiment_arguments
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description='Evaluate a world model.')
     add_experiment_arguments(parser)
-    parser.add_argument('--checkpoint', required=True, type=Path)
+    policy = parser.add_mutually_exclusive_group(required=True)
+    policy.add_argument('--checkpoint', type=Path)
+    policy.add_argument(
+        '--random',
+        action='store_true',
+        help='Evaluate the deterministic random-policy baseline.',
+    )
     parser.add_argument('--seed', required=True, type=int)
     parser.add_argument(
         '--num-trajectories', type=int, help='Number of trajectories.'
+    )
+    parser.add_argument(
+        '--manifest',
+        type=Path,
+        help='Fixed CLEAR-LeWM manifest; its complete pair list is evaluated.',
     )
     parser.add_argument(
         'overrides', nargs='*', help='Extra Hydra overrides.'
@@ -23,21 +34,34 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
     if args.num_trajectories is not None and args.num_trajectories < 1:
         parser.error('--num-trajectories must be at least 1')
+    if args.manifest is not None and args.num_trajectories is not None:
+        parser.error('--manifest cannot be combined with --num-trajectories')
 
     dataset = data_root / experiment.eval_dataset
     if not dataset.is_file():
         parser.error(f'Evaluation dataset does not exist: {dataset}')
 
-    checkpoint = args.checkpoint.expanduser().resolve()
-    if checkpoint.suffix != '.pt' or not checkpoint.is_file():
-        parser.error(f'Checkpoint must be an existing .pt file: {checkpoint}')
-    config = checkpoint.parent / 'config.json'
-    if not config.is_file():
-        parser.error(f'Checkpoint config does not exist: {config}')
+    if args.checkpoint is not None:
+        checkpoint = args.checkpoint.expanduser().resolve()
+        if checkpoint.suffix != '.pt' or not checkpoint.is_file():
+            parser.error(
+                f'Checkpoint must be an existing .pt file: {checkpoint}'
+            )
+        config = checkpoint.parent / 'config.json'
+        if not config.is_file():
+            parser.error(f'Checkpoint config does not exist: {config}')
+        args.checkpoint = checkpoint
+
+    if args.manifest is not None:
+        manifest = args.manifest.expanduser().resolve()
+        if manifest.suffix != '.json' or not manifest.is_file():
+            parser.error(
+                f'Manifest must be an existing .json file: {manifest}'
+            )
+        args.manifest = manifest
 
     args.experiment = experiment
     args.dataset = dataset
-    args.checkpoint = checkpoint
     args.overrides = tuple(args.overrides)
     return args
 
@@ -63,12 +87,22 @@ def build_eval_command(args: argparse.Namespace) -> list[str]:
         sys.executable,
         str(eval_script),
         *args.experiment.eval_defaults,
-        f'policy={args.checkpoint}',
+        f'policy={args.checkpoint if args.checkpoint else "random"}',
         f'eval.dataset_name={args.dataset}',
         f'seed={args.seed}',
         f'output.dir={output_dir}',
         'output.filename=results.txt',
     ]
+    if args.manifest is not None:
+        command.append(f'eval.manifest={args.manifest}')
+        command.extend(
+            (
+                'solver.batch_size=1',
+                'solver.num_samples=300',
+                'solver.n_steps=30',
+                'solver.topk=30',
+            )
+        )
     if args.num_trajectories is not None:
         command.append(f'eval.num_eval={args.num_trajectories}')
     command.extend(args.overrides)
