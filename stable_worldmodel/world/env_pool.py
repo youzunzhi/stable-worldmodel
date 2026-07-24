@@ -141,6 +141,32 @@ class EnvPool:
 
         return None, rewards, terminateds, truncateds, self._stacked_infos
 
+    def set_render_on_step(self, mask: np.ndarray | None = None) -> None:
+        """Select envs that should render a fresh pixel observation on step.
+
+        Environments without a compatible pixel wrapper are left unchanged.
+        ``None`` restores fresh rendering for every environment.
+        """
+        enabled = (
+            np.ones(self.num_envs, dtype=bool)
+            if mask is None
+            else np.asarray(mask, dtype=bool)
+        )
+        if enabled.shape != (self.num_envs,):
+            raise ValueError(
+                f'render mask must have shape ({self.num_envs},), '
+                f'got {enabled.shape}'
+            )
+
+        for i, env in enumerate(self.envs):
+            wrapper = env
+            while wrapper is not None:
+                setter = type(wrapper).__dict__.get('set_render_on_step')
+                if setter is not None:
+                    setter(wrapper, bool(enabled[i]))
+                    break
+                wrapper = getattr(wrapper, 'env', None)
+
     def close(self):
         """Close every env in the pool."""
         for env in self.envs:

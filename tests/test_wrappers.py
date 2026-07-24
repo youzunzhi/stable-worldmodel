@@ -1264,6 +1264,36 @@ def test_add_pixels_wrapper_preserves_existing_info(minimal_env):
     assert 'render_time' in result_info
 
 
+def test_add_pixels_wrapper_can_reuse_cached_pixels(minimal_env):
+    """Suppressed step rendering reuses reset pixels until re-enabled."""
+    import numpy as np
+
+    obs = np.array([1, 2, 3])
+    first = np.full((16, 16, 3), 10, dtype=np.uint8)
+    second = np.full((16, 16, 3), 20, dtype=np.uint8)
+    minimal_env.reset.return_value = (obs, {})
+    minimal_env.step.return_value = (obs, 0.0, False, False, {})
+    minimal_env.render = MagicMock(side_effect=[first, second])
+    minimal_env.unwrapped = minimal_env
+
+    wrapped_env = wrapper.AddPixelsWrapper(
+        minimal_env, pixels_shape=(16, 16)
+    )
+    _, reset_info = wrapped_env.reset()
+    wrapped_env.set_render_on_step(False)
+    *_, cached_info = wrapped_env.step(0.0)
+
+    assert minimal_env.render.call_count == 1
+    assert cached_info['render_time'] == 0.0
+    assert np.array_equal(cached_info['pixels'], reset_info['pixels'])
+
+    wrapped_env.set_render_on_step(True)
+    *_, fresh_info = wrapped_env.step(0.0)
+
+    assert minimal_env.render.call_count == 2
+    assert np.array_equal(fresh_info['pixels'], second)
+
+
 ############################
 ## test ResizeGoalWrapper ##
 ############################
