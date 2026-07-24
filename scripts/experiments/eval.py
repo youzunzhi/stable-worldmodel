@@ -27,6 +27,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help='Fixed CLEAR-LeWM manifest; its complete pair list is evaluated.',
     )
     parser.add_argument(
+        '--no-video',
+        action='store_true',
+        help='Disable evaluation video recording while keeping result files.',
+    )
+    parser.add_argument(
         'overrides', nargs='*', help='Extra Hydra overrides.'
     )
     args = parser.parse_args(argv)
@@ -105,6 +110,8 @@ def build_eval_command(args: argparse.Namespace) -> list[str]:
         )
     if args.num_trajectories is not None:
         command.append(f'eval.num_eval={args.num_trajectories}')
+    if args.no_video:
+        command.append('eval.video=false')
     command.extend(args.overrides)
     return command
 

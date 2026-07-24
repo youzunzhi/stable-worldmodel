@@ -264,10 +264,14 @@ def run(cfg: DictConfig):
     policy.get_action = clipped_get_action
     world.set_policy(policy)
 
-    print(
-        f'[eval] saving videos to {results_path.resolve()} '
-        '(one env_{i}.mp4 per env)'
-    )
+    video_path = results_path if cfg.eval.video else None
+    if video_path is None:
+        print('[eval] video output disabled')
+    else:
+        print(
+            f'[eval] saving videos to {video_path.resolve()} '
+            '(one env_{i}.mp4 per env)'
+        )
 
     autocast_ctx = torch.autocast(
         device_type='cuda',
@@ -293,7 +297,7 @@ def run(cfg: DictConfig):
                 callables=OmegaConf.to_container(
                     cfg.eval.get('callables'), resolve=True
                 ),
-                video=results_path,
+                video=video_path,
             )
         print('Warmup done.')
 
@@ -308,12 +312,13 @@ def run(cfg: DictConfig):
             callables=OmegaConf.to_container(
                 cfg.eval.get('callables'), resolve=True
             ),
-            video=results_path,
+            video=video_path,
         )
     end_time = time.time()
 
     print(metrics)
-    print(f'[eval] videos saved to {results_path.resolve()}')
+    if video_path is not None:
+        print(f'[eval] videos saved to {video_path.resolve()}')
 
     results_path = results_path / cfg.output.filename
     results_path.parent.mkdir(parents=True, exist_ok=True)

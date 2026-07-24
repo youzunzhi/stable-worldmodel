@@ -37,16 +37,19 @@ Verify the four manifest hashes against `clear_eval.json` before evaluation.
 scripts/experiments/eval.sh \
   --model lewm --task pusht \
   --run-name clear-pusht-strict-random-seed42 \
-  --random --seed 42 \
+  --random --seed 42 --no-video \
   --manifest /path/to/CLEAR-LeWM/manifests/v0.3/pusht/strict-seed42-n100.json
 
 scripts/experiments/eval.sh \
   --model lewm --task pusht \
   --run-name clear-pusht-strict-official-seed42 \
-  --checkpoint /path/to/pusht/weights.pt --seed 42 \
+  --checkpoint /path/to/pusht/weights.pt --seed 42 --no-video \
   --manifest /path/to/CLEAR-LeWM/manifests/v0.3/pusht/strict-seed42-n100.json
 ```
 
 Run the same pair for `moderate` and for `cube`. Each result JSON records the
 manifest SHA-256, embedded criterion, exact pair rows, resolved config,
 checkpoint and dataset paths, per-episode outcomes, and runtime duration.
+
+Omit `--no-video` when rollout videos are needed. The flag affects only video
+collection and encoding; metrics and structured result files are still saved.

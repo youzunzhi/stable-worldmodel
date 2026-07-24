@@ -34,6 +34,7 @@ eval:
   num_eval: 50
   goal_offset_steps: 25
   eval_budget: 50
+  video: true
   # Optional fixed CLEAR-LeWM v0.3 manifest. When set, its pair list and
   # task-semantic success criterion replace random row sampling.
   manifest: null
