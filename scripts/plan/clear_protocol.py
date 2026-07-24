@@ -246,3 +246,63 @@ def _install_pusht_success(world, protocol: dict) -> None:
 
     for wrapped in world.envs.envs:
         patch_environment(wrapped.unwrapped)
+
+
+def _install_cube_success(world, protocol: dict) -> None:
+    def patch_environment(env) -> None:
+        original_post_step = env.post_step
+        original_set_target = env.set_target_pos
+        env._clear_lewm_hold_count = 0
+
+        def set_target_pos(self, cube_id, target_pos, target_quat=None):
+            result = original_set_target(cube_id, target_pos, target_quat)
+            self._clear_lewm_hold_count = 0
+            self._success = False
+            return result
+
+        def post_step(self):
+            original_post_step()
+            qpos = np.asarray(self._data.joint('object_joint_0').qpos)
+            target_id = self._cube_target_mocap_ids[0]
+            target_pos = np.asarray(self._data.mocap_pos[target_id])
+            target_quat = np.asarray(self._data.mocap_quat[target_id])
+            position_ok = (
+                np.linalg.norm(qpos[:3] - target_pos)
+                <= protocol['cube_position_threshold_m']
+            )
+            angle_deg = float(
+                cube_symmetry_angle_deg(
+                    qpos[None, 3:7], target_quat[None]
+                )[0]
+            )
+            pose_ok = bool(
+                position_ok
+                and angle_deg <= protocol['cube_orientation_threshold_deg']
+            )
+            self._clear_lewm_hold_count = (
+                self._clear_lewm_hold_count + 1 if pose_ok else 0
+            )
+            self._success = (
+                self._clear_lewm_hold_count >= protocol['sustained_steps']
+            )
+
+        env.set_target_pos = MethodType(set_target_pos, env)
+        env.post_step = MethodType(post_step, env)
+
+    for wrapped in world.envs.envs:
+        patch_environment(wrapped.unwrapped)
+
+
+def install_success_criterion(world, manifest: dict) -> None:
+    """Install CLEAR's task-semantic success rule on every raw env."""
+    protocol = manifest['protocol']
+    if manifest['task'] == 'pusht':
+        if not protocol.get('pusht_block_only'):
+            raise ValueError('CLEAR robust PushT must score the block only')
+        _install_pusht_success(world, protocol)
+    elif manifest['task'] == 'cube':
+        if not protocol.get('cube_symmetry_aware'):
+            raise ValueError('CLEAR robust Cube must be symmetry aware')
+        _install_cube_success(world, protocol)
+    else:
+        raise ValueError(f"Unsupported CLEAR task: {manifest['task']}")
