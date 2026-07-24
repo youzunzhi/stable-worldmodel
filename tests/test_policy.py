@@ -597,6 +597,50 @@ def test_worldmodel_policy_excludes_terminated_envs_from_planning():
     assert np.isfinite(action[1]).all()
 
 
+def test_worldmodel_policy_prepares_only_when_replanning():
+    """Cached actions do not trigger redundant image preprocessing."""
+    solver = MockSolver()
+    config = PlanConfig(horizon=4, receding_horizon=4, action_block=1)
+    calls = {'pixels': 0, 'goal': 0}
+
+    def count_transform(key):
+        def transform(image):
+            calls[key] += 1
+            return image
+
+        return transform
+
+    policy = WorldModelPolicy(
+        solver=solver,
+        config=config,
+        transform={
+            'pixels': count_transform('pixels'),
+            'goal': count_transform('goal'),
+        },
+    )
+    mock_env = MagicMock()
+    mock_env.num_envs = 1
+    mock_env.action_space = gym_spaces.Box(low=-1, high=1, shape=(2,))
+    mock_env.single_action_space = mock_env.action_space
+    policy.set_env(mock_env)
+    info = {
+        'pixels': np.zeros((1, 1, 8, 8, 3), dtype=np.uint8),
+        'goal': np.zeros((1, 1, 8, 8, 3), dtype=np.uint8),
+    }
+
+    policy.get_action(info)
+    assert calls == {'pixels': 1, 'goal': 1}
+    assert not policy.needs_pixels_after_action().item()
+
+    for _ in range(3):
+        policy.get_action(info)
+    assert calls == {'pixels': 1, 'goal': 1}
+    assert policy.needs_pixels_after_action().item()
+
+    policy.get_action(info)
+    assert calls == {'pixels': 2, 'goal': 2}
+
+
 def test_worldmodel_policy_no_warm_start():
     """Test WorldModelPolicy without warm start."""
     solver = MockSolver()
