@@ -184,6 +184,9 @@ class World:
         _, self.infos = self.envs.reset(seed=seed, options=options)
         self.terminateds = np.zeros(self.num_envs, dtype=bool)
         self.truncateds = np.zeros(self.num_envs, dtype=bool)
+        reset_policy = getattr(self.policy, 'reset', None)
+        if callable(reset_policy):
+            reset_policy()
 
     def evaluate(
         self,

@@ -641,6 +641,41 @@ def test_worldmodel_policy_prepares_only_when_replanning():
     assert calls == {'pixels': 2, 'goal': 2}
 
 
+def test_worldmodel_policy_refreshes_goal_cache_key_on_reset():
+    """Solver receives a stable goal key until the policy episode is reset."""
+
+    class CacheCost:
+        supports_goal_cache = True
+
+        def __init__(self):
+            self.cleared = []
+
+        def clear_goal_cache(self, keys=None):
+            self.cleared.append(keys)
+
+    solver = MockSolver()
+    solver.cost = CacheCost()
+    config = PlanConfig(horizon=2, receding_horizon=1)
+    policy = WorldModelPolicy(solver=solver, config=config)
+    mock_env = MagicMock()
+    mock_env.num_envs = 1
+    mock_env.action_space = gym_spaces.Box(low=-1, high=1, shape=(2,))
+    mock_env.single_action_space = mock_env.action_space
+    policy.set_env(mock_env)
+    info = {
+        'pixels': np.zeros((1, 1, 8, 8, 3), dtype=np.uint8),
+        'goal': np.zeros((1, 1, 8, 8, 3), dtype=np.uint8),
+    }
+
+    policy.get_action(info)
+    first_key = policy._goal_cache_keys.item()
+    policy.reset()
+    policy.get_action(info)
+
+    assert policy._goal_cache_keys.item() != first_key
+    assert solver.cost.cleared == [[first_key]]
+
+
 def test_worldmodel_policy_no_warm_start():
     """Test WorldModelPolicy without warm start."""
     solver = MockSolver()

@@ -14,6 +14,7 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 from gymnasium import spaces as gym_spaces
+from unittest.mock import MagicMock
 
 from stable_worldmodel.planning import (
     ControlPenalty,
@@ -136,6 +137,27 @@ def test_cost_evaluator_respects_preinjected_goal_emb():
     model.encode = _fail  # type: ignore[method-assign]
     seam = ShootingCostEvaluator(model, GoalMSE()).get_cost(_clone(info), ac)
     assert seam.shape == (B, S)
+
+
+def test_cost_evaluator_caches_goal_by_explicit_episode_key():
+    """Fresh solver dictionaries reuse one goal encode within an episode."""
+    torch.manual_seed(0)
+    model = FakeLeWM()
+    model.encode = MagicMock(wraps=model.encode)
+    evaluator = ShootingCostEvaluator(model, GoalMSE())
+    info = _make_info_dict()
+    info['_goal_cache_key'] = torch.tensor([11, 12])[:, None].expand(B, S)
+    ac = _make_action_candidates()
+
+    first = evaluator.get_cost(_clone(info), ac)
+    second = evaluator.get_cost(_clone(info), ac)
+
+    assert model.encode.call_count == 1
+    torch.testing.assert_close(second, first, rtol=0, atol=0)
+
+    evaluator.clear_goal_cache([11, 12])
+    evaluator.get_cost(_clone(info), ac)
+    assert model.encode.call_count == 2
 
 
 def test_encode_goal_none_skips_goal_encoding():
