@@ -13,6 +13,7 @@ import json
 import random
 from itertools import permutations, product
 from pathlib import Path
+from types import MethodType
 
 import numpy as np
 
@@ -193,3 +194,55 @@ def _quaternion_matrix_wxyz(quaternion: np.ndarray) -> np.ndarray:
         ),
         axis=-1,
     ).reshape((*quaternion.shape[:-1], 3, 3))
+
+
+def cube_symmetry_angle_deg(q0: np.ndarray, q1: np.ndarray) -> np.ndarray:
+    """Geodesic orientation error modulo the cube's 24 proper rotations."""
+    current = _quaternion_matrix_wxyz(q0)
+    target = _quaternion_matrix_wxyz(q1)
+    relative = np.swapaxes(current, -1, -2) @ target
+    equivalent = relative[..., None, :, :] @ CUBE_SYMMETRY_MATRICES
+    traces = np.trace(equivalent, axis1=-2, axis2=-1)
+    angles = np.arccos(np.clip((traces - 1.0) / 2.0, -1.0, 1.0))
+    return np.degrees(np.min(angles, axis=-1))
+
+
+def _install_pusht_success(world, protocol: dict) -> None:
+    def patch_environment(env) -> None:
+        original_step = env.step
+        original_set_goal = env._set_goal_state
+        env._clear_lewm_hold_count = 0
+
+        def set_goal_state(self, goal_state):
+            result = original_set_goal(goal_state)
+            self._clear_lewm_hold_count = 0
+            return result
+
+        def step(self, action):
+            observation, reward, _, truncated, info = original_step(action)
+            state = np.asarray(observation['state'])
+            goal = np.asarray(self.goal_state)
+            position_error = float(
+                np.linalg.norm(goal[2:4] - state[2:4])
+            )
+            angle_error = abs(float(goal[4] - state[4]))
+            angle_error = min(angle_error, 2.0 * np.pi - angle_error)
+            success = (
+                position_error < protocol['pusht_position_threshold']
+                and np.degrees(angle_error)
+                < protocol['pusht_angle_threshold_deg']
+            )
+            self._clear_lewm_hold_count = (
+                self._clear_lewm_hold_count + 1 if success else 0
+            )
+            terminated = (
+                self._clear_lewm_hold_count >= protocol['sustained_steps']
+            )
+            info['clear_lewm_hold_count'] = self._clear_lewm_hold_count
+            return observation, reward, terminated, truncated, info
+
+        env._set_goal_state = MethodType(set_goal_state, env)
+        env.step = MethodType(step, env)
+
+    for wrapped in world.envs.envs:
+        patch_environment(wrapped.unwrapped)
