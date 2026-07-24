@@ -80,8 +80,56 @@ class ShootingCostEvaluator(torch.nn.Module):
         self.objective = objective
         self.constraints = constraints
         self.encode_goal = encode_goal
+        self.supports_goal_cache = encode_goal is not None
+        self._goal_cache: dict[int, torch.Tensor] = {}
         if constraints:
             self.get_constraints = self._get_constraints
+
+    def clear_goal_cache(self, keys: list[int] | None = None) -> None:
+        """Clear every cached goal, or only the provided episode keys."""
+        if keys is None:
+            self._goal_cache.clear()
+            return
+        for key in keys:
+            self._goal_cache.pop(int(key), None)
+
+    @staticmethod
+    def _cache_keys(value: torch.Tensor) -> list[int]:
+        """Read one cache key per environment from solver-expanded tensors."""
+        if value.ndim < 2:
+            raise ValueError(
+                '_goal_cache_key must include environment and sample axes'
+            )
+        return (
+            value[:, 0]
+            .reshape(value.shape[0], -1)[:, 0]
+            .detach()
+            .cpu()
+            .tolist()
+        )
+
+    def _goal_embedding(self, info_dict: dict) -> torch.Tensor:
+        """Encode a goal or reuse the embedding for its explicit episode key."""
+        cache_value = info_dict.get('_goal_cache_key')
+        if cache_value is None:
+            return self.encode_goal(self.model, info_dict)
+        if not torch.is_tensor(cache_value):
+            raise TypeError('_goal_cache_key must be a torch.Tensor')
+
+        keys = self._cache_keys(cache_value)
+        missing = [key for key in keys if key not in self._goal_cache]
+        if missing:
+            encode_info = {
+                key: value
+                for key, value in info_dict.items()
+                if key != '_goal_cache_key'
+            }
+            encoded = self.encode_goal(self.model, encode_info)
+            for row, key in enumerate(keys):
+                if key not in self._goal_cache:
+                    self._goal_cache[key] = encoded[row].detach()
+
+        return torch.stack([self._goal_cache[key] for key in keys])
 
     def _rollout(
         self, info_dict: dict, action_candidates: torch.Tensor
@@ -92,7 +140,7 @@ class ShootingCostEvaluator(torch.nn.Module):
         on separate ``info_dict`` copies, so each must encode + roll out itself.
         """
         if self.encode_goal is not None and 'goal_emb' not in info_dict:
-            info_dict['goal_emb'] = self.encode_goal(self.model, info_dict)
+            info_dict['goal_emb'] = self._goal_embedding(info_dict)
 
         info_dict = self.model.rollout(info_dict, action_candidates)
         info_dict['action_candidates'] = action_candidates
