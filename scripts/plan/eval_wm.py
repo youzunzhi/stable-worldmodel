@@ -18,8 +18,11 @@ from torchvision.transforms import v2 as transforms
 import stable_worldmodel as swm
 
 from clear_protocol import (
+    install_success_criterion,
     load_manifest,
+    resolve_manifest_pairs,
     seed_runtime,
+    validate_dataset,
     validate_solver_config,
 )
 
@@ -166,6 +169,8 @@ def run(cfg: DictConfig):
     dataset = get_dataset(cfg, cfg.eval.dataset_name)
     stats_dataset = dataset  # get_dataset(cfg, cfg.dataset.stats)
     col_name = episode_col(dataset)
+    if clear_manifest is not None:
+        validate_dataset(dataset, clear_manifest)
     ep_indices, _ = np.unique(
         stats_dataset.get_col_data(col_name), return_index=True
     )
@@ -213,22 +218,35 @@ def run(cfg: DictConfig):
         )
 
     else:
-        policy = swm.policy.RandomPolicy()
+        policy = swm.policy.RandomPolicy(seed=int(cfg.seed))
 
-    random_episode_indices = sample_evaluation_starts(
-        dataset=dataset,
-        episode_ids=ep_indices,
-        goal_offset_steps=cfg.eval.goal_offset_steps,
-        num_samples=cfg.eval.num_eval,
-        seed=cfg.seed,
-    )
+    if clear_manifest is None:
+        random_episode_indices = sample_evaluation_starts(
+            dataset=dataset,
+            episode_ids=ep_indices,
+            goal_offset_steps=cfg.eval.goal_offset_steps,
+            num_samples=cfg.eval.num_eval,
+            seed=cfg.seed,
+        )
+        eval_episodes = dataset.get_col_data(col_name)[
+            random_episode_indices
+        ]
+        eval_start_idx = dataset.get_col_data('step_idx')[
+            random_episode_indices
+        ]
+    else:
+        (
+            random_episode_indices,
+            eval_episodes,
+            eval_start_idx,
+        ) = resolve_manifest_pairs(dataset, clear_manifest)
     print(random_episode_indices)
 
     # Index the full index columns directly: the Lance reader excludes
     # index columns (episode_idx/step_idx) from get_row_data, but get_col_data
     # exposes them (and both are already cached from the checks above).
-    eval_episodes = dataset.get_col_data(col_name)[random_episode_indices]
-    eval_start_idx = dataset.get_col_data('step_idx')[random_episode_indices]
+    if clear_manifest is not None:
+        install_success_criterion(world, clear_manifest)
 
     # The planner operates in normalized dataset coordinates and may produce
     # values outside the environment's declared action space after inverse
