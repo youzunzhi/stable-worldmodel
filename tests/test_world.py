@@ -7,7 +7,7 @@ import numpy as np
 import pytest
 
 from stable_worldmodel.world.env_pool import EnvPool
-from stable_worldmodel.world.world import World
+from stable_worldmodel.world.world import World, _info_shape_prefix
 
 
 class CounterEnv(gym.Env):
@@ -507,3 +507,10 @@ class TestWorldMisc:
         world.envs = pool
         world.close()
         assert len(close_calls) == 3
+
+    def test_info_shape_prefix_does_not_require_pixels(self):
+        infos = {
+            'observation': np.zeros((3, 1, 7), dtype=np.float32),
+            'terminated': np.zeros((3, 1), dtype=bool),
+        }
+        assert _info_shape_prefix(infos, 3) == (3, 1)

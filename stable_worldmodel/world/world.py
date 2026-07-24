@@ -155,6 +155,7 @@ class World:
         self.rewards: np.ndarray | None = None
         self.terminateds: np.ndarray | None = None
         self.truncateds: np.ndarray | None = None
+        self.add_pixels = add_pixels
 
     @property
     def num_envs(self) -> int:
@@ -537,7 +538,7 @@ class World:
                     self.envs.envs[i].unwrapped, callables, env_init
                 )
 
-        shape_prefix = self.infos['pixels'].shape[:2]
+        shape_prefix = _info_shape_prefix(self.infos, n)
         for src, dst_prefix in [(init_state, ''), (goal_state, '')]:
             for k, v in src.items():
                 key = dst_prefix + k if dst_prefix else k
@@ -618,6 +619,20 @@ def _extract_init_goal(dataset, episodes_idx, start_steps, goal_offset):
         goal_state['goal' if k == 'pixels' else f'goal_{k}'] = np.stack(v)
 
     return init_state, goal_state, dataset_videos
+
+
+def _info_shape_prefix(infos: dict, n_envs: int) -> tuple[int, int]:
+    """Infer the standard ``(env, time)`` prefix without requiring pixels."""
+    for value in infos.values():
+        if (
+            isinstance(value, (np.ndarray, torch.Tensor))
+            and value.ndim >= 2
+            and value.shape[0] == n_envs
+        ):
+            return int(value.shape[0]), int(value.shape[1])
+    raise ValueError(
+        'Could not infer environment/time dimensions from the info dict'
+    )
 
 
 def _apply_callables(env, callables, init_state):
