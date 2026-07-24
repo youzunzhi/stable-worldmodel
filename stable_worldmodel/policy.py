@@ -321,6 +321,8 @@ class WorldModelPolicy(BasePolicy):
         self._action_buffer: list[deque[torch.Tensor]] | None = None
         self._next_init: torch.Tensor | None = None
         self._last_dead: np.ndarray | None = None
+        self._goal_cache_keys: np.ndarray | None = None
+        self._next_goal_cache_key = 0
 
     @property
     def flatten_receding_horizon(self) -> int:
@@ -342,10 +344,53 @@ class WorldModelPolicy(BasePolicy):
             deque(maxlen=self.flatten_receding_horizon) for _ in range(n_envs)
         ]
         self._last_dead = np.zeros(n_envs, dtype=bool)
+        self._goal_cache_keys = np.arange(n_envs, dtype=np.int64)
+        self._next_goal_cache_key = n_envs
 
         assert isinstance(self.solver, Solver), (
             'Solver must implement the Solver protocol'
         )
+
+    def _cost(self) -> Any:
+        return getattr(self.solver, 'cost', None)
+
+    def _refresh_goal_cache_keys(self, mask: np.ndarray) -> None:
+        if self._goal_cache_keys is None:
+            return
+        indices = np.flatnonzero(mask)
+        if not len(indices):
+            return
+
+        cost = self._cost()
+        clear_cache = getattr(cost, 'clear_goal_cache', None)
+        if callable(clear_cache):
+            clear_cache(self._goal_cache_keys[indices].tolist())
+
+        stop = self._next_goal_cache_key + len(indices)
+        self._goal_cache_keys[indices] = np.arange(
+            self._next_goal_cache_key, stop, dtype=np.int64
+        )
+        self._next_goal_cache_key = stop
+
+    def reset(self, mask: np.ndarray | None = None) -> None:
+        """Clear planning state and assign fresh per-episode goal cache keys."""
+        if self._action_buffer is None:
+            return
+        selected = (
+            np.ones(len(self._action_buffer), dtype=bool)
+            if mask is None
+            else np.asarray(mask, dtype=bool)
+        )
+        if selected.shape != (len(self._action_buffer),):
+            raise ValueError(
+                f'policy reset mask must have shape '
+                f'({len(self._action_buffer)},), got {selected.shape}'
+            )
+        for i in np.flatnonzero(selected):
+            self._action_buffer[i].clear()
+            if self._next_init is not None:
+                self._next_init[i] = 0
+        self._refresh_goal_cache_keys(selected)
 
     def get_action(self, info_dict: dict, **kwargs: Any) -> np.ndarray:
         """Get action via planning with the world model.
@@ -366,11 +411,13 @@ class WorldModelPolicy(BasePolicy):
             needs_flush = np.asarray(needs_flush, dtype=bool).reshape(
                 n_envs, -1
             )
+            flush_mask = needs_flush.any(axis=1)
             for i in range(n_envs):
-                if needs_flush[i].any():
+                if flush_mask[i]:
                     self._action_buffer[i].clear()
                     if self._next_init is not None:
                         self._next_init[i] = 0
+            self._refresh_goal_cache_keys(flush_mask)
 
         terminated = info_dict.get('terminated')
         dead = (
@@ -403,6 +450,11 @@ class WorldModelPolicy(BasePolicy):
                 else:
                     sliced[k] = v
             sliced = self._prepare_info(sliced)
+            cost = self._cost()
+            if getattr(cost, 'supports_goal_cache', False):
+                sliced['_goal_cache_key'] = torch.as_tensor(
+                    self._goal_cache_keys[replan_idx], dtype=torch.int64
+                )
 
             sliced_init = (
                 self._next_init[idx_tensor]
