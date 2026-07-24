@@ -129,9 +129,11 @@ class BasePolicy:
                         v = np.transpose(v, (0, 3, 1, 2))
                     else:
                         v = v.permute(0, 3, 1, 2)
-                v = torch.stack(
-                    [self.transform[k](tv_tensors.Image(x)) for x in v]
-                )
+                    v = self.transform[k](tv_tensors.Image(v))
+                else:
+                    v = torch.stack(
+                        [self.transform[k](tv_tensors.Image(x)) for x in v]
+                    )
                 is_numpy = isinstance(v, (np.ndarray | np.generic))
 
                 if shape is not None:

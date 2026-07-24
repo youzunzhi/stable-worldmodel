@@ -6,6 +6,8 @@ import numpy as np
 import pytest
 import torch
 from gymnasium import spaces as gym_spaces
+from torchvision import tv_tensors
+from torchvision.transforms import v2 as transforms
 
 from stable_worldmodel.policy import (
     BasePolicy,
@@ -225,6 +227,37 @@ def test_prepare_info_non_numpy_passthrough():
     result = policy._prepare_info(info)
     assert torch.is_tensor(result['tensor'])
     assert result['scalar'] == 42
+
+
+def test_prepare_info_batched_images_match_per_image_pipeline_bitwise():
+    """Batched v2 transforms preserve the former per-image tensor values."""
+    rng = np.random.default_rng(42)
+    pixels = rng.integers(
+        0, 256, size=(3, 2, 20, 24, 3), dtype=np.uint8
+    )
+    transform = transforms.Compose(
+        [
+            transforms.ToImage(),
+            transforms.ToDtype(torch.float32, scale=True),
+            transforms.Normalize(
+                mean=(0.485, 0.456, 0.406),
+                std=(0.229, 0.224, 0.225),
+            ),
+            transforms.Resize(size=16),
+        ]
+    )
+    nchw = np.transpose(
+        pixels.reshape(-1, *pixels.shape[2:]), (0, 3, 1, 2)
+    )
+    reference = torch.stack(
+        [transform(tv_tensors.Image(image)) for image in nchw]
+    ).reshape(3, 2, 3, 16, 19)
+
+    policy = BasePolicy()
+    policy.transform = {'pixels': transform}
+    actual = policy._prepare_info({'pixels': pixels})['pixels']
+
+    assert torch.equal(actual, reference)
 
 
 ###########################
