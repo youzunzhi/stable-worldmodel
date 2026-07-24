@@ -1,9 +1,14 @@
 import json
+from types import SimpleNamespace
 
+import numpy as np
 import pytest
 
 from scripts.plan.clear_protocol import (
+    cube_symmetry_angle_deg,
+    install_success_criterion,
     load_manifest,
+    resolve_manifest_pairs,
     validate_solver_config,
 )
 
@@ -36,6 +41,53 @@ def _manifest(task='pusht', protocol='moderate'):
             }
         ],
     }
+
+
+class _FakePushT:
+    def __init__(self):
+        self.goal_state = np.zeros(7)
+        self.state = np.zeros(7)
+
+    def _set_goal_state(self, goal_state):
+        self.goal_state = np.asarray(goal_state)
+
+    def step(self, action):
+        return {'state': self.state.copy()}, 0.0, True, False, {}
+
+
+def _world(env):
+    wrapped = SimpleNamespace(unwrapped=env)
+    return SimpleNamespace(envs=SimpleNamespace(envs=[wrapped]))
+
+
+def test_pusht_scores_block_pose_and_requires_hold():
+    env = _FakePushT()
+    env.goal_state = np.array([100.0, 100.0, 10.0, 20.0, 0.0, 0.0, 0.0])
+    env.state = np.array([0.0, 0.0, 10.0, 20.0, 0.0, 0.0, 0.0])
+    install_success_criterion(_world(env), _manifest())
+    outcomes = [env.step(np.zeros(2))[2] for _ in range(3)]
+    assert outcomes == [False, False, True]
+
+
+def test_cube_symmetry_accepts_equivalent_quarter_turn():
+    identity = np.array([[1.0, 0.0, 0.0, 0.0]])
+    quarter_turn_z = np.array(
+        [[np.sqrt(0.5), 0.0, 0.0, np.sqrt(0.5)]]
+    )
+    assert cube_symmetry_angle_deg(identity, quarter_turn_z)[0] < 1e-6
+
+
+def test_manifest_rows_must_match_episode_and_step_identity():
+    dataset = SimpleNamespace(
+        get_col_data=lambda key: {
+            'episode_idx': np.array([3, 7]),
+            'step_idx': np.array([1, 4]),
+        }[key]
+    )
+    rows, episodes, steps = resolve_manifest_pairs(dataset, _manifest())
+    assert rows.tolist() == [1]
+    assert episodes.tolist() == [7]
+    assert steps.tolist() == [4]
 
 
 def test_manifest_rejects_pre_solved_pairs(tmp_path):
