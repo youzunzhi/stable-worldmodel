@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import random
 from pathlib import Path
 
 import numpy as np
@@ -124,3 +125,30 @@ def resolve_manifest_pairs(
     if not np.array_equal(steps, expected_steps):
         raise ValueError('CLEAR manifest start steps do not match dataset rows')
     return rows, episodes, steps
+
+
+def validate_solver_config(solver) -> None:
+    """Reject CLEAR-labelled runs with a different CEM budget."""
+    mismatches = {
+        name: (int(solver[name]), expected)
+        for name, expected in CLEAR_SOLVER.items()
+        if int(solver[name]) != expected
+    }
+    if mismatches:
+        details = ', '.join(
+            f'{name}={actual} (expected {expected})'
+            for name, (actual, expected) in mismatches.items()
+        )
+        raise ValueError(f'CLEAR-LeWM solver contract mismatch: {details}')
+
+
+def seed_runtime(seed: int) -> None:
+    """Apply CLEAR's deterministic Python, NumPy, Torch, and CUDA seeds."""
+    import torch
+
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.set_num_threads(CLEAR_CPU_THREADS)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
