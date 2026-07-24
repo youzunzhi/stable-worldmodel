@@ -66,13 +66,33 @@ def get_episodes_length(dataset, episodes):
     return np.array(lengths)
 
 
-def get_dataset(cfg, dataset_name):
+def get_dataset(cfg, dataset_name, keys_to_load=None):
+    kwargs = {}
+    if keys_to_load is not None:
+        kwargs['keys_to_load'] = keys_to_load
     dataset = swm.data.load_dataset(
         dataset_name,
         cache_dir=cfg.get('cache_dir', None),
         keys_to_cache=list(cfg.dataset.keys_to_cache),
+        **kwargs,
     )
     return dataset
+
+
+def non_pixel_hdf5_keys(dataset_name):
+    """List non-image columns without reading any HDF5 pixel payload."""
+    import h5py
+
+    path = Path(dataset_name).expanduser()
+    if not path.is_file():
+        return None
+    with h5py.File(path, 'r') as dataset:
+        return [
+            key
+            for key in dataset.keys()
+            if key not in ('ep_len', 'ep_offset')
+            and not key.startswith('pixels')
+        ]
 
 
 def prepare_results_path(cfg):
@@ -158,8 +178,14 @@ def run(cfg: DictConfig):
     results_path = prepare_results_path(cfg)
 
     # create world environment
+    policy_name = cfg.get('policy', 'random')
+    use_pixels = policy_name != 'random' or bool(cfg.eval.video)
     cfg.world.max_episode_steps = 2 * cfg.eval.eval_budget
-    world = swm.World(**cfg.world, image_shape=(224, 224))
+    world = swm.World(
+        **cfg.world,
+        image_shape=(224, 224) if use_pixels else None,
+        add_pixels=use_pixels,
+    )
 
     # create the transform
     img_dtype = torch.bfloat16 if cfg.get('bf16', False) else torch.float32
@@ -168,7 +194,14 @@ def run(cfg: DictConfig):
         'goal': img_transform(cfg, img_dtype),
     }
 
-    dataset = get_dataset(cfg, cfg.eval.dataset_name)
+    keys_to_load = (
+        None
+        if use_pixels
+        else non_pixel_hdf5_keys(cfg.eval.dataset_name)
+    )
+    dataset = get_dataset(
+        cfg, cfg.eval.dataset_name, keys_to_load=keys_to_load
+    )
     stats_dataset = dataset  # get_dataset(cfg, cfg.dataset.stats)
     col_name = episode_col(dataset)
     if clear_manifest is not None:
@@ -191,7 +224,7 @@ def run(cfg: DictConfig):
             process[f'goal_{col}'] = process[col]
 
     # -- run evaluation
-    policy = cfg.get('policy', 'random')
+    policy = policy_name
 
     if policy != 'random':
         model = swm.wm.utils.load_pretrained(cfg.policy)
