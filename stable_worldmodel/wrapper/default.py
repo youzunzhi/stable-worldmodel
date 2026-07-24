@@ -419,6 +419,22 @@ class AddPixelsWrapper(gym.Wrapper):
 
         self.Image = Image
         self.resample = resample if resample is not None else Image.BILINEAR
+        self._render_on_step = True
+        self._cached_pixels: dict[str, np.ndarray] | None = None
+
+    def set_render_on_step(self, enabled: bool) -> None:
+        """Control whether the next step renders a fresh pixel observation."""
+        self._render_on_step = bool(enabled)
+
+    def _attach_pixels(self, info: dict, *, force: bool = False) -> None:
+        if force or self._render_on_step or self._cached_pixels is None:
+            pixels, render_time = self._get_pixels()
+            self._cached_pixels = pixels
+        else:
+            pixels = self._cached_pixels
+            render_time = 0.0
+        info['render_time'] = render_time
+        info.update(pixels)
 
     def _get_pixels(self) -> tuple[dict[str, np.ndarray], float]:
         """Render environment and process pixels.
@@ -468,8 +484,7 @@ class AddPixelsWrapper(gym.Wrapper):
             Standard Gymnasium reset results.
         """
         obs, info = self.env.reset(*args, **kwargs)
-        pixels, info['render_time'] = self._get_pixels()
-        info.update(pixels)
+        self._attach_pixels(info, force=True)
         return obs, info
 
     def step(self, action: Any) -> tuple[Any, float, bool, bool, dict]:
@@ -482,8 +497,7 @@ class AddPixelsWrapper(gym.Wrapper):
             Standard Gymnasium step results.
         """
         obs, reward, terminated, truncated, info = self.env.step(action)
-        pixels, info['render_time'] = self._get_pixels()
-        info.update(pixels)
+        self._attach_pixels(info)
         return obs, reward, terminated, truncated, info
 
 
@@ -624,14 +638,16 @@ class MegaWrapper(gym.Wrapper):
         super().__init__(env)
 
         req_keys = list(required_keys) if required_keys is not None else []
+        self._pixels_wrapper: AddPixelsWrapper | None = None
 
         if add_pixels:
             req_keys.append(r'^pixels(?:\..*)?$')
             resample = _resolve_resample(image_resample)
             # this adds `pixels` key to info with optional transform
-            env = AddPixelsWrapper(
+            self._pixels_wrapper = AddPixelsWrapper(
                 env, image_shape, pixels_transform, resample
             )
+            env = self._pixels_wrapper
 
         # this removes the info output, everything is in observation!
         env = EverythingToInfoWrapper(env)
@@ -642,3 +658,8 @@ class MegaWrapper(gym.Wrapper):
             env = ResizeGoalWrapper(env, image_shape, goal_transform, resample)
 
         self.env = env
+
+    def set_render_on_step(self, enabled: bool) -> None:
+        """Enable or suppress fresh rendering on the next environment step."""
+        if self._pixels_wrapper is not None:
+            self._pixels_wrapper.set_render_on_step(enabled)
