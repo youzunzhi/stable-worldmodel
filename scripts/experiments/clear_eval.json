@@ -1,0 +1,41 @@
+{
+  "clear_lewm": {
+    "repository": "https://github.com/DavidSunok/CLEAR-LeWM",
+    "revision": "f06b66b358f5e42aa582e4a5599d3356c29edcf4",
+    "version": "0.3.0"
+  },
+  "manifests": {
+    "cube/moderate": "a06f6b7348425dc6f10c24ebc0b497487212f31caee83ada3c67029339204b89",
+    "cube/strict": "1cec3fb6c4c612b6fe4e28389faf0c3f207a8b707eaf8513e890730c2a7e82b2",
+    "pusht/moderate": "e0cf72023f42b3644658547febb70c2dccc88cb9df9cd6133592ad80556b9ad1",
+    "pusht/strict": "131471d3a7a2d7e90abdf3fbdedfa157f1dc13454c7a3c83fbd6db69649e2758"
+  },
+  "reference_success_percent": {
+    "cube/moderate": {
+      "official_lewm": 43,
+      "random": 4
+    },
+    "cube/strict": {
+      "official_lewm": 18,
+      "random": 3
+    },
+    "pusht/moderate": {
+      "official_lewm": 93,
+      "random": 7
+    },
+    "pusht/strict": {
+      "official_lewm": 79,
+      "random": 2
+    }
+  },
+  "solver": {
+    "batch_size": 1,
+    "n_steps": 30,
+    "num_samples": 300,
+    "topk": 30
+  },
+  "runtime": {
+    "cpu_threads": 1,
+    "seed": 42
+  }
+}

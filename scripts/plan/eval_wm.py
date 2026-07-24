@@ -18,8 +18,10 @@ from torchvision.transforms import v2 as transforms
 import stable_worldmodel as swm
 
 from clear_protocol import (
+    CLEAR_LEWM_REVISION,
     install_success_criterion,
     load_manifest,
+    manifest_sha256,
     resolve_manifest_pairs,
     seed_runtime,
     validate_dataset,
@@ -350,6 +352,20 @@ def run(cfg: DictConfig):
         'evaluation_time_seconds': end_time - start_time,
         'evaluation_time_per_trajectory_seconds': (
             (end_time - start_time) / completed
+        ),
+        'clear_lewm': (
+            {
+                'source_revision': CLEAR_LEWM_REVISION,
+                'manifest_path': str(
+                    Path(clear_manifest_path).expanduser().resolve()
+                ),
+                'manifest_sha256': manifest_sha256(clear_manifest_path),
+                'task': clear_manifest['task'],
+                'protocol': clear_manifest['protocol'],
+                'cpu_threads': torch.get_num_threads(),
+            }
+            if clear_manifest is not None
+            else None
         ),
         'resolved_config': OmegaConf.to_container(cfg, resolve=True),
     }
