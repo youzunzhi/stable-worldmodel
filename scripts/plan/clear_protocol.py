@@ -11,6 +11,7 @@ from __future__ import annotations
 import hashlib
 import json
 import random
+from itertools import permutations, product
 from pathlib import Path
 
 import numpy as np
@@ -152,3 +153,43 @@ def seed_runtime(seed: int) -> None:
     torch.manual_seed(seed)
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(seed)
+
+
+def _cube_symmetry_matrices() -> np.ndarray:
+    matrices = []
+    identity = np.eye(3, dtype=np.float64)
+    for permutation in permutations(range(3)):
+        base = identity[:, permutation]
+        for signs in product((-1.0, 1.0), repeat=3):
+            matrix = base * np.asarray(signs, dtype=np.float64)[None, :]
+            if np.linalg.det(matrix) > 0.5:
+                matrices.append(matrix)
+    result = np.asarray(matrices, dtype=np.float64)
+    if result.shape != (24, 3, 3):
+        raise RuntimeError(f'Expected 24 cube symmetries, got {result.shape}')
+    return result
+
+
+CUBE_SYMMETRY_MATRICES = _cube_symmetry_matrices()
+
+
+def _quaternion_matrix_wxyz(quaternion: np.ndarray) -> np.ndarray:
+    quaternion = np.asarray(quaternion, dtype=np.float64)
+    quaternion = quaternion / np.clip(
+        np.linalg.norm(quaternion, axis=-1, keepdims=True), 1e-12, None
+    )
+    w, x, y, z = np.moveaxis(quaternion, -1, 0)
+    return np.stack(
+        (
+            1 - 2 * (y * y + z * z),
+            2 * (x * y - z * w),
+            2 * (x * z + y * w),
+            2 * (x * y + z * w),
+            1 - 2 * (x * x + z * z),
+            2 * (y * z - x * w),
+            2 * (x * z - y * w),
+            2 * (y * z + x * w),
+            1 - 2 * (x * x + y * y),
+        ),
+        axis=-1,
+    ).reshape((*quaternion.shape[:-1], 3, 3))
