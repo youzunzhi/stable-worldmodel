@@ -151,6 +151,8 @@ def sample_evaluation_starts(
 def run(cfg: DictConfig):
     """Run evaluation of dinowm vs random policy."""
     clear_manifest_path = cfg.eval.get('manifest')
+    solver_ablation = bool(cfg.eval.get('solver_ablation', False))
+    clear_solver_contract_matched = None
     clear_manifest = (
         load_manifest(clear_manifest_path) if clear_manifest_path else None
     )
@@ -168,7 +170,14 @@ def run(cfg: DictConfig):
         cfg.eval.num_eval = len(clear_manifest['pairs'])
         cfg.eval.goal_offset_steps = int(protocol['goal_offset'])
         cfg.eval.eval_budget = int(protocol['eval_budget'])
-        validate_solver_config(cfg.solver)
+        try:
+            validate_solver_config(cfg.solver)
+        except ValueError:
+            if not solver_ablation:
+                raise
+            clear_solver_contract_matched = False
+        else:
+            clear_solver_contract_matched = True
         seed_runtime(int(cfg.seed))
 
     assert (
@@ -401,6 +410,8 @@ def run(cfg: DictConfig):
                 'task': clear_manifest['task'],
                 'protocol': clear_manifest['protocol'],
                 'cpu_threads': torch.get_num_threads(),
+                'solver_contract_matched': clear_solver_contract_matched,
+                'solver_ablation_opt_in': solver_ablation,
             }
             if clear_manifest is not None
             else None

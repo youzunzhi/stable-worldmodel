@@ -32,6 +32,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help='Disable evaluation video recording while keeping result files.',
     )
     parser.add_argument(
+        '--solver',
+        choices=('cem', 'gd'),
+        default='cem',
+        help='Planning solver config. GD uses AdamW with multiple restarts.',
+    )
+    parser.add_argument(
         'overrides', nargs='*', help='Extra Hydra overrides.'
     )
     args = parser.parse_args(argv)
@@ -98,16 +104,28 @@ def build_eval_command(args: argparse.Namespace) -> list[str]:
         f'output.dir={output_dir}',
         'output.filename=results.txt',
     ]
+    if args.solver != 'cem':
+        command.append(f'solver={args.solver}')
     if args.manifest is not None:
         command.append(f'eval.manifest={args.manifest}')
-        command.extend(
-            (
-                'solver.batch_size=1',
-                'solver.num_samples=300',
-                'solver.n_steps=30',
-                'solver.topk=30',
+        if args.solver == 'cem':
+            command.extend(
+                (
+                    'solver.batch_size=1',
+                    'solver.num_samples=300',
+                    'solver.n_steps=30',
+                    'solver.topk=30',
+                )
             )
-        )
+        else:
+            command.extend(
+                (
+                    'solver.batch_size=1',
+                    'solver.num_samples=100',
+                    'solver.n_steps=30',
+                    'eval.solver_ablation=true',
+                )
+            )
     if args.num_trajectories is not None:
         command.append(f'eval.num_eval={args.num_trajectories}')
     if args.no_video:

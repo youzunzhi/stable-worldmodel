@@ -108,3 +108,13 @@ def test_clear_solver_contract_rejects_short_cube_budget():
     }
     with pytest.raises(ValueError, match='n_steps=10'):
         validate_solver_config(solver)
+
+
+def test_clear_solver_contract_reports_missing_cem_fields():
+    solver = {
+        'batch_size': 1,
+        'num_samples': 100,
+        'n_steps': 30,
+    }
+    with pytest.raises(ValueError, match='topk=missing'):
+        validate_solver_config(solver)

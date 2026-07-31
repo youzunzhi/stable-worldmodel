@@ -131,14 +131,19 @@ def resolve_manifest_pairs(
 
 def validate_solver_config(solver) -> None:
     """Reject CLEAR-labelled runs with a different CEM budget."""
-    mismatches = {
-        name: (int(solver[name]), expected)
-        for name, expected in CLEAR_SOLVER.items()
-        if int(solver[name]) != expected
-    }
+    mismatches = {}
+    for name, expected in CLEAR_SOLVER.items():
+        actual = solver.get(name)
+        if actual is None:
+            mismatches[name] = (None, expected)
+            continue
+        actual = int(actual)
+        if actual != expected:
+            mismatches[name] = (actual, expected)
     if mismatches:
         details = ', '.join(
-            f'{name}={actual} (expected {expected})'
+            f'{name}={actual if actual is not None else "missing"} '
+            f'(expected {expected})'
             for name, (actual, expected) in mismatches.items()
         )
         raise ValueError(f'CLEAR-LeWM solver contract mismatch: {details}')

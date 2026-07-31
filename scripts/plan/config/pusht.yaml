@@ -33,6 +33,9 @@ eval:
   # Optional fixed CLEAR-LeWM v0.3 manifest. When set, its pair list and
   # task-semantic success criterion replace random row sampling.
   manifest: null
+  # Permit a non-CEM solver on fixed CLEAR pairs. Such a run is an ablation,
+  # not a protocol-conformant CLEAR result, and is marked as such in JSON.
+  solver_ablation: false
   img_size: 224
   dataset_name: pusht_expert_train.h5
   callables:

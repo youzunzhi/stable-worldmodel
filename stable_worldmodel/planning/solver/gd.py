@@ -122,17 +122,25 @@ class GradientSolver(torch.nn.Module):
         """Initialize the action tensor for optimization."""
         if actions is None:
             actions = torch.zeros(
-                (n_envs, 0, self.action_dim), dtype=self.dtype
+                (n_envs, 0, self.action_dim),
+                device=self.device,
+                dtype=self.dtype,
             )
+        else:
+            actions = actions.to(device=self.device, dtype=self.dtype)
 
         # fill remaining action
         remaining = self.horizon - actions.shape[1]
 
         if remaining > 0:
             new_actions = torch.zeros(
-                n_envs, remaining, self.action_dim, dtype=self.dtype
+                n_envs,
+                remaining,
+                self.action_dim,
+                device=self.device,
+                dtype=self.dtype,
             )
-            actions = torch.cat([actions, new_actions], dim=1).to(self.device)
+            actions = torch.cat([actions, new_actions], dim=1)
 
         actions = actions.unsqueeze(1).repeat_interleave(
             self.num_samples, dim=1
@@ -149,7 +157,8 @@ class GradientSolver(torch.nn.Module):
 
         # reset actions — re-register when shape differs (batch size may vary across calls)
         if hasattr(self, 'init') and self.init.shape == actions.shape:
-            self.init.copy_(actions)
+            with torch.no_grad():
+                self.init.copy_(actions)
         else:
             if 'init' in self._parameters:
                 del self._parameters['init']
@@ -162,6 +171,7 @@ class GradientSolver(torch.nn.Module):
         start_time = time.time()
         outputs = {
             'cost': [],  # Will store list of cost histories per batch
+            'costs': [],  # Final cost of the selected restart per environment
             'actions': None,
         }
 
@@ -265,12 +275,24 @@ class GradientSolver(torch.nn.Module):
 
                 # Add noise
                 if self.action_noise > 0:
-                    batch_init.data += (
-                        torch.randn(batch_init.shape, generator=self.torch_gen)
-                        * self.action_noise
-                    )
+                    with torch.no_grad():
+                        batch_init.add_(
+                            torch.randn(
+                                batch_init.shape,
+                                generator=self.torch_gen,
+                                device=batch_init.device,
+                                dtype=batch_init.dtype,
+                            )
+                            * self.action_noise
+                        )
 
                 batch_cost_history.append(cost.item())
+
+            # The loop's ``costs`` were computed before its final optimizer
+            # update. Re-score the optimized actions so restart selection and
+            # reported costs refer to the actions that are actually returned.
+            with torch.no_grad():
+                final_costs = self.cost.get_cost(expanded_infos, batch_init)
 
             # Store cost history for this batch
             outputs['cost'].append(batch_cost_history)
@@ -279,11 +301,16 @@ class GradientSolver(torch.nn.Module):
             with torch.no_grad():
                 self.init[start_idx:end_idx] = batch_init
 
-            top_idx = torch.argsort(costs, dim=1)[:, 0]
-            batch_indices = torch.arange(current_bs)
+            top_idx = torch.argmin(final_costs, dim=1)
+            batch_indices = torch.arange(
+                current_bs, device=batch_init.device
+            )
 
             top_actions_batch = batch_init[batch_indices, top_idx]
             batch_top_actions_list.append(top_actions_batch.detach().cpu())
+            outputs['costs'].extend(
+                final_costs[batch_indices, top_idx].detach().cpu().tolist()
+            )
 
         # Concatenate all batch results
         outputs['actions'] = torch.cat(batch_top_actions_list, dim=0)

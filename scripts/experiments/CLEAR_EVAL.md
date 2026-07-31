@@ -53,3 +53,29 @@ checkpoint and dataset paths, per-episode outcomes, and runtime duration.
 
 Omit `--no-video` when rollout videos are needed. The flag affects only video
 collection and encoding; metrics and structured result files are still saved.
+
+## Matched solver ablation
+
+Use the same manifest, checkpoint, seed, horizon, action block, success
+criterion, and control budget while replacing CEM with gradient-based planning:
+
+```bash
+scripts/experiments/eval.sh \
+  --model lewm --task pusht \
+  --run-name solver-ablation-pusht-strict-gd-seed42 \
+  --checkpoint /path/to/pusht/weights.pt --seed 42 --no-video \
+  --solver gd \
+  --manifest /path/to/CLEAR-LeWM/manifests/v0.3/pusht/strict-seed42-n100.json
+```
+
+The GD config uses 100 AdamW restarts, 30 updates, learning rate 0.1, and the
+same seeded Gaussian initialization scale as CEM. Override fields such as
+`solver.num_samples` or `solver.optimizer_kwargs.lr` only as an explicitly
+reported tuning ablation.
+
+Because the solver is part of the CLEAR contract, this is a matched-pair
+solver ablation rather than a protocol-conformant CLEAR result. Its structured
+JSON records `solver_contract_matched: false` and the complete resolved solver
+configuration. It is also not compute-matched to CEM: every GD update includes
+backpropagation, while every CEM iteration evaluates sampled candidates
+without backward.
