@@ -390,7 +390,11 @@ def run(cfg: DictConfig):
 
     completed = len(metrics['episode_successes'])
     structured = {
-        'checkpoint': str(Path(cfg.policy).resolve()),
+        'checkpoint': (
+            'random'
+            if cfg.policy == 'random'
+            else str(Path(cfg.policy).resolve())
+        ),
         'dataset': str(Path(cfg.eval.dataset_name).resolve()),
         'seed': int(cfg.seed),
         'requested_trajectories': int(cfg.eval.num_eval),
