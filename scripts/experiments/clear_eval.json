@@ -1,31 +1,40 @@
 {
   "clear_lewm": {
     "repository": "https://github.com/DavidSunok/CLEAR-LeWM",
-    "revision": "f06b66b358f5e42aa582e4a5599d3356c29edcf4",
-    "version": "0.3.0"
+    "revision": "df026185a36bd9997c69d94753854db0b1a46f54",
+    "tag": "v0.5.0",
+    "version": "0.5.0"
   },
   "manifests": {
-    "cube/moderate": "a06f6b7348425dc6f10c24ebc0b497487212f31caee83ada3c67029339204b89",
-    "cube/strict": "1cec3fb6c4c612b6fe4e28389faf0c3f207a8b707eaf8513e890730c2a7e82b2",
-    "pusht/moderate": "e0cf72023f42b3644658547febb70c2dccc88cb9df9cd6133592ad80556b9ad1",
-    "pusht/strict": "131471d3a7a2d7e90abdf3fbdedfa157f1dc13454c7a3c83fbd6db69649e2758"
+    "cube/moderate/seed0": "d06053263ecfa4bc3f2a7b0a996239a5105177f2de18cdefc5ec41cdab3097e7",
+    "cube/moderate/seed1": "6dd8ea3c417d4f77303703be3b21bb6c4f5d0ab0d67afb2f1a008996fe5e238f",
+    "cube/moderate/seed42": "03f9c3a375707bdcd40d32aa1be26ef15ab2529fe513e67eea59789b36c70d63",
+    "cube/strict/seed0": "a99e8add0fff0453b7f9d9082378fc6b74a171f26cf2ca86e64830ccb452a6cd",
+    "cube/strict/seed1": "9c2eaf897cf3571c31619b9df26825591080e477e628b572eca0ae2fc38dc022",
+    "cube/strict/seed42": "fccf9d6de3336431a09f146b4fadbf1a1150aff4b2d699e75ca32835b3242ecd",
+    "pusht/moderate/seed0": "f90fd6b829f6c52f821c474ff7c58d6fad64c4f5713ac6f146262181a89a74d6",
+    "pusht/moderate/seed1": "9d229873dc1e161c3a6be6bcce7e1d8f8f0b7b488a4b3bbda740fd54097bab29",
+    "pusht/moderate/seed42": "dcdce1f5e90c29246b70670d6a61171bd8ba17814bc88726ac65994714c14afa",
+    "pusht/strict/seed0": "f68292d80db3469ff3fa4d8c0c6bb7e6914199426f778129c06e78313a47366f",
+    "pusht/strict/seed1": "141d579c9501c9c4af260917c2e60724c6ac98ab03e656217f2063480310fe30",
+    "pusht/strict/seed42": "2042018fc346927af5da75cce2565db8476121d1db67a99d0fc50f218eddcbc9"
   },
   "reference_success_percent": {
-    "cube/moderate": {
-      "official_lewm": 43,
-      "random": 4
+    "cube/moderate/seed42": {
+      "official_lewm": 51,
+      "random": 15
     },
-    "cube/strict": {
-      "official_lewm": 18,
+    "cube/strict/seed42": {
+      "official_lewm": 25,
+      "random": 8
+    },
+    "pusht/moderate/seed42": {
+      "official_lewm": 88,
       "random": 3
     },
-    "pusht/moderate": {
-      "official_lewm": 93,
+    "pusht/strict/seed42": {
+      "official_lewm": 71,
       "random": 7
-    },
-    "pusht/strict": {
-      "official_lewm": 79,
-      "random": 2
     }
   },
   "solver": {
@@ -36,6 +45,7 @@
   },
   "runtime": {
     "cpu_threads": 1,
-    "seed": 42
+    "canonical_submission_seed": 42,
+    "reference_policy_seeds": [0, 1, 42]
   }
 }

@@ -1,7 +1,7 @@
-"""CLEAR-LeWM v0.3 manifest and task-success adapter.
+"""CLEAR-LeWM v0.5 manifest and task-success adapter.
 
 The protocol definitions are derived from DavidSunok/CLEAR-LeWM at revision
-f06b66b358f5e42aa582e4a5599d3356c29edcf4.  CLEAR-LeWM is MIT licensed.
+df026185a36bd9997c69d94753854db0b1a46f54.  CLEAR-LeWM is MIT licensed.
 This module keeps stable-worldmodel's planner and rollout loop, while applying
 the fixed start-goal manifest and external task-completion predicates.
 """
@@ -18,7 +18,8 @@ from types import MethodType
 import numpy as np
 
 
-CLEAR_LEWM_REVISION = 'f06b66b358f5e42aa582e4a5599d3356c29edcf4'
+CLEAR_LEWM_VERSION = '0.5.0'
+CLEAR_LEWM_REVISION = 'df026185a36bd9997c69d94753854db0b1a46f54'
 CLEAR_MANIFEST_SCHEMA = 'clear-lewm-manifest-v1'
 CLEAR_TASKS = {'pusht', 'cube'}
 CLEAR_PROTOCOLS = {'moderate', 'strict'}
@@ -29,6 +30,79 @@ CLEAR_SOLVER = {
     'topk': 30,
 }
 CLEAR_CPU_THREADS = 1
+
+
+_V05_SHARED_PROTOCOL = {
+    'goal_offset': 25,
+    'eval_budget': 50,
+    'sampling': 'episode-balanced',
+    'split': 'all',
+    'heldout_fraction': 0,
+    'exclude_initial_success': True,
+    'success_mode': 'task-sustained',
+}
+_V05_TASK_PROTOCOLS = {
+    ('moderate', 'pusht'): {
+        'pusht_block_only': False,
+        'pusht_position_threshold': 20,
+        'pusht_angle_threshold_deg': 20,
+        'pusht_sustained_steps': None,
+        'sustained_steps': 1,
+    },
+    ('strict', 'pusht'): {
+        'pusht_block_only': True,
+        'pusht_position_threshold': 10,
+        'pusht_angle_threshold_deg': 10,
+        'pusht_sustained_steps': 3,
+        'sustained_steps': 1,
+    },
+    ('moderate', 'cube'): {
+        'cube_position_threshold_m': 0.04,
+        'cube_orientation_threshold_deg': None,
+        'cube_symmetry_aware': False,
+        'cube_sustained_steps': None,
+        'sustained_steps': 1,
+    },
+    ('strict', 'cube'): {
+        'cube_position_threshold_m': 0.03,
+        'cube_orientation_threshold_deg': 15,
+        'cube_symmetry_aware': True,
+        'cube_sustained_steps': 3,
+        'sustained_steps': 1,
+    },
+}
+
+
+def _validate_v05_protocol(manifest: dict) -> None:
+    """Reject older same-schema manifests before they can be mislabeled."""
+    protocol = manifest['protocol']
+    task = manifest['task']
+    expected = {
+        **_V05_SHARED_PROTOCOL,
+        **_V05_TASK_PROTOCOLS[(protocol['name'], task)],
+    }
+    mismatches = {
+        name: (protocol.get(name), value)
+        for name, value in expected.items()
+        if protocol.get(name) != value
+    }
+    if mismatches:
+        details = ', '.join(
+            f'{name}={actual!r} (expected {expected!r})'
+            for name, (actual, expected) in mismatches.items()
+        )
+        raise ValueError(
+            f'CLEAR-LeWM v{CLEAR_LEWM_VERSION} protocol mismatch: {details}'
+        )
+
+
+def _hold_steps(protocol: dict, task: str) -> int:
+    task_steps = protocol.get(f'{task}_sustained_steps')
+    return int(
+        task_steps
+        if task_steps is not None
+        else protocol.get('sustained_steps', 1)
+    )
 
 
 def load_manifest(path: str | Path) -> dict:
@@ -51,6 +125,7 @@ def load_manifest(path: str | Path) -> dict:
             f"CLEAR protocol must be one of {sorted(CLEAR_PROTOCOLS)}, "
             f"got {protocol.get('name')!r}"
         )
+    _validate_v05_protocol(manifest)
     pairs = manifest.get('pairs')
     if not isinstance(pairs, list) or not pairs:
         raise ValueError('CLEAR manifest must contain at least one pair')
@@ -149,6 +224,16 @@ def validate_solver_config(solver) -> None:
         raise ValueError(f'CLEAR-LeWM solver contract mismatch: {details}')
 
 
+def validate_policy_seed(manifest: dict, seed: int) -> None:
+    """Require the policy RNG seed embedded in the selected manifest."""
+    expected = int(manifest['policy_seed'])
+    if int(seed) != expected:
+        raise ValueError(
+            'CLEAR-LeWM policy seed mismatch: '
+            f'{int(seed)} != manifest seed {expected}'
+        )
+
+
 def seed_runtime(seed: int) -> None:
     """Apply CLEAR's deterministic Python, NumPy, Torch, and CUDA seeds."""
     import torch
@@ -227,8 +312,13 @@ def _install_pusht_success(world, protocol: dict) -> None:
             observation, reward, _, truncated, info = original_step(action)
             state = np.asarray(observation['state'])
             goal = np.asarray(self.goal_state)
+            position_slice = (
+                slice(2, 4)
+                if protocol['pusht_block_only']
+                else slice(0, 4)
+            )
             position_error = float(
-                np.linalg.norm(goal[2:4] - state[2:4])
+                np.linalg.norm(goal[position_slice] - state[position_slice])
             )
             angle_error = abs(float(goal[4] - state[4]))
             angle_error = min(angle_error, 2.0 * np.pi - angle_error)
@@ -241,7 +331,8 @@ def _install_pusht_success(world, protocol: dict) -> None:
                 self._clear_lewm_hold_count + 1 if success else 0
             )
             terminated = (
-                self._clear_lewm_hold_count >= protocol['sustained_steps']
+                self._clear_lewm_hold_count
+                >= _hold_steps(protocol, 'pusht')
             )
             info['clear_lewm_hold_count'] = self._clear_lewm_hold_count
             return observation, reward, terminated, truncated, info
@@ -270,25 +361,34 @@ def _install_cube_success(world, protocol: dict) -> None:
             qpos = np.asarray(self._data.joint('object_joint_0').qpos)
             target_id = self._cube_target_mocap_ids[0]
             target_pos = np.asarray(self._data.mocap_pos[target_id])
-            target_quat = np.asarray(self._data.mocap_quat[target_id])
             position_ok = (
                 np.linalg.norm(qpos[:3] - target_pos)
                 <= protocol['cube_position_threshold_m']
             )
-            angle_deg = float(
-                cube_symmetry_angle_deg(
-                    qpos[None, 3:7], target_quat[None]
-                )[0]
-            )
-            pose_ok = bool(
-                position_ok
-                and angle_deg <= protocol['cube_orientation_threshold_deg']
-            )
+            pose_ok = bool(position_ok)
+            orientation_threshold = protocol[
+                'cube_orientation_threshold_deg'
+            ]
+            if orientation_threshold is not None:
+                if not protocol['cube_symmetry_aware']:
+                    raise ValueError(
+                        'This adapter only supports symmetry-aware Cube '
+                        'orientation scoring'
+                    )
+                target_quat = np.asarray(self._data.mocap_quat[target_id])
+                angle_deg = float(
+                    cube_symmetry_angle_deg(
+                        qpos[None, 3:7], target_quat[None]
+                    )[0]
+                )
+                pose_ok = bool(
+                    pose_ok and angle_deg <= orientation_threshold
+                )
             self._clear_lewm_hold_count = (
                 self._clear_lewm_hold_count + 1 if pose_ok else 0
             )
             self._success = (
-                self._clear_lewm_hold_count >= protocol['sustained_steps']
+                self._clear_lewm_hold_count >= _hold_steps(protocol, 'cube')
             )
 
         env.set_target_pos = MethodType(set_target_pos, env)
@@ -299,15 +399,11 @@ def _install_cube_success(world, protocol: dict) -> None:
 
 
 def install_success_criterion(world, manifest: dict) -> None:
-    """Install CLEAR's task-semantic success rule on every raw env."""
+    """Install the selected CLEAR v0.5 success rule on every raw env."""
     protocol = manifest['protocol']
     if manifest['task'] == 'pusht':
-        if not protocol.get('pusht_block_only'):
-            raise ValueError('CLEAR robust PushT must score the block only')
         _install_pusht_success(world, protocol)
     elif manifest['task'] == 'cube':
-        if not protocol.get('cube_symmetry_aware'):
-            raise ValueError('CLEAR robust Cube must be symmetry aware')
         _install_cube_success(world, protocol)
     else:
         raise ValueError(f"Unsupported CLEAR task: {manifest['task']}")

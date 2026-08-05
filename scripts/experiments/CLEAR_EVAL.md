@@ -1,7 +1,7 @@
 # CLEAR-LeWM evaluation
 
 This checkout evaluates our `stable_worldmodel` planner and environments on
-the fixed CLEAR-LeWM v0.3 manifests. The protocol source is pinned in
+the fixed CLEAR-LeWM v0.5 manifests. The protocol source is pinned in
 `clear_eval.json`; do not use a moving CLEAR-LeWM `main` checkout for reported
 results.
 
@@ -9,12 +9,22 @@ The adapter keeps our model loading, CEM implementation, action clipping, and
 physical rollout loop. It changes only the evaluation contract:
 
 - fixed episode-balanced, initially unsolved start-goal pairs;
-- PushT success from T-block position and angle, held for 3 or 5 steps;
-- Cube success from position and orientation modulo 24 proper cube rotations,
-  held for 3 or 5 steps;
-- 100 pairs, goal offset 25, control budget 50, seed 42;
+- Moderate PushT scores pusher plus T position within 20 px and T angle within
+  20 degrees; the first hit succeeds;
+- Strict PushT scores only the T within 10 px and 10 degrees for 3 steps;
+- Moderate Cube scores cube-center position within 4 cm; the first hit
+  succeeds;
+- Strict Cube scores cube-center position within 3 cm and orientation within
+  15 degrees modulo 24 proper cube rotations for 3 steps;
+- 100 pairs, goal offset 25, control budget 50; canonical manifests use
+  policy seeds 0, 1, and 42, with seed 42 used for community submissions;
 - CEM 300 samples, 30 elites, 30 iterations, solver batch size 1.
 - Python, NumPy, Torch, CUDA, and policy seed 42; Torch CPU threads 1.
+
+Upstream v0.5 also defines Reacher and TwoRoom. This adapter intentionally
+supports PushT and Cube, the two tasks in our trained-checkpoint registry. Use
+the upstream evaluator for the other two tasks rather than labeling an
+unsupported local run as CLEAR-LeWM v0.5.
 
 This is intentionally a reproduction with our runtime, not a claim that our
 newer package and numerical stack are byte-identical to CLEAR-LeWM's published
@@ -26,10 +36,10 @@ newer package and numerical stack are byte-identical to CLEAR-LeWM's published
 git clone --recurse-submodules \
   https://github.com/DavidSunok/CLEAR-LeWM.git /path/to/CLEAR-LeWM
 git -C /path/to/CLEAR-LeWM checkout \
-  f06b66b358f5e42aa582e4a5599d3356c29edcf4
+  df026185a36bd9997c69d94753854db0b1a46f54
 ```
 
-Verify the four manifest hashes against `clear_eval.json` before evaluation.
+Verify the selected manifest hash against `clear_eval.json` before evaluation.
 
 ## One matched evaluation
 
@@ -38,13 +48,13 @@ scripts/experiments/eval.sh \
   --model lewm --task pusht \
   --run-name clear-pusht-strict-random-seed42 \
   --random --seed 42 --no-video \
-  --manifest /path/to/CLEAR-LeWM/manifests/v0.3/pusht/strict-seed42-n100.json
+  --manifest /path/to/CLEAR-LeWM/manifests/v0.5/pusht/strict-seed42-n100.json
 
 scripts/experiments/eval.sh \
   --model lewm --task pusht \
   --run-name clear-pusht-strict-official-seed42 \
   --checkpoint /path/to/pusht/weights.pt --seed 42 --no-video \
-  --manifest /path/to/CLEAR-LeWM/manifests/v0.3/pusht/strict-seed42-n100.json
+  --manifest /path/to/CLEAR-LeWM/manifests/v0.5/pusht/strict-seed42-n100.json
 ```
 
 Run the same pair for `moderate` and for `cube`. Each result JSON records the
@@ -65,7 +75,7 @@ scripts/experiments/eval.sh \
   --run-name solver-ablation-pusht-strict-gd-seed42 \
   --checkpoint /path/to/pusht/weights.pt --seed 42 --no-video \
   --solver gd \
-  --manifest /path/to/CLEAR-LeWM/manifests/v0.3/pusht/strict-seed42-n100.json
+  --manifest /path/to/CLEAR-LeWM/manifests/v0.5/pusht/strict-seed42-n100.json
 ```
 
 The GD config uses 100 AdamW restarts, 30 updates, learning rate 0.1, and the

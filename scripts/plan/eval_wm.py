@@ -19,12 +19,14 @@ import stable_worldmodel as swm
 
 from clear_protocol import (
     CLEAR_LEWM_REVISION,
+    CLEAR_LEWM_VERSION,
     install_success_criterion,
     load_manifest,
     manifest_sha256,
     resolve_manifest_pairs,
     seed_runtime,
     validate_dataset,
+    validate_policy_seed,
     validate_solver_config,
 )
 
@@ -167,6 +169,7 @@ def run(cfg: DictConfig):
                 f'{expected_env}, got {cfg.world.env_name}'
             )
         protocol = clear_manifest['protocol']
+        validate_policy_seed(clear_manifest, cfg.seed)
         cfg.eval.num_eval = len(clear_manifest['pairs'])
         cfg.eval.goal_offset_steps = int(protocol['goal_offset'])
         cfg.eval.eval_budget = int(protocol['eval_budget'])
@@ -402,6 +405,7 @@ def run(cfg: DictConfig):
         ),
         'clear_lewm': (
             {
+                'version': CLEAR_LEWM_VERSION,
                 'source_revision': CLEAR_LEWM_REVISION,
                 'manifest_path': str(
                     Path(clear_manifest_path).expanduser().resolve()
