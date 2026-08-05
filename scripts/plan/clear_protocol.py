@@ -20,12 +20,12 @@ import numpy as np
 try:
     from .clear_tworoom import (
         install_tworoom_success,
-        topology_audit_records,
+        topology_audit_records as _topology_audit_records,
     )
 except ImportError:  # Direct execution via scripts/plan/eval_wm.py.
     from clear_tworoom import (
         install_tworoom_success,
-        topology_audit_records,
+        topology_audit_records as _topology_audit_records,
     )
 
 
@@ -41,6 +41,11 @@ CLEAR_SOLVER = {
     'topk': 30,
 }
 CLEAR_CPU_THREADS = 1
+
+
+def topology_audit_records() -> list[dict]:
+    """Expose any TwoRoom route diagnostics collected by the adapter."""
+    return _topology_audit_records()
 
 
 _V05_SHARED_PROTOCOL = {
