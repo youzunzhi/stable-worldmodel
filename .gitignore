@@ -231,3 +231,9 @@ results/
 local_scripts/
 CLAUDE.md
 uv.lock
+
+# Canonical, provenance-complete CLEAR evaluation artifacts are versioned.
+!results/
+results/*
+!results/clear_eval/
+!results/clear_eval/**

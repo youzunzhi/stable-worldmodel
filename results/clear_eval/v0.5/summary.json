@@ -1,0 +1,60 @@
+{
+  "schema_version": "stable-worldmodel-clear-results-v1",
+  "clear_lewm": {
+    "version": "0.5.0",
+    "tag": "v0.5.0",
+    "revision": "df026185a36bd9997c69d94753854db0b1a46f54"
+  },
+  "evaluation_source_commit": "fba769e6444d29b9790b68413d6f447e0a3aac05",
+  "policy_seed": 42,
+  "completed_pairs_per_run": 100,
+  "video": false,
+  "checkpoints": {
+    "official_pusht_sha256": "48938400ae3464c9680731287f583a9cb516f55a8ec64ea13a91be47fb15b607",
+    "official_cube_sha256": "2839a907362f403f9136383016e91774373a295d958ae75121791f22a9fddf89",
+    "trained_pusht_sha256": "1cf72a6616b9625e056595d98794b61595bddce923ea87bb1d527fc6f43d98b7",
+    "trained_cube_sha256": "6ed18d2aacbd4b6c51fd2ba79fe57f8b0b456691e6cf69455723269099151d6f"
+  },
+  "manifests": {
+    "pusht_moderate_sha256": "dcdce1f5e90c29246b70670d6a61171bd8ba17814bc88726ac65994714c14afa",
+    "pusht_strict_sha256": "2042018fc346927af5da75cce2565db8476121d1db67a99d0fc50f218eddcbc9",
+    "cube_moderate_sha256": "03f9c3a375707bdcd40d32aa1be26ef15ab2529fe513e67eea59789b36c70d63",
+    "cube_strict_sha256": "fccf9d6de3336431a09f146b4fadbf1a1150aff4b2d699e75ca32835b3242ecd"
+  },
+  "results": {
+    "cem": {
+      "official": {
+        "pusht_moderate": {"successes": 88, "evaluation_time_seconds": 62.42435002326965, "result_sha256": "8ff2d38e6a4c7fa3c60e89ecc84cccc93630a2e0e7d056f50eacbb6c6e113edd"},
+        "pusht_strict": {"successes": 71, "evaluation_time_seconds": 75.74086141586304, "result_sha256": "16995c1886b8e8ab1c0dc93557a82c956cea078bd5ce8bc1f285f8fd17e00b37"},
+        "cube_moderate": {"successes": 52, "evaluation_time_seconds": 127.61012887954712, "result_sha256": "6017f798dfef1f8e2ce17b94c16cdcdce8659ab488020a48a2d272c6a833febd"},
+        "cube_strict": {"successes": 22, "evaluation_time_seconds": 146.84137964248657, "result_sha256": "f135cf3d1b04e64a40c517fbc504f781016d9f9b104dfcba80bb71f8dca57fe4"}
+      },
+      "trained": {
+        "pusht_moderate": {"successes": 96, "evaluation_time_seconds": 52.81157159805298, "result_sha256": "95d010cfaf722d1d8398a717ca4e13023c20d90a996dae16444de9abe1c6cdc4"},
+        "pusht_strict": {"successes": 85, "evaluation_time_seconds": 73.83875679969788, "result_sha256": "cb05e03b83550fff0720c576165aa08dbf2c00801789196739a54657ae8ca109"},
+        "cube_moderate": {"successes": 47, "evaluation_time_seconds": 129.55314111709595, "result_sha256": "bf20ca71811938073a4065aa10157fd47c19b5eeaea0c7569aab5f771b50e0b3"},
+        "cube_strict": {"successes": 28, "evaluation_time_seconds": 139.3538875579834, "result_sha256": "91f585c7decd8524ece010fb1fa72945ac624b2d7971ba1b0a41575202ac8b9b"}
+      },
+      "random": {
+        "pusht_moderate": {"successes": 3, "evaluation_time_seconds": 1.4433023929595947, "result_sha256": "8e53d6e8779d9539335eec88e252a29e7559307c3012fe6e03d16545be692820"},
+        "pusht_strict": {"successes": 7, "evaluation_time_seconds": 1.411086082458496, "result_sha256": "5d9e78de1a1db3ecb19d09cf5408e7a76a51b32b12860ce3e3f6c1ae2fad6c09"},
+        "cube_moderate": {"successes": 15, "evaluation_time_seconds": 40.03209829330444, "result_sha256": "d39d5f07dc34c12ba8c7704baf806e8a4747110ad764e9f910638ac2a8a6667e"},
+        "cube_strict": {"successes": 8, "evaluation_time_seconds": 41.69783806800842, "result_sha256": "d0477810fd27bbee0d80221909a91f13b676b1153e593666a9ad5425641a8b61"}
+      }
+    },
+    "gd_ablation_trained": {
+      "pusht_moderate": {"successes": 90, "evaluation_time_seconds": 143.84002351760864, "result_sha256": "db3a59066adf0ce220d24a2303883d27febb97c7fe936ef7170fc4591b7d3892"},
+      "pusht_strict": {"successes": 82, "evaluation_time_seconds": 175.56782984733582, "result_sha256": "7bf49d1f534bde0d992b734b66b678656677289df37a68344252e7da816ad8aa"},
+      "cube_moderate": {"successes": 46, "evaluation_time_seconds": 244.4713649749756, "result_sha256": "940ce387007c9b80b49f25b2491657ff4f4049592c07229d20aebe7f76c1a971"},
+      "cube_strict": {"successes": 20, "evaluation_time_seconds": 288.6251697540283, "result_sha256": "c356826d4bdb4ccb3b754beaa36fd4bb1b1bd05f5f76327138cb9d531f00e4bb"}
+    }
+  },
+  "artifact_audit": {
+    "structured_result_json_count": 16,
+    "all_completed_100": true,
+    "all_manifest_hashes_matched": true,
+    "all_cpu_threads_one": true,
+    "all_no_video": true,
+    "error_log_matches": 0
+  }
+}

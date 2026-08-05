@@ -89,3 +89,11 @@ JSON records `solver_contract_matched: false` and the complete resolved solver
 configuration. It is also not compute-matched to CEM: every GD update includes
 backpropagation, while every CEM iteration evaluates sampled candidates
 without backward.
+
+## Canonical results
+
+The current seed-42 v0.5 result matrix, bundled manifests, checkpoint hashes,
+and all 16 structured result JSONs are tracked under
+`results/clear_eval/v0.5/`. The version README is the headline report and
+`summary.json` is the machine-readable index. Treat the JSON files under
+`raw/` as the primary evidence.
