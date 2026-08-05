@@ -17,11 +17,22 @@ from types import MethodType
 
 import numpy as np
 
+try:
+    from .clear_tworoom import (
+        install_tworoom_success,
+        topology_audit_records,
+    )
+except ImportError:  # Direct execution via scripts/plan/eval_wm.py.
+    from clear_tworoom import (
+        install_tworoom_success,
+        topology_audit_records,
+    )
+
 
 CLEAR_LEWM_VERSION = '0.5.0'
 CLEAR_LEWM_REVISION = 'df026185a36bd9997c69d94753854db0b1a46f54'
 CLEAR_MANIFEST_SCHEMA = 'clear-lewm-manifest-v1'
-CLEAR_TASKS = {'pusht', 'cube'}
+CLEAR_TASKS = {'pusht', 'cube', 'tworoom'}
 CLEAR_PROTOCOLS = {'moderate', 'strict'}
 CLEAR_SOLVER = {
     'batch_size': 1,
@@ -68,6 +79,25 @@ _V05_TASK_PROTOCOLS = {
         'cube_orientation_threshold_deg': 15,
         'cube_symmetry_aware': True,
         'cube_sustained_steps': 3,
+        'sustained_steps': 1,
+    },
+    ('moderate', 'tworoom'): {
+        'tworoom_collision_mode': 'swept',
+        'tworoom_crossroom_only': True,
+        'tworoom_distance_threshold': 16,
+        'tworoom_route_required': False,
+        'tworoom_source_window_clean': True,
+        'tworoom_sustained_steps': None,
+        'sustained_steps': 1,
+    },
+    ('strict', 'tworoom'): {
+        'tworoom_collision_mode': 'swept',
+        'tworoom_crossroom_only': True,
+        'tworoom_distance_threshold': 8,
+        'tworoom_goal_side_required': True,
+        'tworoom_route_required': True,
+        'tworoom_source_window_clean': True,
+        'tworoom_sustained_steps': None,
         'sustained_steps': 1,
     },
 }
@@ -405,5 +435,7 @@ def install_success_criterion(world, manifest: dict) -> None:
         _install_pusht_success(world, protocol)
     elif manifest['task'] == 'cube':
         _install_cube_success(world, protocol)
+    elif manifest['task'] == 'tworoom':
+        install_tworoom_success(world, protocol)
     else:
         raise ValueError(f"Unsupported CLEAR task: {manifest['task']}")

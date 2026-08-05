@@ -25,6 +25,7 @@ from clear_protocol import (
     manifest_sha256,
     resolve_manifest_pairs,
     seed_runtime,
+    topology_audit_records,
     validate_dataset,
     validate_policy_seed,
     validate_solver_config,
@@ -162,6 +163,7 @@ def run(cfg: DictConfig):
         expected_env = {
             'pusht': 'swm/PushT-v1',
             'cube': 'swm/OGBCube-v0',
+            'tworoom': 'swm/TwoRoom-v1',
         }[clear_manifest['task']]
         if cfg.world.env_name != expected_env:
             raise ValueError(
@@ -389,12 +391,42 @@ def run(cfg: DictConfig):
         return value
 
     completed = len(metrics['episode_successes'])
+    checkpoint_path = (
+        None if cfg.policy == 'random' else Path(cfg.policy).resolve()
+    )
+    checkpoint_config_path = (
+        checkpoint_path.parent / 'config.json'
+        if checkpoint_path is not None
+        else None
+    )
+    checkpoint_source_path = (
+        checkpoint_path.parent / 'source.json'
+        if checkpoint_path is not None
+        else None
+    )
+    checkpoint_provenance = (
+        json.loads(checkpoint_source_path.read_text())
+        if checkpoint_source_path is not None
+        and checkpoint_source_path.is_file()
+        else None
+    )
     structured = {
         'checkpoint': (
             'random'
-            if cfg.policy == 'random'
-            else str(Path(cfg.policy).resolve())
+            if checkpoint_path is None
+            else str(checkpoint_path)
         ),
+        'checkpoint_sha256': (
+            None
+            if checkpoint_path is None
+            else manifest_sha256(checkpoint_path)
+        ),
+        'checkpoint_config_sha256': (
+            None
+            if checkpoint_config_path is None
+            else manifest_sha256(checkpoint_config_path)
+        ),
+        'checkpoint_provenance': checkpoint_provenance,
         'dataset': str(Path(cfg.eval.dataset_name).resolve()),
         'seed': int(cfg.seed),
         'requested_trajectories': int(cfg.eval.num_eval),
@@ -422,6 +454,12 @@ def run(cfg: DictConfig):
                 'solver_ablation_opt_in': solver_ablation,
             }
             if clear_manifest is not None
+            else None
+        ),
+        'topology': (
+            jsonable(topology_audit_records())
+            if clear_manifest is not None
+            and clear_manifest['task'] == 'tworoom'
             else None
         ),
         'resolved_config': OmegaConf.to_container(cfg, resolve=True),

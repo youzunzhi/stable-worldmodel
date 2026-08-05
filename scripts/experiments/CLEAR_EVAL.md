@@ -16,15 +16,19 @@ physical rollout loop. It changes only the evaluation contract:
   succeeds;
 - Strict Cube scores cube-center position within 3 cm and orientation within
   15 degrees modulo 24 proper cube rotations for 3 steps;
+- Moderate TwoRoom uses continuous swept-disk collision and succeeds within
+  16 px on clean cross-room pairs;
+- Strict TwoRoom additionally requires a legal door crossing, the goal side,
+  a valid complete route, and endpoint distance below 8 px;
 - 100 pairs, goal offset 25, control budget 50; canonical manifests use
   policy seeds 0, 1, and 42, with seed 42 used for community submissions;
 - CEM 300 samples, 30 elites, 30 iterations, solver batch size 1.
 - Python, NumPy, Torch, CUDA, and policy seed 42; Torch CPU threads 1.
 
-Upstream v0.5 also defines Reacher and TwoRoom. This adapter intentionally
-supports PushT and Cube, the two tasks in our trained-checkpoint registry. Use
-the upstream evaluator for the other two tasks rather than labeling an
-unsupported local run as CLEAR-LeWM v0.5.
+Upstream v0.5 also defines Reacher. This adapter supports PushT, Cube, and
+TwoRoom, the three tasks in our trained-checkpoint registry. Use the upstream
+evaluator for Reacher rather than labeling an unsupported local run as
+CLEAR-LeWM v0.5.
 
 This is intentionally a reproduction with our runtime, not a claim that our
 newer package and numerical stack are byte-identical to CLEAR-LeWM's published
@@ -57,9 +61,14 @@ scripts/experiments/eval.sh \
   --manifest /path/to/CLEAR-LeWM/manifests/v0.5/pusht/strict-seed42-n100.json
 ```
 
-Run the same pair for `moderate` and for `cube`. Each result JSON records the
+Run the same pair for `moderate`, and for `cube` or `tworoom`. The pinned
+official TwoRoom checkpoint is `quentinll/lewm-tworooms` revision
+`77adaae0bc31deab21c93740d1f8bb947cd0bdec`; its source `weights.pt` SHA-256 is
+`566f223624ea4bfb39dbfe6ae731198dd6ea73b7b8919fed6b1ecafca810f7dd`.
+Each result JSON records the
 manifest SHA-256, embedded criterion, exact pair rows, resolved config,
-checkpoint and dataset paths, per-episode outcomes, and runtime duration.
+checkpoint/config SHA-256, optional checkpoint provenance, dataset path,
+per-episode outcomes, runtime duration, and TwoRoom route diagnostics.
 
 Omit `--no-video` when rollout videos are needed. The flag affects only video
 collection and encoding; metrics and structured result files are still saved.

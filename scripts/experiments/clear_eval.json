@@ -17,7 +17,13 @@
     "pusht/moderate/seed42": "dcdce1f5e90c29246b70670d6a61171bd8ba17814bc88726ac65994714c14afa",
     "pusht/strict/seed0": "f68292d80db3469ff3fa4d8c0c6bb7e6914199426f778129c06e78313a47366f",
     "pusht/strict/seed1": "141d579c9501c9c4af260917c2e60724c6ac98ab03e656217f2063480310fe30",
-    "pusht/strict/seed42": "2042018fc346927af5da75cce2565db8476121d1db67a99d0fc50f218eddcbc9"
+    "pusht/strict/seed42": "2042018fc346927af5da75cce2565db8476121d1db67a99d0fc50f218eddcbc9",
+    "tworoom/moderate/seed0": "2fea3d51e85b1a93c284f566bbd9714eb70d013507554bd581b851b33ad4643a",
+    "tworoom/moderate/seed1": "a46e008facb0427a97dadde11e39f105f9ac3fb138627b254fcd9cbb83ec8805",
+    "tworoom/moderate/seed42": "216250de76495a17a58bb16538b678408063798c3e4f55381943b79214ac83f6",
+    "tworoom/strict/seed0": "c43efa59f1f421e8fe5a809460d132d26b6650f43952cea96ab987258c0eca54",
+    "tworoom/strict/seed1": "5a988d7c1f1dd96ce774b44181f9c71bfb616c871cddabea8e57e30fa2bce059",
+    "tworoom/strict/seed42": "b1833f5e500db94157b5f091bef8c77380a8d49a4862701eba7c2cad8b87fc35"
   },
   "reference_success_percent": {
     "cube/moderate/seed42": {
@@ -35,6 +41,22 @@
     "pusht/strict/seed42": {
       "official_lewm": 71,
       "random": 7
+    },
+    "tworoom/moderate/seed42": {
+      "official_lewm": 81,
+      "random": 6
+    },
+    "tworoom/strict/seed42": {
+      "official_lewm": 57,
+      "random": 0
+    }
+  },
+  "official_checkpoints": {
+    "tworoom": {
+      "repository": "quentinll/lewm-tworooms",
+      "revision": "77adaae0bc31deab21c93740d1f8bb947cd0bdec",
+      "config_sha256": "2564086e961e7b5c7c04dffc451091115b389a590645ff19653c64fd0bc16e09",
+      "weights_sha256": "566f223624ea4bfb39dbfe6ae731198dd6ea73b7b8919fed6b1ecafca810f7dd"
     }
   },
   "solver": {

@@ -11,6 +11,7 @@ from scripts.plan.clear_protocol import (
     cube_symmetry_angle_deg,
     install_success_criterion,
     load_manifest,
+    manifest_sha256,
     resolve_manifest_pairs,
     validate_policy_seed,
     validate_solver_config,
@@ -45,6 +46,23 @@ def _manifest(task='pusht', protocol='moderate'):
             'cube_position_threshold_m': 0.03,
             'cube_orientation_threshold_deg': 15,
             'cube_sustained_steps': 3,
+        },
+        ('moderate', 'tworoom'): {
+            'tworoom_collision_mode': 'swept',
+            'tworoom_crossroom_only': True,
+            'tworoom_distance_threshold': 16,
+            'tworoom_route_required': False,
+            'tworoom_source_window_clean': True,
+            'tworoom_sustained_steps': None,
+        },
+        ('strict', 'tworoom'): {
+            'tworoom_collision_mode': 'swept',
+            'tworoom_crossroom_only': True,
+            'tworoom_distance_threshold': 8,
+            'tworoom_goal_side_required': True,
+            'tworoom_route_required': True,
+            'tworoom_source_window_clean': True,
+            'tworoom_sustained_steps': None,
         },
     }
     return {
@@ -221,6 +239,24 @@ def test_adapter_revision_matches_clear_eval_registry():
     )
     assert registry['clear_lewm']['version'] == CLEAR_LEWM_VERSION
     assert registry['clear_lewm']['revision'] == CLEAR_LEWM_REVISION
+
+
+@pytest.mark.parametrize('protocol', ['moderate', 'strict'])
+def test_bundled_tworoom_manifest_matches_registry(protocol):
+    registry = json.loads(
+        (REPO_ROOT / 'scripts/experiments/clear_eval.json').read_text()
+    )
+    path = (
+        REPO_ROOT
+        / 'results/clear_eval/v0.5/manifests/tworoom'
+        / f'{protocol}-seed42-n100.json'
+    )
+    manifest = load_manifest(path)
+    assert manifest['task'] == 'tworoom'
+    assert len(manifest['pairs']) == 100
+    assert manifest_sha256(path) == registry['manifests'][
+        f'tworoom/{protocol}/seed42'
+    ]
 
 
 def test_policy_seed_must_match_manifest():

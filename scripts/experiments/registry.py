@@ -21,6 +21,11 @@ CUBE_DATASET = (
     / 'cube_single_expert.h5'
 )
 
+# The official TwoRoom dataset is distributed as one HDF5 snapshot. CLEAR
+# v0.5 identifies it by a metadata fingerprint rather than a repository
+# revision; both training and evaluation use the same immutable local file.
+TWOROOM_DATASET = Path('tworoom') / 'tworoom.h5'
+
 
 @dataclass(frozen=True)
 class ExperimentSpec:
@@ -51,6 +56,14 @@ EXPERIMENTS = {
             '--config-name=cube',
             'solver.n_steps=10',
         ),
+    ),
+    ('lewm', 'tworoom'): ExperimentSpec(
+        train_script=Path('scripts/train/lewm.py'),
+        eval_script=Path('scripts/plan/eval_wm.py'),
+        train_dataset=TWOROOM_DATASET,
+        eval_dataset=TWOROOM_DATASET,
+        train_defaults=('data=tworoom', 'launcher=local'),
+        eval_defaults=('--config-name=tworoom',),
     ),
 }
 
