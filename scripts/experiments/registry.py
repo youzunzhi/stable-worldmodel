@@ -62,7 +62,11 @@ EXPERIMENTS = {
         eval_script=Path('scripts/plan/eval_wm.py'),
         train_dataset=TWOROOM_DATASET,
         eval_dataset=TWOROOM_DATASET,
-        train_defaults=('data=tworoom', 'launcher=local'),
+        train_defaults=(
+            'data=tworoom',
+            'launcher=local',
+            'trainer.max_epochs=10',
+        ),
         eval_defaults=('--config-name=tworoom',),
     ),
 }
