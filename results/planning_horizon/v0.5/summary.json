@@ -1,0 +1,369 @@
+{
+  "schema_version": 1,
+  "experiment_id": "PLANNING_HORIZON_260808",
+  "status": "audited_complete",
+  "description": "CLEAR-LeWM v0.5 planning and execution-budget ablations: compare horizon/receding 10/5 and 10/10 at budget 50, plus horizon/receding 5/5 at budget 25, against the project-trained 5/5 budget-50 baseline across PushT, Cube, and TwoRoom under Moderate and Strict criteria.",
+  "comparison_unit": "successes_out_of_100_fixed_pairs",
+  "evaluation_source": {
+    "commit": "df026185a36bd9997c69d94753854db0b1a46f54",
+    "remote_runtime": "/public/home/xsy0001/workspace/code/stable-worldmodel-tp-lewm",
+    "remote_data_root": "/public/home/xsy0001/workspace/data/stable-worldmodel"
+  },
+  "fixed_contract": {
+    "clear_lewm_version": "0.5.0",
+    "policy_arm": "A",
+    "policy_seed": 42,
+    "checkpoint_training_seed": 3072,
+    "pairs_per_cell": 100,
+    "canonical_eval_budget_primitive_steps": 50,
+    "goal_offset_primitive_steps": 25,
+    "action_block_primitive_steps": 5,
+    "cem": {
+      "batch_size": 1,
+      "num_samples": 300,
+      "n_steps": 30,
+      "topk": 30,
+      "seed": 42
+    },
+    "cpu_threads": 1,
+    "video": false
+  },
+  "planner_configs": {
+    "baseline": {
+      "planning_horizon": 5,
+      "receding_horizon": 5,
+      "eval_budget_primitive_steps": 50
+    },
+    "h5_r5_budget25": {
+      "planning_horizon": 5,
+      "receding_horizon": 5,
+      "eval_budget_primitive_steps": 25
+    },
+    "h10_r5": {
+      "planning_horizon": 10,
+      "receding_horizon": 5,
+      "eval_budget_primitive_steps": 50
+    },
+    "h10_r10": {
+      "planning_horizon": 10,
+      "receding_horizon": 10,
+      "eval_budget_primitive_steps": 50
+    }
+  },
+  "checkpoint_sha256": {
+    "pusht": "1cf72a6616b9625e056595d98794b61595bddce923ea87bb1d527fc6f43d98b7",
+    "cube": "6ed18d2aacbd4b6c51fd2ba79fe57f8b0b456691e6cf69455723269099151d6f",
+    "tworoom": "b42b2a215185989ef19cd2c72619f9f3116967b55cf114f33ae1ae4a9c34b31b"
+  },
+  "checkpoint_config_sha256": {
+    "pusht": "c4a21dab4e6ab5803e9ae159bc7345104e4fe083116580fa5719357aea0af5b8",
+    "cube": "86f2ed24c61b48354416c23af51aa51279ae28a33cb36b7ebc3d057eec2b8c0d",
+    "tworoom": "c4a21dab4e6ab5803e9ae159bc7345104e4fe083116580fa5719357aea0af5b8"
+  },
+  "manifest_sha256": {
+    "pusht_moderate": "dcdce1f5e90c29246b70670d6a61171bd8ba17814bc88726ac65994714c14afa",
+    "pusht_strict": "2042018fc346927af5da75cce2565db8476121d1db67a99d0fc50f218eddcbc9",
+    "cube_moderate": "03f9c3a375707bdcd40d32aa1be26ef15ab2529fe513e67eea59789b36c70d63",
+    "cube_strict": "fccf9d6de3336431a09f146b4fadbf1a1150aff4b2d699e75ca32835b3242ecd",
+    "tworoom_moderate": "216250de76495a17a58bb16538b678408063798c3e4f55381943b79214ac83f6",
+    "tworoom_strict": "b1833f5e500db94157b5f091bef8c77380a8d49a4862701eba7c2cad8b87fc35"
+  },
+  "averages_across_6_cells": {
+    "baseline_h5_r5": {
+      "successes": 70.83333333333333,
+      "evaluation_time_seconds": 92.25483445326488
+    },
+    "h5_r5_budget25": {
+      "successes": 52.5,
+      "delta_vs_baseline": -18.333333333333332,
+      "evaluation_time_seconds": 67.09077374140422
+    },
+    "h10_r5": {
+      "successes": 27.0,
+      "delta_vs_baseline": -43.833333333333336,
+      "evaluation_time_seconds": 206.56310359636942
+    },
+    "h10_r10": {
+      "successes": 38.166666666666664,
+      "delta_vs_baseline": -32.666666666666664,
+      "delta_vs_h10_r5": 11.166666666666666,
+      "evaluation_time_seconds": 113.4454185962677
+    }
+  },
+  "cells": [
+    {
+      "task": "pusht",
+      "criterion": "moderate",
+      "baseline_successes": 96,
+      "h10_r5": {
+        "successes": 21,
+        "delta_vs_baseline": -75,
+        "baseline_both_success": 21,
+        "baseline_lost": 75,
+        "baseline_gained": 0,
+        "evaluation_time_seconds": 184.43312883377075,
+        "result_sha256": "6136280ee756fd037261ab7f63180ae873b959081398b50557c8ca3378063723"
+      },
+      "h10_r10": {
+        "successes": 56,
+        "delta_vs_baseline": -40,
+        "baseline_both_success": 55,
+        "baseline_lost": 41,
+        "baseline_gained": 1,
+        "delta_vs_h10_r5": 35,
+        "r5_to_r10_lost": 3,
+        "r5_to_r10_gained": 38,
+        "evaluation_time_seconds": 94.39528131484985,
+        "result_sha256": "1e62e41a2553820659d296529b36e3beb5947199b421d8c8baf94e329c570c51"
+      }
+    },
+    {
+      "task": "pusht",
+      "criterion": "strict",
+      "baseline_successes": 85,
+      "h10_r5": {
+        "successes": 43,
+        "delta_vs_baseline": -42,
+        "baseline_both_success": 42,
+        "baseline_lost": 43,
+        "baseline_gained": 1,
+        "evaluation_time_seconds": 159.85634398460388,
+        "result_sha256": "d7d6c2a8f5e4bb2034d3ec170d78dfb7c25345b716d4a8d107d78333a4806295"
+      },
+      "h10_r10": {
+        "successes": 47,
+        "delta_vs_baseline": -38,
+        "baseline_both_success": 45,
+        "baseline_lost": 40,
+        "baseline_gained": 2,
+        "delta_vs_h10_r5": 4,
+        "r5_to_r10_lost": 4,
+        "r5_to_r10_gained": 8,
+        "evaluation_time_seconds": 92.52026319503784,
+        "result_sha256": "725aedd729e96a9037a68ea2f917bdaa9ead82b4216b5a099488ee6389126c37"
+      }
+    },
+    {
+      "task": "cube",
+      "criterion": "moderate",
+      "baseline_successes": 47,
+      "h10_r5": {
+        "successes": 40,
+        "delta_vs_baseline": -7,
+        "baseline_both_success": 32,
+        "baseline_lost": 15,
+        "baseline_gained": 8,
+        "evaluation_time_seconds": 235.62235593795776,
+        "result_sha256": "83228095012fbcd4d45d19899720ff3d4a6c7074ac43ba2af60e2728263b7656"
+      },
+      "h10_r10": {
+        "successes": 38,
+        "delta_vs_baseline": -9,
+        "baseline_both_success": 32,
+        "baseline_lost": 15,
+        "baseline_gained": 6,
+        "delta_vs_h10_r5": -2,
+        "r5_to_r10_lost": 4,
+        "r5_to_r10_gained": 2,
+        "evaluation_time_seconds": 147.91257905960083,
+        "result_sha256": "f5074310295f234575f545a427db2f9667a296f10e44558bb3ce1d2f72c9a497"
+      }
+    },
+    {
+      "task": "cube",
+      "criterion": "strict",
+      "baseline_successes": 28,
+      "h10_r5": {
+        "successes": 12,
+        "delta_vs_baseline": -16,
+        "baseline_both_success": 7,
+        "baseline_lost": 21,
+        "baseline_gained": 5,
+        "evaluation_time_seconds": 259.9177131652832,
+        "result_sha256": "4051b385cd23aaf83d29d62d4f0d84ae372341a03a6b39581539d04e8817bfa7"
+      },
+      "h10_r10": {
+        "successes": 14,
+        "delta_vs_baseline": -14,
+        "baseline_both_success": 9,
+        "baseline_lost": 19,
+        "baseline_gained": 5,
+        "delta_vs_h10_r5": 2,
+        "r5_to_r10_lost": 0,
+        "r5_to_r10_gained": 2,
+        "evaluation_time_seconds": 149.0090663433075,
+        "result_sha256": "ac1262af614f3d9cc9f71e83367f91c224609f065e7b2bdae369ef09817861e1"
+      }
+    },
+    {
+      "task": "tworoom",
+      "criterion": "moderate",
+      "baseline_successes": 88,
+      "h10_r5": {
+        "successes": 37,
+        "delta_vs_baseline": -51,
+        "baseline_both_success": 36,
+        "baseline_lost": 52,
+        "baseline_gained": 1,
+        "evaluation_time_seconds": 195.44568991661072,
+        "result_sha256": "baf9c4bd4aadf7629dc7d900ee206ddb9dab2fd4a04166bfc470c668a5467f48"
+      },
+      "h10_r10": {
+        "successes": 56,
+        "delta_vs_baseline": -32,
+        "baseline_both_success": 53,
+        "baseline_lost": 35,
+        "baseline_gained": 3,
+        "delta_vs_h10_r5": 19,
+        "r5_to_r10_lost": 7,
+        "r5_to_r10_gained": 26,
+        "evaluation_time_seconds": 99.24360704421997,
+        "result_sha256": "3f0dd07e833da7064df0b3629a20c7675acf3baab8e1acac7c981c0a5730daed"
+      }
+    },
+    {
+      "task": "tworoom",
+      "criterion": "strict",
+      "baseline_successes": 81,
+      "h10_r5": {
+        "successes": 9,
+        "delta_vs_baseline": -72,
+        "baseline_both_success": 9,
+        "baseline_lost": 72,
+        "baseline_gained": 0,
+        "evaluation_time_seconds": 204.10338973999023,
+        "result_sha256": "cdc2432fb435946de9437ffe4ad970ec71d0f1ff9edf4435e5f5f66c83c43c72"
+      },
+      "h10_r10": {
+        "successes": 18,
+        "delta_vs_baseline": -63,
+        "baseline_both_success": 17,
+        "baseline_lost": 64,
+        "baseline_gained": 1,
+        "delta_vs_h10_r5": 9,
+        "r5_to_r10_lost": 3,
+        "r5_to_r10_gained": 12,
+        "evaluation_time_seconds": 97.59171462059021,
+        "result_sha256": "56112b1dcbd8a090c34935c77e436892335993279b5e87201378040db9afcf40"
+      }
+    }
+  ],
+  "budget25_cells": [
+    {
+      "task": "pusht",
+      "criterion": "moderate",
+      "baseline_successes": 96,
+      "successes": 92,
+      "delta_vs_baseline": -4,
+      "baseline_both_success": 92,
+      "baseline_lost": 4,
+      "baseline_gained": 0,
+      "evaluation_time_seconds": 50.54260444641113,
+      "result_sha256": "f877f687c8d6a40025a4181489ee9a678042c771d0198dfe9212a210d18e04f3"
+    },
+    {
+      "task": "pusht",
+      "criterion": "strict",
+      "baseline_successes": 85,
+      "successes": 56,
+      "delta_vs_baseline": -29,
+      "baseline_both_success": 56,
+      "baseline_lost": 29,
+      "baseline_gained": 0,
+      "evaluation_time_seconds": 48.84017324447632,
+      "result_sha256": "2b4238b364125c612110ea77e95340b0537fb72181e8afddcbacfb93da2947c0"
+    },
+    {
+      "task": "cube",
+      "criterion": "moderate",
+      "baseline_successes": 47,
+      "successes": 45,
+      "delta_vs_baseline": -2,
+      "baseline_both_success": 45,
+      "baseline_lost": 2,
+      "baseline_gained": 0,
+      "evaluation_time_seconds": 98.79701924324036,
+      "result_sha256": "16f9130d483573adaeb7d96bd11a3bfbfd6f70bd5929efe9dea6025077364aa5"
+    },
+    {
+      "task": "cube",
+      "criterion": "strict",
+      "baseline_successes": 28,
+      "successes": 24,
+      "delta_vs_baseline": -4,
+      "baseline_both_success": 24,
+      "baseline_lost": 4,
+      "baseline_gained": 0,
+      "evaluation_time_seconds": 99.78886580467224,
+      "result_sha256": "42f081c94164081c7f4e7f295850cd42ea3c7d3ef0cb33e14edd9cb42834cc31"
+    },
+    {
+      "task": "tworoom",
+      "criterion": "moderate",
+      "baseline_successes": 88,
+      "successes": 72,
+      "delta_vs_baseline": -16,
+      "baseline_both_success": 72,
+      "baseline_lost": 16,
+      "baseline_gained": 0,
+      "evaluation_time_seconds": 52.122331380844116,
+      "result_sha256": "e3092e5bf1f2405cf867d6480ea9e18cc349c1998ab5a9007b2497c463d21001"
+    },
+    {
+      "task": "tworoom",
+      "criterion": "strict",
+      "baseline_successes": 81,
+      "successes": 26,
+      "delta_vs_baseline": -55,
+      "baseline_both_success": 26,
+      "baseline_lost": 55,
+      "baseline_gained": 0,
+      "evaluation_time_seconds": 52.45364832878113,
+      "result_sha256": "54fcefd6dbf470f1afefa8e23f2bf7b187496cb3927347d39faea3c83d7a9a40"
+    }
+  ],
+  "budget_ablation_provenance": {
+    "canonical_protocol_eval_budget_primitive_steps": 50,
+    "executed_eval_budget_primitive_steps": 25,
+    "resolved_config_budget_ablation_opt_in": true,
+    "result_eval_budget_contract_matched": false,
+    "remote_evaluator_original_sha256": "66015833ac18ad1572ef76b0a49fcdad2458f7929bb355df28c8f70d97198c6a",
+    "remote_evaluator_temporary_sha256": "a4f338f07fe285401a08c984bb224ce1fe3c2927d1446c0d87b11fe9878a8d0e",
+    "remote_evaluator_restored": true
+  },
+  "baseline_result_sha256": {
+    "pusht_moderate": "ee3fcd786f11b6ac62738d312faf0532a37d1b1f12cd0460f9a910cea969dfaa",
+    "pusht_strict": "11c2721dabb08bb5be60fedc6a7569b05151ce7859cdd5c035d5ae557fa5a8e6",
+    "cube_moderate": "681b5a88865edbe9bc5c5b09a8e361bb0ba95ff3af535a1d21a038df0a02292c",
+    "cube_strict": "7f7256ad938b2d7071855d901ac922cc7e35db50f52f68f2f93d173acc43d950",
+    "tworoom_moderate": "cf95c4efcc1bffe96a739b1477e481e0244c38ef79ac4439a4b9041462ffba06",
+    "tworoom_strict": "a52da0cc243cfd646641acb5bfee5bb7b7a952711068af9aabe9e2cf52d3a02d"
+  },
+  "artifact_audit": {
+    "new_result_json_count": 18,
+    "horizon_ablation_result_json_count": 12,
+    "budget_ablation_result_json_count": 6,
+    "baseline_result_json_count": 6,
+    "all_completed_trajectories": 100,
+    "all_success_vectors_length": 100,
+    "success_rate_matches_vector_sum_with_float_tolerance": true,
+    "sampled_episode_flat_and_start_indices_match_baseline": true,
+    "checkpoint_config_manifest_and_solver_contract_match": true,
+    "budget25_actual_eval_budget_primitive_steps": 25,
+    "budget25_protocol_eval_budget_primitive_steps": 50,
+    "budget25_ablation_opt_in_present": true,
+    "budget25_contract_mismatch_expected": true,
+    "budget25_success_sets_are_subsets_of_baseline": true,
+    "tworoom_topology_records_per_run": 100,
+    "tworoom_invalid_routes": 0,
+    "tworoom_unclear_starts": 0,
+    "tworoom_unclear_goals": 0,
+    "log_error_scan_clean": true
+  },
+  "artifact_layout": {
+    "ablation_raw": "raw/",
+    "baseline_raw": "baseline_raw/",
+    "logs": "logs/"
+  },
+  "protocol_note": "The 5/5 budget-50 row is the canonical baseline planner contract. The 10/5 and 10/10 rows deliberately change planner horizons, and the 5/5 budget-25 row deliberately changes the execution budget. All three are ablations, not canonical CLEAR-LeWM v0.5 baseline submissions."
+}

@@ -1,0 +1,70 @@
+==== CONFIG ====
+cache_dir: null
+solver:
+  _target_: stable_worldmodel.planning.solver.CEMSolver
+  cost: ???
+  batch_size: 1
+  num_samples: 300
+  var_scale: 1.0
+  n_steps: 30
+  topk: 30
+  device: cuda
+  seed: ${seed}
+objective:
+  _target_: stable_worldmodel.planning.GoalMSE
+world:
+  env_name: swm/TwoRoom-v1
+  num_envs: ${eval.num_eval}
+  max_episode_steps: 100
+dataset:
+  stats: ${eval.dataset_name}
+  keys_to_cache:
+  - action
+  - proprio
+seed: 42
+policy: /ssd/sxu/workspace/code/stable-worldmodel/outputs/experiments/checkpoints/lewm-tworoom-53ca790-seed3072/weights_epoch_10.pt
+plan_config:
+  horizon: 5
+  receding_horizon: 5
+  action_block: 5
+eval:
+  num_eval: 100
+  goal_offset_steps: 25
+  eval_budget: 50
+  video: false
+  arm: A
+  task_head: null
+  task_rollouts_dir: null
+  manifest: /ssd/sxu/workspace/code/stable-worldmodel/outputs/worktrees/tp-lewm/results/clear_eval/v0.5/manifests/tworoom/strict-seed42-n100.json
+  solver_ablation: false
+  img_size: 224
+  dataset_name: /ssd/sxu/workspace/data/stable-worldmodel/tworoom/tworoom.h5
+  callables:
+  - method: _set_state
+    args:
+      state:
+        value: pos_agent
+  - method: _set_goal_state
+    args:
+      goal_state:
+        value: goal_pos_agent
+compile: false
+bf16: false
+output:
+  dir: /ssd/sxu/workspace/code/stable-worldmodel/outputs/worktrees/tp-lewm/outputs/experiments/evaluations/tp-eval-A-tworoom-strict-seed42-2aedf8f
+  filename: results.txt
+
+==== RESULTS ====
+metrics: {'success_rate': 81.0, 'episode_successes': array([ True,  True,  True,  True,  True,  True, False, False,  True,
+        True,  True,  True,  True,  True,  True,  True, False, False,
+        True,  True, False,  True,  True,  True,  True,  True, False,
+       False,  True,  True,  True,  True,  True,  True, False, False,
+        True,  True,  True,  True,  True,  True,  True,  True, False,
+        True, False,  True,  True,  True,  True,  True,  True, False,
+       False,  True,  True,  True,  True,  True,  True,  True, False,
+        True,  True,  True,  True,  True,  True,  True,  True,  True,
+        True,  True,  True, False,  True,  True,  True,  True,  True,
+        True,  True,  True, False,  True, False, False,  True,  True,
+        True,  True,  True,  True,  True,  True,  True, False,  True,
+        True]), 'seeds': None}
+evaluation_time: 87.22184681892395 seconds

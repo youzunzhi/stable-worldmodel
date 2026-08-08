@@ -1,0 +1,38 @@
+[2026-08-08 13:46:10,061][datasets][INFO] - JAX version 0.6.2 available.
+13:46:39 | INFO  | atomic_chec~| [atomic_save] installed crash-safe checkpoint plugin (write to sibling .tmp + fsync + atomic rename)
+[2026-08-08 13:46:43,281][root][INFO] - Cached 'action' from '/public/home/xsy0001/workspace/data/stable-worldmodel/tworoom/tworoom.h5'
+[2026-08-08 13:46:47,454][root][INFO] - Cached 'proprio' from '/public/home/xsy0001/workspace/data/stable-worldmodel/tworoom/tworoom.h5'
+13:46:51 | INFO  | utils.py    | Created ViT-tiny from scratch with config: {'hidden_size': 192, 'num_hidden_layers': 12, 'num_attention_heads': 3, 'intermediate_size': 768, 'image_size': 224, 'patch_size': 14}
+/public/home/xsy0001/miniconda3/envs/lewm/lib/python3.10/site-packages/gymnasium/utils/passive_env_checker.py:129: UserWarning: [33mWARN: The obs returned by the `reset()` method was expecting a numpy array, actual type: <class 'torch.Tensor'>[0m
+  logger.warn(
+/public/home/xsy0001/miniconda3/envs/lewm/lib/python3.10/site-packages/gymnasium/spaces/box.py:415: UserWarning: [33mWARN: Casting input x to numpy array.[0m
+  gym.logger.warn("Casting input x to numpy array.")
+/public/home/xsy0001/miniconda3/envs/lewm/lib/python3.10/site-packages/gymnasium/utils/passive_env_checker.py:129: UserWarning: [33mWARN: The obs returned by the `step()` method was expecting a numpy array, actual type: <class 'torch.Tensor'>[0m
+  logger.warn(
+/public/home/xsy0001/miniconda3/envs/lewm/lib/python3.10/site-packages/gymnasium/spaces/box.py:415: UserWarning: [33mWARN: Casting input x to numpy array.[0m
+  gym.logger.warn("Casting input x to numpy array.")
+[ 38970  58456  59930  72195  77238  79236  82491  89419 115139 121827
+ 130352 142096 149930 163623 174290 177606 205264 217554 232273 253886
+ 276939 299184 303802 310012 320198 325953 326421 330975 333087 353349
+ 355915 373853 379400 383557 391411 397371 400032 400356 402456 403103
+ 418085 421405 428866 438073 440289 455041 456326 467160 493135 504123
+ 505584 528699 569194 572128 572481 585169 597401 614124 615418 623041
+ 624968 632568 634617 640348 648910 649993 662145 668898 669222 675104
+ 676623 684331 690756 692301 701362 709537 723609 724441 733459 733558
+ 742233 743451 763610 765474 767816 778856 786127 795570 809190 819596
+ 827822 829185 843033 853365 857834 866908 877534 889801 904304 908222]
+[eval] video output disabled
+CEM solve time: 95.8950 seconds
+CEM solve time: 84.1457 seconds
+{'success_rate': 37.0, 'episode_successes': array([False, False,  True, False, False, False, False,  True,  True,
+        True,  True,  True, False, False, False, False,  True, False,
+        True,  True, False,  True, False, False, False, False,  True,
+       False,  True, False,  True, False, False, False, False,  True,
+       False,  True, False,  True,  True, False, False, False, False,
+       False, False,  True, False, False,  True, False, False, False,
+       False, False, False, False,  True, False, False, False, False,
+        True, False,  True,  True,  True, False, False, False,  True,
+       False, False, False, False, False, False, False,  True,  True,
+        True, False,  True,  True,  True, False, False, False, False,
+        True, False,  True,  True, False, False, False,  True,  True,
+        True]), 'seeds': None}

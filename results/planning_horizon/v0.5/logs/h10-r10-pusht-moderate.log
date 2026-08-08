@@ -1,0 +1,38 @@
+/public/home/xsy0001/miniconda3/envs/lewm/lib/python3.10/site-packages/pygame/pkgdata.py:25: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import resource_stream, resource_exists
+[2026-08-08 13:50:40,779][datasets][INFO] - JAX version 0.6.2 available.
+13:50:46 | INFO  | atomic_chec~| [atomic_save] installed crash-safe checkpoint plugin (write to sibling .tmp + fsync + atomic rename)
+[2026-08-08 13:50:46,641][root][INFO] - Cached 'action' from '/public/home/xsy0001/workspace/data/stable-worldmodel/hf/datasets/quentinll--lewm-pusht/655cd446b9929369d7d406001da85c15d1457850/pusht_expert_train.h5'
+[2026-08-08 13:50:46,679][root][INFO] - Cached 'proprio' from '/public/home/xsy0001/workspace/data/stable-worldmodel/hf/datasets/quentinll--lewm-pusht/655cd446b9929369d7d406001da85c15d1457850/pusht_expert_train.h5'
+[2026-08-08 13:50:46,730][root][INFO] - Cached 'state' from '/public/home/xsy0001/workspace/data/stable-worldmodel/hf/datasets/quentinll--lewm-pusht/655cd446b9929369d7d406001da85c15d1457850/pusht_expert_train.h5'
+13:50:47 | INFO  | utils.py    | Created ViT-tiny from scratch with config: {'hidden_size': 192, 'num_hidden_layers': 12, 'num_attention_heads': 3, 'intermediate_size': 768, 'image_size': 224, 'patch_size': 14}
+/public/home/xsy0001/miniconda3/envs/lewm/lib/python3.10/site-packages/gymnasium/spaces/box.py:415: UserWarning: [33mWARN: Casting input x to numpy array.[0m
+  gym.logger.warn("Casting input x to numpy array.")
+/public/home/xsy0001/miniconda3/envs/lewm/lib/python3.10/site-packages/gymnasium/utils/passive_env_checker.py:157: UserWarning: [33mWARN: The obs returned by the `step()` method is not within the observation space.[0m
+  logger.warn(f"{pre} is not within the observation space.")
+[  96019  145064  153730  176276  195912  204277  212097  215367  221161
+  283275  286514  303027  335044  359856  373793  415546  431028  442799
+  459882  526602  526955  550857  651142  681713  726883  758108  772652
+  824178  840897  847495  855945  857541  895948  927918  951549  990451
+ 1000399 1003993 1004258 1018582 1026749 1039290 1040253 1070579 1077127
+ 1081511 1098647 1143207 1146227 1169288 1196809 1243711 1250565 1271677
+ 1304034 1473067 1474027 1485957 1495755 1522171 1566554 1589429 1596119
+ 1598614 1607347 1628400 1637883 1640873 1680775 1726853 1742428 1745600
+ 1776831 1781704 1782645 1806138 1811057 1828797 1836030 1845436 1871912
+ 1886101 1923753 1931609 1940963 1941182 1949436 1966592 1995485 1999273
+ 2083057 2095515 2113818 2120911 2156329 2162001 2204183 2274374 2278161
+ 2283664]
+[eval] video output disabled
+CEM solve time: 90.6888 seconds
+{'success_rate': 56.00000000000001, 'episode_successes': array([ True, False, False,  True,  True,  True, False, False, False,
+        True, False, False, False, False,  True,  True,  True,  True,
+        True,  True,  True,  True,  True, False,  True, False,  True,
+       False, False,  True, False,  True, False,  True,  True,  True,
+       False,  True,  True,  True, False,  True,  True,  True,  True,
+        True,  True,  True,  True,  True, False,  True, False,  True,
+       False, False, False, False, False, False,  True,  True,  True,
+        True, False, False, False, False, False, False,  True,  True,
+        True,  True,  True,  True, False,  True, False,  True, False,
+       False,  True, False, False, False,  True, False, False,  True,
+        True,  True,  True,  True, False, False,  True, False,  True,
+       False]), 'seeds': None}

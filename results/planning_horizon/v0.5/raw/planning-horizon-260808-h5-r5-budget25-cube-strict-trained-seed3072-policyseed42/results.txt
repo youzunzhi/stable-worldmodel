@@ -1,0 +1,82 @@
+==== CONFIG ====
+cache_dir: null
+solver:
+  _target_: stable_worldmodel.planning.solver.CEMSolver
+  cost: ???
+  batch_size: 1
+  num_samples: 300
+  var_scale: 1.0
+  n_steps: 30
+  topk: 30
+  device: cuda
+  seed: ${seed}
+objective:
+  _target_: stable_worldmodel.planning.GoalMSE
+world:
+  env_name: swm/OGBCube-v0
+  num_envs: ${eval.num_eval}
+  max_episode_steps: 50
+  env_type: single
+  ob_type: states
+  multiview: false
+  width: 224
+  height: 224
+  visualize_info: false
+  terminate_at_goal: true
+dataset:
+  stats: ${eval.dataset_name}
+  keys_to_cache:
+  - action
+seed: 42
+policy: /public/home/xsy0001/workspace/code/stable-worldmodel-tp-lewm/outputs/experiments/checkpoints/lewm-cube-paper10-seed3072/weights_epoch_10.pt
+plan_config:
+  horizon: 5
+  receding_horizon: 5
+  action_block: 5
+eval:
+  num_eval: 100
+  goal_offset_steps: 25
+  eval_budget: 25
+  video: false
+  arm: A
+  task_head: null
+  task_rollouts_dir: null
+  manifest: /public/home/xsy0001/workspace/code/stable-worldmodel-tp-lewm/outputs/inputs/CLEAR-LeWM-v0.5.0/manifests/v0.5/cube/strict-seed42-n100.json
+  solver_ablation: false
+  img_size: 224
+  dataset_name: /public/home/xsy0001/workspace/data/stable-worldmodel/hf/datasets/quentinll--lewm-cube/02a19a67a0dc8c9d6215f89c19e0a597691e152a/cube_single_expert.h5
+  callables:
+  - method: set_state
+    args:
+      qpos:
+        value: qpos
+      qvel:
+        value: qvel
+  - method: set_target_pos
+    args:
+      cube_id:
+        value: 0
+        in_dataset: false
+      target_pos:
+        value: goal_privileged_block_0_pos
+      target_quat:
+        value: goal_privileged_block_0_quat
+  budget_ablation: true
+output:
+  dir: /public/home/xsy0001/workspace/code/stable-worldmodel-tp-lewm/outputs/experiments/evaluations/planning-horizon-260808-h5-r5-budget25-cube-strict-trained-seed3072-policyseed42
+  filename: results.txt
+
+==== RESULTS ====
+metrics: {'success_rate': 24.0, 'episode_successes': array([False, False,  True, False, False, False, False, False, False,
+       False, False, False, False, False,  True, False,  True, False,
+       False, False,  True, False,  True, False,  True,  True, False,
+       False,  True, False,  True, False, False, False,  True, False,
+       False,  True, False, False, False, False, False, False, False,
+       False, False,  True, False, False, False,  True, False, False,
+        True, False, False, False, False, False, False, False,  True,
+        True, False, False, False, False,  True, False, False, False,
+       False,  True, False, False, False,  True, False, False, False,
+       False,  True, False, False, False, False, False, False,  True,
+       False,  True, False,  True, False, False, False, False, False,
+        True]), 'seeds': None}
+evaluation_time: 99.78886580467224 seconds
