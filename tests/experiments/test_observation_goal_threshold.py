@@ -31,6 +31,7 @@ from scripts.experiments.observation_goal_threshold.sample_pairs import (
     AffinePermutation,
     DenseSpatialGrid,
     sample_stratified_partition,
+    sample_task_stratum,
     uniform_ordered_pairs,
 )
 from scripts.experiments.observation_goal_threshold.split import (
@@ -236,6 +237,32 @@ def test_stratified_sampler_is_latent_blind_reproducible_and_balanced():
     }
     assert set(first['anchor_group']) == set(groups)
     assert audit['positive']['realized'] == 300
+
+
+def test_stratum_sampler_refills_after_unique_pair_collisions():
+    # Only cross-cluster pairs are in the far stratum: 19,800 pairs exist, but
+    # the first 3% overdraw has too many collisions to fill this 15,000 sample.
+    # The sampler must continue its seeded stream until the no-replacement
+    # contract is satisfied.
+    states = np.concatenate(
+        [np.zeros(990, dtype=np.float32), np.full(10, 100.0, np.float32)]
+    )[:, None]
+    rows = np.arange(len(states))
+    result = sample_task_stratum(
+        partition_rows=rows,
+        all_states=states,
+        all_groups=np.zeros(len(states), dtype=np.int64),
+        contract=contract(),
+        target_count=15_000,
+        lower_exclusive=50.0,
+        upper_inclusive=None,
+        label=LABEL_F,
+        seed=260820,
+        total_dataset_rows=len(states),
+    )
+    assert len(result['pair_id']) == 15_000
+    assert len(np.unique(result['pair_id'])) == 15_000
+    assert (result['task_error'] > 50.0).all()
 
 
 def synthetic_samples():

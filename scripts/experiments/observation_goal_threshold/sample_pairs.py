@@ -179,68 +179,81 @@ def sample_task_stratum(
     accepted_raw = 0
     proposals = 0
     max_proposals = max(20_000_000, target_count * 300)
-    while accepted_raw < int(np.ceil(target_count * 1.03)):
-        remaining = target_count - accepted_raw
-        batch = min(4_000_000, max(250_000, remaining * 4))
-        anchor_local = rng.integers(0, len(rows), size=batch, dtype=np.int64)
-        if finite_band:
-            assert grid is not None and offsets is not None
-            goal_local, design_weight, valid = grid.propose(
-                anchor_local, offsets, rng
+    raw_target = int(np.ceil(target_count * 1.03))
+    while True:
+        while accepted_raw < raw_target:
+            remaining = raw_target - accepted_raw
+            batch = min(4_000_000, max(250_000, remaining * 4))
+            anchor_local = rng.integers(
+                0, len(rows), size=batch, dtype=np.int64
             )
-        else:
-            goal_local = rng.integers(0, len(rows), size=batch, dtype=np.int64)
-            design_weight = np.full(batch, len(rows), dtype=np.float64)
-            valid = np.ones(batch, dtype=bool)
-        valid &= anchor_local != goal_local
-        error = contract.task_error(states[anchor_local], states[goal_local])
-        if lower_exclusive is not None:
-            valid &= error > lower_exclusive
-        if upper_inclusive is not None:
-            if int(label) == int(LABEL_T):
-                valid &= error < upper_inclusive
+            if finite_band:
+                assert grid is not None and offsets is not None
+                goal_local, design_weight, valid = grid.propose(
+                    anchor_local, offsets, rng
+                )
             else:
-                valid &= error <= upper_inclusive
-        labels = contract.classify(error)
-        valid &= labels == label
-        selected = np.flatnonzero(valid)
-        if len(selected):
-            anchor_row = rows[anchor_local[selected]]
-            goal_row = rows[goal_local[selected]]
-            accepted.append(
-                {
-                    'anchor_row': anchor_row,
-                    'goal_row': goal_row,
-                    'anchor_group': groups[anchor_local[selected]],
-                    'goal_group': groups[goal_local[selected]],
-                    'task_error': error[selected],
-                    'analysis_weight': design_weight[selected],
-                }
+                goal_local = rng.integers(
+                    0, len(rows), size=batch, dtype=np.int64
+                )
+                design_weight = np.full(batch, len(rows), dtype=np.float64)
+                valid = np.ones(batch, dtype=bool)
+            valid &= anchor_local != goal_local
+            error = contract.task_error(
+                states[anchor_local], states[goal_local]
             )
-            accepted_raw += len(selected)
-        proposals += batch
-        if proposals > max_proposals:
-            raise RuntimeError(
-                f'stratum sampling shortfall: {accepted_raw}/{target_count} '
-                f'after {proposals} proposals'
-            )
+            if lower_exclusive is not None:
+                valid &= error > lower_exclusive
+            if upper_inclusive is not None:
+                if int(label) == int(LABEL_T):
+                    valid &= error < upper_inclusive
+                else:
+                    valid &= error <= upper_inclusive
+            labels = contract.classify(error)
+            valid &= labels == label
+            selected = np.flatnonzero(valid)
+            if len(selected):
+                anchor_row = rows[anchor_local[selected]]
+                goal_row = rows[goal_local[selected]]
+                accepted.append(
+                    {
+                        'anchor_row': anchor_row,
+                        'goal_row': goal_row,
+                        'anchor_group': groups[anchor_local[selected]],
+                        'goal_group': groups[goal_local[selected]],
+                        'task_error': error[selected],
+                        'analysis_weight': design_weight[selected],
+                    }
+                )
+                accepted_raw += len(selected)
+            proposals += batch
+            if proposals > max_proposals:
+                raise RuntimeError(
+                    'stratum sampling shortfall: '
+                    f'{accepted_raw} raw accepted for {target_count} unique '
+                    f'pairs after {proposals} proposals'
+                )
 
-    merged = {
-        key: np.concatenate([part[key] for part in accepted])
-        for key in accepted[0]
-    }
-    pair_key = merged['anchor_row'].astype(np.uint64) * np.uint64(
-        total_dataset_rows
-    ) + merged['goal_row'].astype(np.uint64)
-    _, first = np.unique(pair_key, return_index=True)
-    first.sort()
-    if len(first) < target_count:
-        # Extremely unlikely at formal scale; rerun with a distinct seed rather
-        # than silently duplicating a pair.
-        raise RuntimeError(
-            f'unique-pair shortfall: {len(first)}/{target_count}; '
-            'use a new pre-scoring config seed'
-        )
+        merged = {
+            key: np.concatenate([part[key] for part in accepted])
+            for key in accepted[0]
+        }
+        pair_key = merged['anchor_row'].astype(np.uint64) * np.uint64(
+            total_dataset_rows
+        ) + merged['goal_row'].astype(np.uint64)
+        _, first = np.unique(pair_key, return_index=True)
+        first.sort()
+        if len(first) >= target_count:
+            break
+
+        # A fixed overdraw fraction is not enough when a large stratum has a
+        # modest collision rate: the PushT formal run produced 5,996,879
+        # unique pairs from a 6,000,000 target.  Continue the same seeded
+        # proposal stream and re-deduplicate instead of changing the seed or
+        # silently duplicating rows.  The 10k floor keeps refill iterations
+        # coarse without materially increasing formal-run memory.
+        shortfall = target_count - len(first)
+        raw_target = accepted_raw + max(10_000, shortfall * 2)
     first = first[:target_count]
     result: dict[str, np.ndarray | int | float] = {
         key: value[first] for key, value in merged.items()
