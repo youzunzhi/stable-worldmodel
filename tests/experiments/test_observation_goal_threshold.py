@@ -14,6 +14,7 @@ from scripts.experiments.observation_goal_threshold.contracts import (
 )
 from scripts.experiments.observation_goal_threshold.encode import (
     encode_projected,
+    pair_partition_matches,
     parameter_hash,
     preprocess_pixels,
     score_pair_shards,
@@ -419,6 +420,16 @@ def test_audit_scoring_requires_locked_threshold(tmp_path):
             locked_threshold_path=None,
             device='cpu',
         )
+
+
+def test_dictionary_encoded_partition_guard_supports_pyarrow_25():
+    pa = pytest.importorskip('pyarrow')
+    dictionary = pa.DictionaryArray.from_arrays(
+        pa.array([0, 0], type=pa.int8()), pa.array(['threshold_fit'])
+    )
+    table = pa.table({'partition': dictionary})
+    assert pair_partition_matches(table, 'threshold_fit')
+    assert not pair_partition_matches(table, 'threshold_validation')
 
 
 @pytest.mark.parametrize(

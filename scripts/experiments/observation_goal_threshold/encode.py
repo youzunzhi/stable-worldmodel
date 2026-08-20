@@ -62,6 +62,17 @@ def load_frozen_model(checkpoint: str | Path, device: str):
     return model
 
 
+def pair_partition_matches(table, expected: str) -> bool:
+    """Validate one dictionary-encoded partition column across pyarrow versions."""
+    import pyarrow as pa
+    import pyarrow.compute as pc
+
+    if len(table) == 0:
+        return False
+    values = pc.unique(table['partition'].cast(pa.string())).to_pylist()
+    return values == [expected]
+
+
 def encode_observations(
     *,
     dataset_path: str | Path,
@@ -172,7 +183,6 @@ def score_pair_shards(
 ) -> dict:
     """Append mean-D squared latent distance to materialized pair shards."""
     import pyarrow as pa
-    import pyarrow.compute as pc
     import pyarrow.parquet as pq
     import torch
 
@@ -195,11 +205,7 @@ def score_pair_shards(
     hashes = []
     for path in sorted(source.glob('*.parquet')):
         table = pq.read_table(path)
-        if (
-            len(table) == 0
-            or table['partition'][0].as_py() != partition
-            or pc.count_distinct(table['partition']).as_py() != 1
-        ):
+        if not pair_partition_matches(table, partition):
             raise ValueError(f'pair shard partition mismatch: {path}')
         anchor_row = table['anchor_row'].to_numpy()
         goal_row = table['goal_row'].to_numpy()
