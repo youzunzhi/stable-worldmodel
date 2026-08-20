@@ -1,0 +1,83 @@
+{
+  "artifact_schema_version": "experiment-t-v1-summary",
+  "formal_commit": "142ffa7156ad79eaefd7f8d757b7ed0e4a6d54ea",
+  "formal_root": "/public/home/xsy0001/workspace/data/stable-worldmodel/experiments/observation_goal_threshold/formal-142ffa7-20260820",
+  "pair_contract_per_task": {
+    "uniform_target": 100000000,
+    "uniform_realized": 100000000,
+    "stratified_target": 20000000,
+    "stratified_realized": 20000000,
+    "fit_fraction": 0.6,
+    "validation_fraction": 0.2,
+    "audit_fraction": 0.2
+  },
+  "selection_contract": {
+    "min_macro_tpr": 0.9,
+    "max_macro_fpr": 0.1,
+    "tie_break": "smallest_epsilon"
+  },
+  "tasks": {
+    "pusht": {
+      "variant": "pusht_joint_xy_pointwise_gap20_30",
+      "status": "PROMOTABLE",
+      "epsilon": 1.6419658660888672,
+      "selected_threshold_sha256": "5dc633561a94928eb37dcf2506423ba58c8cf35994cf3e8d7a74867880ae98fb",
+      "fit": {
+        "macro_tpr": 0.9431121029946082,
+        "macro_fpr": 0.0999987636644322,
+        "uniform_tpr": 0.9467348781221787,
+        "uniform_fpr": 0.14384353058475077
+      },
+      "validation": {
+        "macro_tpr": 0.9542799047039667,
+        "macro_fpr": 0.09815489040714044,
+        "uniform_tpr": 0.9537503610745579,
+        "uniform_fpr": 0.15035386320153998
+      },
+      "audit": {
+        "macro_tpr": 0.9529359317640687,
+        "macro_fpr": 0.10022377227754171,
+        "macro_tpr_clustered_95ci": [0.9417019941935401, 0.9629022651380316],
+        "macro_fpr_clustered_95ci": [0.09159159152845447, 0.10898773952094493],
+        "uniform_tpr": 0.9508603258174049,
+        "uniform_fpr": 0.14349465634455474,
+        "population_precision": 0.008637821479246454
+      }
+    },
+    "cube": {
+      "variant": "cube_block_xyz_pointwise_gap03_04",
+      "status": "THRESHOLD_CALIBRATION_NO_FEASIBLE_OPERATING_POINT",
+      "epsilon": null,
+      "best_macro_tpr_within_fpr_contract": 0.7078820482046937,
+      "required_macro_tpr": 0.9,
+      "audit_opened": false
+    },
+    "tworoom": {
+      "variant": "tworoom_agent_xy_pointwise_gap8_16",
+      "status": "PROMOTABLE",
+      "epsilon": 1.392462968826294,
+      "selected_threshold_sha256": "e2b00f0b38f42b37373e8d4576d915d0140943f5f8b0d0569d61f5b3b41ece4d",
+      "fit": {
+        "macro_tpr": 1.0,
+        "macro_fpr": 0.0293897738137507,
+        "uniform_tpr": 1.0,
+        "uniform_fpr": 0.0669202820906677
+      },
+      "validation": {
+        "macro_tpr": 1.0,
+        "macro_fpr": 0.027474136108444718,
+        "uniform_tpr": 1.0,
+        "uniform_fpr": 0.06505748022998198
+      },
+      "audit": {
+        "macro_tpr": 1.0,
+        "macro_fpr": 0.028177251743511027,
+        "macro_tpr_clustered_95ci": [1.0, 1.0],
+        "macro_fpr_clustered_95ci": [0.027207191264950685, 0.029152900577382942],
+        "uniform_tpr": 1.0,
+        "uniform_fpr": 0.06522467461349418,
+        "population_precision": 0.2289968438500488
+      }
+    }
+  }
+}
