@@ -23,10 +23,8 @@ def preprocess_pixels(pixels, image_size: tuple[int, int] = (224, 224)):
     if array.ndim != 4 or array.shape[-1] != 3 or array.dtype != np.uint8:
         raise ValueError('pixels must be a uint8 NHWC RGB batch')
     tensor = torch.from_numpy(array).permute(0, 3, 1, 2)
-    tensor = tensor.to(torch.float32).div_(255.0)
-    mean = torch.tensor(IMAGENET_MEAN, dtype=tensor.dtype).view(1, 3, 1, 1)
-    std = torch.tensor(IMAGENET_STD, dtype=tensor.dtype).view(1, 3, 1, 1)
-    tensor = (tensor - mean) / std
+    tensor = tvf.to_dtype(tensor, dtype=torch.float32, scale=True)
+    tensor = tvf.normalize(tensor, mean=IMAGENET_MEAN, std=IMAGENET_STD)
     return tvf.resize(tensor, size=list(image_size), antialias=True)
 
 

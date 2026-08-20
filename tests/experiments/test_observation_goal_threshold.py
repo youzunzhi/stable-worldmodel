@@ -317,12 +317,26 @@ def test_cluster_bootstrap_is_seed_reproducible():
 
 
 def test_preprocessing_shape_scale_and_finiteness():
-    pytest.importorskip('torchvision')
-    pixels = np.zeros((2, 224, 224, 3), dtype=np.uint8)
+    torch = pytest.importorskip('torch')
+    spt = pytest.importorskip('stable_pretraining')
+    transforms = pytest.importorskip('torchvision.transforms.v2')
+    pixels = np.arange(2 * 224 * 224 * 3, dtype=np.uint8).reshape(
+        2, 224, 224, 3
+    )
     output = preprocess_pixels(pixels)
     assert tuple(output.shape) == (2, 3, 224, 224)
     assert output.dtype.is_floating_point
     assert output.isfinite().all()
+    reference = transforms.Compose(
+        [
+            transforms.ToImage(),
+            transforms.ToDtype(torch.float32, scale=True),
+            transforms.Normalize(**spt.data.dataset_stats.ImageNet),
+            transforms.Resize(size=224),
+        ]
+    )
+    expected = torch.stack([reference(image) for image in pixels])
+    assert torch.equal(output, expected)
 
 
 def test_encode_projected_never_calls_predictor_or_action_encoder():
