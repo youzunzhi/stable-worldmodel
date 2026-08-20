@@ -122,7 +122,13 @@ class DenseSpatialGrid:
         valid &= count > 0
         safe_count = np.maximum(count, 1)
         slot = (rng.random(len(anchor_local)) * safe_count).astype(np.int64)
-        goal_local = self.order[self.starts[cell] + slot]
+        position = self.starts[cell] + slot
+        # A multidimensional bounding grid can end in an empty flattened cell
+        # even though every coordinate-wise maximum is occupied somewhere.
+        # Invalid proposals are rejected by the returned mask, but must first
+        # be redirected to a safe row so indexing itself remains total.
+        position[~valid] = 0
+        goal_local = self.order[position]
         return goal_local, count.astype(np.float64), valid
 
 

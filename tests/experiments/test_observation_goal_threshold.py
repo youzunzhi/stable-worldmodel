@@ -28,6 +28,7 @@ from scripts.experiments.observation_goal_threshold.metrics import (
 )
 from scripts.experiments.observation_goal_threshold.sample_pairs import (
     AffinePermutation,
+    DenseSpatialGrid,
     sample_stratified_partition,
     uniform_ordered_pairs,
 )
@@ -185,6 +186,26 @@ def test_uniform_ordered_pairs_are_unique_deterministic_and_not_self():
     assert np.array_equal(a1, a2) and np.array_equal(g1, g2)
     assert not np.any(a1 == g1)
     assert len(np.unique(a1 * 100 + g1)) == 1000
+
+
+def test_sparse_grid_empty_terminal_cell_is_rejected_without_index_error():
+    grid = DenseSpatialGrid(np.array([[0.0, 10.0], [10.0, 0.0]]), 10.0)
+
+    class DeterministicRng:
+        @staticmethod
+        def integers(low, high, size):
+            return np.zeros(size, dtype=np.int64)
+
+        @staticmethod
+        def random(size):
+            return np.zeros(size)
+
+    goal, count, valid = grid.propose(
+        np.array([0]), np.array([[1, 0]]), DeterministicRng()
+    )
+    assert goal.shape == count.shape == valid.shape == (1,)
+    assert count[0] == 0
+    assert not valid[0]
 
 
 def test_stratified_sampler_is_latent_blind_reproducible_and_balanced():
