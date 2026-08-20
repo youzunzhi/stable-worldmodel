@@ -1,0 +1,83 @@
+{
+  "artifact_schema_version": "experiment-t-v1",
+  "task": "pusht",
+  "dataset": {
+    "path": "/public/home/xsy0001/workspace/data/stable-worldmodel/hf/datasets/quentinll--lewm-pusht/655cd446b9929369d7d406001da85c15d1457850/pusht_expert_train.h5",
+    "expected_bytes": 46300921856,
+    "repository": "quentinll/lewm-pusht",
+    "revision": "655cd446b9929369d7d406001da85c15d1457850",
+    "pixels_column": "pixels",
+    "state_column": "state",
+    "state_indices": [0, 1, 2, 3],
+    "episode_column": "episode_idx",
+    "step_column": "step_idx",
+    "group_rule": "episode_idx // 101",
+    "variants_per_source": 101,
+    "hash_mode": "full_file"
+  },
+  "checkpoint": {
+    "path": "/public/home/xsy0001/workspace/code/stable-worldmodel/outputs/worktrees/lewm-dagger-pusht/outputs/experiments/lewm-dagger-pusht-v3/runs/checkpoints/lewm-dagger-pusht-m0-seed3072/weights_epoch_10.pt",
+    "sha256": "e4f14a2276918bcb34876fb8d86d16dbd8683ae6077a13a2275dee008a68c775",
+    "config_sha256": "c4a21dab4e6ab5803e9ae159bc7345104e4fe083116580fa5719357aea0af5b8",
+    "provenance": "canonical DAgger R1 M0, seed 3072, trained from scratch on the precommitted offline D0 split; compatibility fallback because the former /ssd full-demo checkpoint is unavailable"
+  },
+  "task_label": {
+    "variant": "pusht_joint_xy_pointwise_gap20_30",
+    "state_fields": ["pusher_x", "pusher_y", "block_x", "block_y"],
+    "metric": "joint_l2",
+    "positive_if_lt": 20.0,
+    "negative_if_gt": 30.0,
+    "negative_edges": [60.0, 150.0],
+    "unit": "pixel",
+    "ignored_fields": ["block_angle", "pusher_velocity_x", "pusher_velocity_y"],
+    "exact_self_pairs": "exclude"
+  },
+  "compatibility_signature": {
+    "scene": "PushT-v1 fixed 224x224 rendering",
+    "camera": "fixed",
+    "image_shape": [224, 224, 3],
+    "target_marker": "absent",
+    "variant_identity_retained": true
+  },
+  "preprocessing": {
+    "pixel_source": "HDF5 pixels HWC RGB uint8",
+    "channel_order": "RGB",
+    "scale": "uint8 / 255",
+    "normalization": "ImageNet mean/std from stable_pretraining",
+    "resize": [224, 224],
+    "interpolation": "bilinear antialias",
+    "encoder_symbol": "model.encoder(..., interpolate_pos_encoding=True).last_hidden_state[:, 0]",
+    "projector_symbol": "model.projector",
+    "residual": "mean_D((z_i-z_j)^2)",
+    "dtype": "float32",
+    "latent_dim": 192
+  },
+  "data": {
+    "threshold_split_seed": 260820,
+    "pair_sampling_seed": 90210,
+    "fit_fraction": 0.6,
+    "validation_fraction": 0.2,
+    "audit_fraction": 0.2
+  },
+  "pair_sampling": {
+    "uniform_pairs": 100000000,
+    "stratified_pairs": 20000000,
+    "stratified_positive_fraction": 0.5,
+    "pair_shard_rows": 1000000
+  },
+  "selection": {
+    "min_positive_recall": 0.9,
+    "max_negative_fpr": 0.1,
+    "min_population_precision": null,
+    "tie_break": "smallest_epsilon"
+  },
+  "analysis": {
+    "bootstrap_replicates": 10000,
+    "analysis_seed": 20260820
+  },
+  "runtime": {
+    "encode_batch_size": 256,
+    "pair_score_batch_size": 1000000,
+    "max_task_hours": 5
+  }
+}

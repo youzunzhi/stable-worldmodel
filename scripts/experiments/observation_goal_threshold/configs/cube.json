@@ -1,0 +1,83 @@
+{
+  "artifact_schema_version": "experiment-t-v1",
+  "task": "cube",
+  "dataset": {
+    "path": "/public/home/xsy0001/workspace/data/stable-worldmodel/hf/datasets/quentinll--lewm-cube/02a19a67a0dc8c9d6215f89c19e0a597691e152a/cube_single_expert.h5",
+    "expected_bytes": 101942558720,
+    "repository": "quentinll/lewm-cube",
+    "revision": "02a19a67a0dc8c9d6215f89c19e0a597691e152a",
+    "pixels_column": "pixels",
+    "state_column": "privileged_block_0_pos",
+    "state_indices": [0, 1, 2],
+    "episode_column": "ep_idx",
+    "step_column": "step_idx",
+    "group_rule": "episode",
+    "hash_mode": "full_file"
+  },
+  "checkpoint": {
+    "path": "/public/home/xsy0001/workspace/code/stable-worldmodel/outputs/worktrees/lewm-dagger/outputs/experiments/lewm-dagger-r1-cube-tworoom-v2-73e9902d/cube/seed-3072/runtime/checkpoints/lewm-dagger-cube-m0-seed3072/weights_epoch_10.pt",
+    "sha256": "eece65ce87e451d8ee953d83da0c566f77ad2d8f8f6ee5e77f7ddbae5bedf883",
+    "config_sha256": "86f2ed24c61b48354416c23af51aa51279ae28a33cb36b7ebc3d057eec2b8c0d",
+    "provenance": "canonical repaired DAgger R1 M0 v2, seed 3072, trained from scratch on the precommitted offline D0 split; compatibility fallback because the former /ssd full-demo checkpoint is unavailable"
+  },
+  "task_label": {
+    "variant": "cube_block_xyz_pointwise_gap03_04",
+    "state_fields": ["privileged_block_0_pos"],
+    "metric": "l2",
+    "positive_if_lt": 0.03,
+    "negative_if_gt": 0.04,
+    "negative_edges": [0.08, 0.2],
+    "unit": "metre",
+    "ignored_fields": ["privileged_block_0_quat", "privileged_block_0_yaw", "qvel", "qpos", "effector_state", "gripper_contact"],
+    "exact_self_pairs": "exclude"
+  },
+  "compatibility_signature": {
+    "object_inventory": "cube_single; one block",
+    "target_object_id": 0,
+    "scene": "OGBench cube_single fixed scene",
+    "camera": "fixed 224x224 RGB",
+    "rendering": "fixed",
+    "target_marker": "absent from encoded observation"
+  },
+  "preprocessing": {
+    "pixel_source": "HDF5 pixels HWC RGB uint8",
+    "channel_order": "RGB",
+    "scale": "uint8 / 255",
+    "normalization": "ImageNet mean/std from stable_pretraining",
+    "resize": [224, 224],
+    "interpolation": "bilinear antialias",
+    "encoder_symbol": "model.encoder(..., interpolate_pos_encoding=True).last_hidden_state[:, 0]",
+    "projector_symbol": "model.projector",
+    "residual": "mean_D((z_i-z_j)^2)",
+    "dtype": "float32",
+    "latent_dim": 192
+  },
+  "data": {
+    "threshold_split_seed": 260820,
+    "pair_sampling_seed": 90210,
+    "fit_fraction": 0.6,
+    "validation_fraction": 0.2,
+    "audit_fraction": 0.2
+  },
+  "pair_sampling": {
+    "uniform_pairs": 100000000,
+    "stratified_pairs": 20000000,
+    "stratified_positive_fraction": 0.5,
+    "pair_shard_rows": 1000000
+  },
+  "selection": {
+    "min_positive_recall": 0.9,
+    "max_negative_fpr": 0.1,
+    "min_population_precision": null,
+    "tie_break": "smallest_epsilon"
+  },
+  "analysis": {
+    "bootstrap_replicates": 10000,
+    "analysis_seed": 20260820
+  },
+  "runtime": {
+    "encode_batch_size": 256,
+    "pair_score_batch_size": 1000000,
+    "max_task_hours": 5
+  }
+}

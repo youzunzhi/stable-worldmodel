@@ -1,0 +1,89 @@
+{
+  "artifact_schema_version": "experiment-t-v1",
+  "task": "tworoom",
+  "dataset": {
+    "path": "/public/home/xsy0001/workspace/data/stable-worldmodel/tworoom/tworoom.h5",
+    "expected_bytes": 12775849984,
+    "repository": "quentinll/lewm-tworooms",
+    "revision": "6903a2de048b13819d812da0b4dd661290bc01e4",
+    "pixels_column": "pixels",
+    "state_column": "pos_agent",
+    "state_indices": [0, 1],
+    "episode_column": "ep_idx",
+    "step_column": "step_idx",
+    "group_rule": "episode",
+    "hash_mode": "full_file"
+  },
+  "checkpoint": {
+    "path": "/public/home/xsy0001/workspace/code/stable-worldmodel/outputs/worktrees/lewm-dagger/outputs/experiments/lewm-dagger-r1-cube-tworoom-v2-73e9902d/tworoom/seed-3072/runtime/checkpoints/lewm-dagger-tworoom-m0-seed3072/weights_epoch_10.pt",
+    "sha256": "68e6ca32ec5f7bdfb728ef89164ab62f566147e7724b74e5cf8e5858db746a65",
+    "config_sha256": "c4a21dab4e6ab5803e9ae159bc7345104e4fe083116580fa5719357aea0af5b8",
+    "provenance": "canonical repaired DAgger R1 M0 v2, seed 3072, trained from scratch on the precommitted offline D0 split; compatibility fallback because the former /ssd full-demo checkpoint is unavailable"
+  },
+  "task_label": {
+    "variant": "tworoom_agent_xy_pointwise_gap8_16",
+    "state_fields": ["pos_agent"],
+    "metric": "l2",
+    "positive_if_lt": 8.0,
+    "negative_if_gt": 16.0,
+    "negative_edges": [32.0, 96.0],
+    "unit": "pixel",
+    "ignored_fields": ["goal_pos_agent", "action", "collision_history", "route_valid", "room_crossing_history", "goal_side_history", "success_hold"],
+    "exact_self_pairs": "exclude"
+  },
+  "compatibility_signature": {
+    "wall_axis": 1,
+    "wall_center": 112,
+    "wall_thickness": 10,
+    "door_count": 1,
+    "door_positions": [49],
+    "door_sizes_half_extent": [14],
+    "agent_radius": 7.0,
+    "image_size": 224,
+    "border_size": 14,
+    "camera": "fixed raster 224x224 RGB",
+    "renderer": "TwoRoomEnv torch Gaussian agent renderer",
+    "target_rendered": false
+  },
+  "preprocessing": {
+    "pixel_source": "HDF5 pixels HWC RGB uint8",
+    "channel_order": "RGB",
+    "scale": "uint8 / 255",
+    "normalization": "ImageNet mean/std from stable_pretraining",
+    "resize": [224, 224],
+    "interpolation": "bilinear antialias",
+    "encoder_symbol": "model.encoder(..., interpolate_pos_encoding=True).last_hidden_state[:, 0]",
+    "projector_symbol": "model.projector",
+    "residual": "mean_D((z_i-z_j)^2)",
+    "dtype": "float32",
+    "latent_dim": 192
+  },
+  "data": {
+    "threshold_split_seed": 260820,
+    "pair_sampling_seed": 90210,
+    "fit_fraction": 0.6,
+    "validation_fraction": 0.2,
+    "audit_fraction": 0.2
+  },
+  "pair_sampling": {
+    "uniform_pairs": 100000000,
+    "stratified_pairs": 20000000,
+    "stratified_positive_fraction": 0.5,
+    "pair_shard_rows": 1000000
+  },
+  "selection": {
+    "min_positive_recall": 0.9,
+    "max_negative_fpr": 0.1,
+    "min_population_precision": null,
+    "tie_break": "smallest_epsilon"
+  },
+  "analysis": {
+    "bootstrap_replicates": 10000,
+    "analysis_seed": 20260820
+  },
+  "runtime": {
+    "encode_batch_size": 256,
+    "pair_score_batch_size": 1000000,
+    "max_task_hours": 5
+  }
+}
