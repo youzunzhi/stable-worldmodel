@@ -1,0 +1,37 @@
+/public/home/xsy0001/miniconda3/envs/lewm/lib/python3.10/site-packages/pygame/pkgdata.py:25: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import resource_stream, resource_exists
+[2026-08-21 12:54:03,608][datasets][INFO] - JAX version 0.6.2 available.
+12:54:12 | INFO  | atomic_chec~| [atomic_save] installed crash-safe checkpoint plugin (write to sibling .tmp + fsync + atomic rename)
+[2026-08-21 12:54:12,680][root][INFO] - Cached 'action' from '/public/home/xsy0001/workspace/data/stable-worldmodel/hf/datasets/quentinll--lewm-pusht/655cd446b9929369d7d406001da85c15d1457850/pusht_expert_train.h5'
+[2026-08-21 12:54:12,710][root][INFO] - Cached 'proprio' from '/public/home/xsy0001/workspace/data/stable-worldmodel/hf/datasets/quentinll--lewm-pusht/655cd446b9929369d7d406001da85c15d1457850/pusht_expert_train.h5'
+[2026-08-21 12:54:12,756][root][INFO] - Cached 'state' from '/public/home/xsy0001/workspace/data/stable-worldmodel/hf/datasets/quentinll--lewm-pusht/655cd446b9929369d7d406001da85c15d1457850/pusht_expert_train.h5'
+12:54:14 | INFO  | utils.py    | Created ViT-tiny from scratch with config: {'hidden_size': 192, 'num_hidden_layers': 12, 'num_attention_heads': 3, 'intermediate_size': 768, 'image_size': 224, 'patch_size': 14}
+/public/home/xsy0001/miniconda3/envs/lewm/lib/python3.10/site-packages/gymnasium/spaces/box.py:415: UserWarning: [33mWARN: Casting input x to numpy array.[0m
+  gym.logger.warn("Casting input x to numpy array.")
+[  97314  145571  154317  176734  196453  204818  212429  215636  221341
+  283513  286729  303160  335336  360111  373928  415546  431279  443048
+  460019  526601  527135  551174  650837  681302  726265  757430  771814
+  823849  840399  846889  855351  856959  895703  928066  951441  991001
+ 1000875 1004469 1004682 1019068 1027251 1039742 1040660 1070821 1077414
+ 1081795 1098983 1143559 1146389 1169282 1196916 1243526 1250153 1271676
+ 1304102 1473082 1474029 1486075 1496022 1522307 1566716 1589541 1596266
+ 1598766 1607481 1628280 1637763 1640875 1680408 1726363 1741863 1745035
+ 1776265 1780615 1781551 1805586 1810318 1827290 1834545 1844324 1871268
+ 1885340 1922881 1931049 1940382 1940601 1948437 1965161 1994768 1998540
+ 2082958 2095508 2113769 2120795 2155953 2161499 2203969 2274287 2278068
+ 2283571]
+[eval] video output disabled
+CEM solve time: 49.9830 seconds
+CEM solve time: 25.3981 seconds
+{'success_rate': 67.0, 'episode_successes': array([ True, False,  True,  True, False,  True,  True,  True,  True,
+        True,  True,  True, False, False, False,  True,  True,  True,
+        True,  True,  True,  True, False, False,  True,  True,  True,
+        True,  True, False,  True,  True, False,  True,  True, False,
+        True,  True,  True, False,  True, False,  True,  True,  True,
+        True,  True, False,  True, False, False,  True,  True,  True,
+        True, False,  True, False,  True,  True,  True,  True, False,
+       False, False,  True, False, False,  True,  True,  True,  True,
+        True,  True,  True,  True,  True, False, False, False,  True,
+       False, False, False, False,  True,  True,  True, False,  True,
+        True,  True, False,  True,  True,  True, False, False,  True,
+        True]), 'seeds': None, 'find_goal_threshold_self_eval': {'pairs': 100, 'actual_successes': 67, 'actual_failures': 33, 'predicted_successes': 98, 'predicted_failures': 2, 'confusion': {'tp': 67, 'tn': 2, 'fp': 31, 'fn': 0}, 'accuracy': 0.69, 'accuracy_wilson_95ci': {'low': 0.5937394428051057, 'high': 0.7722030278762395}, 'sensitivity_tpr': 1.0, 'specificity_tnr': 0.06060606060606061, 'false_positive_rate': 0.9393939393939394, 'false_negative_rate': 0.0, 'precision': 0.6836734693877551, 'negative_predictive_value': 1.0, 'balanced_accuracy': 0.5303030303030303, 'actual_success_rate_percent': 67.0, 'predicted_success_rate_percent': 98.0, 'success_rate_error_percentage_points': 30.999999999999993, 'success_rate_error_paired_bootstrap_95ci': {'low': 22.0, 'high': 40.0, 'replicates': 10000, 'seed': 20260821, 'unit': 'percentage_points'}, 'absolute_success_rate_error_percentage_points': 30.999999999999993}}

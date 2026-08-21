@@ -1,0 +1,214 @@
+{
+  "artifact_schema_version": "find-goal-threshold-self-eval-summary-v1",
+  "cells": [
+    {
+      "checkpoint_sha256": "e4f14a2276918bcb34876fb8d86d16dbd8683ae6077a13a2275dee008a68c775",
+      "epsilon": 1.6419658660888672,
+      "manifest_sha256": "dcdce1f5e90c29246b70670d6a61171bd8ba17814bc88726ac65994714c14afa",
+      "protocol": "moderate",
+      "result_path": "/public/home/xsy0001/workspace/data/stable-worldmodel/experiments/observation_goal_threshold/self-eval-d0c466b-20260821-available-thresholds/pusht-moderate/pusht_results.txt.json",
+      "result_sha256": "4401ae1f554e6d35931081e0ed12bcf1ee2c78b8a268bbcc507efd69ae6ab15f",
+      "selected_threshold_sha256": "5dc633561a94928eb37dcf2506423ba58c8cf35994cf3e8d7a74867880ae98fb",
+      "summary": {
+        "absolute_success_rate_error_percentage_points": 8.999999999999996,
+        "accuracy": 0.91,
+        "accuracy_wilson_95ci": {
+          "high": 0.9519274599974348,
+          "low": 0.837737871472837
+        },
+        "actual_failures": 10,
+        "actual_success_rate_percent": 90.0,
+        "actual_successes": 90,
+        "balanced_accuracy": 0.55,
+        "confusion": {
+          "fn": 0,
+          "fp": 9,
+          "tn": 1,
+          "tp": 90
+        },
+        "false_negative_rate": 0.0,
+        "false_positive_rate": 0.9,
+        "negative_predictive_value": 1.0,
+        "pairs": 100,
+        "precision": 0.9090909090909091,
+        "predicted_failures": 1,
+        "predicted_success_rate_percent": 99.0,
+        "predicted_successes": 99,
+        "sensitivity_tpr": 1.0,
+        "specificity_tnr": 0.1,
+        "success_rate_error_paired_bootstrap_95ci": {
+          "high": 15.0,
+          "low": 4.0,
+          "replicates": 10000,
+          "seed": 20260821,
+          "unit": "percentage_points"
+        },
+        "success_rate_error_percentage_points": 8.999999999999996
+      },
+      "task": "pusht"
+    },
+    {
+      "checkpoint_sha256": "e4f14a2276918bcb34876fb8d86d16dbd8683ae6077a13a2275dee008a68c775",
+      "epsilon": 1.6419658660888672,
+      "manifest_sha256": "2042018fc346927af5da75cce2565db8476121d1db67a99d0fc50f218eddcbc9",
+      "protocol": "strict",
+      "result_path": "/public/home/xsy0001/workspace/data/stable-worldmodel/experiments/observation_goal_threshold/self-eval-d0c466b-20260821-available-thresholds/pusht-strict/pusht_results.txt.json",
+      "result_sha256": "d4782cca9a8337e48d2b322561af7a47586742f8c580ec5d067aef3e4c70f308",
+      "selected_threshold_sha256": "5dc633561a94928eb37dcf2506423ba58c8cf35994cf3e8d7a74867880ae98fb",
+      "summary": {
+        "absolute_success_rate_error_percentage_points": 30.999999999999993,
+        "accuracy": 0.69,
+        "accuracy_wilson_95ci": {
+          "high": 0.7722030278762395,
+          "low": 0.5937394428051057
+        },
+        "actual_failures": 33,
+        "actual_success_rate_percent": 67.0,
+        "actual_successes": 67,
+        "balanced_accuracy": 0.5303030303030303,
+        "confusion": {
+          "fn": 0,
+          "fp": 31,
+          "tn": 2,
+          "tp": 67
+        },
+        "false_negative_rate": 0.0,
+        "false_positive_rate": 0.9393939393939394,
+        "negative_predictive_value": 1.0,
+        "pairs": 100,
+        "precision": 0.6836734693877551,
+        "predicted_failures": 2,
+        "predicted_success_rate_percent": 98.0,
+        "predicted_successes": 98,
+        "sensitivity_tpr": 1.0,
+        "specificity_tnr": 0.06060606060606061,
+        "success_rate_error_paired_bootstrap_95ci": {
+          "high": 40.0,
+          "low": 22.0,
+          "replicates": 10000,
+          "seed": 20260821,
+          "unit": "percentage_points"
+        },
+        "success_rate_error_percentage_points": 30.999999999999993
+      },
+      "task": "pusht"
+    },
+    {
+      "checkpoint_sha256": "68e6ca32ec5f7bdfb728ef89164ab62f566147e7724b74e5cf8e5858db746a65",
+      "epsilon": 1.392462968826294,
+      "manifest_sha256": "216250de76495a17a58bb16538b678408063798c3e4f55381943b79214ac83f6",
+      "protocol": "moderate",
+      "result_path": "/public/home/xsy0001/workspace/data/stable-worldmodel/experiments/observation_goal_threshold/self-eval-d0c466b-20260821-available-thresholds/tworoom-moderate/tworoom_results.txt.json",
+      "result_sha256": "5650e2450f6d9573328d12c8947613adca52e5aecd8dd0b1215035cff9ea4b17",
+      "selected_threshold_sha256": "e2b00f0b38f42b37373e8d4576d915d0140943f5f8b0d0569d61f5b3b41ece4d",
+      "summary": {
+        "absolute_success_rate_error_percentage_points": 51.0,
+        "accuracy": 0.49,
+        "accuracy_wilson_95ci": {
+          "high": 0.5865198806597283,
+          "low": 0.3942199893044113
+        },
+        "actual_failures": 8,
+        "actual_success_rate_percent": 92.0,
+        "actual_successes": 92,
+        "balanced_accuracy": 0.7228260869565217,
+        "confusion": {
+          "fn": 51,
+          "fp": 0,
+          "tn": 8,
+          "tp": 41
+        },
+        "false_negative_rate": 0.5543478260869565,
+        "false_positive_rate": 0.0,
+        "negative_predictive_value": 0.13559322033898305,
+        "pairs": 100,
+        "precision": 1.0,
+        "predicted_failures": 59,
+        "predicted_success_rate_percent": 41.0,
+        "predicted_successes": 41,
+        "sensitivity_tpr": 0.44565217391304346,
+        "specificity_tnr": 1.0,
+        "success_rate_error_paired_bootstrap_95ci": {
+          "high": -41.0,
+          "low": -61.0,
+          "replicates": 10000,
+          "seed": 20260821,
+          "unit": "percentage_points"
+        },
+        "success_rate_error_percentage_points": -51.0
+      },
+      "task": "tworoom"
+    },
+    {
+      "checkpoint_sha256": "68e6ca32ec5f7bdfb728ef89164ab62f566147e7724b74e5cf8e5858db746a65",
+      "epsilon": 1.392462968826294,
+      "manifest_sha256": "b1833f5e500db94157b5f091bef8c77380a8d49a4862701eba7c2cad8b87fc35",
+      "protocol": "strict",
+      "result_path": "/public/home/xsy0001/workspace/data/stable-worldmodel/experiments/observation_goal_threshold/self-eval-d0c466b-20260821-available-thresholds/tworoom-strict/tworoom_results.txt.json",
+      "result_sha256": "a8d330b1f26796ffb4c3ff498bb18ba9773699eb3e8aae62518d0bb6800cd672",
+      "selected_threshold_sha256": "e2b00f0b38f42b37373e8d4576d915d0140943f5f8b0d0569d61f5b3b41ece4d",
+      "summary": {
+        "absolute_success_rate_error_percentage_points": 14.000000000000002,
+        "accuracy": 0.86,
+        "accuracy_wilson_95ci": {
+          "high": 0.9147365634006086,
+          "low": 0.7786281178903616
+        },
+        "actual_failures": 18,
+        "actual_success_rate_percent": 82.0,
+        "actual_successes": 82,
+        "balanced_accuracy": 0.6111111111111112,
+        "confusion": {
+          "fn": 0,
+          "fp": 14,
+          "tn": 4,
+          "tp": 82
+        },
+        "false_negative_rate": 0.0,
+        "false_positive_rate": 0.7777777777777778,
+        "negative_predictive_value": 1.0,
+        "pairs": 100,
+        "precision": 0.8541666666666666,
+        "predicted_failures": 4,
+        "predicted_success_rate_percent": 96.0,
+        "predicted_successes": 96,
+        "sensitivity_tpr": 1.0,
+        "specificity_tnr": 0.2222222222222222,
+        "success_rate_error_paired_bootstrap_95ci": {
+          "high": 21.0,
+          "low": 8.0,
+          "replicates": 10000,
+          "seed": 20260821,
+          "unit": "percentage_points"
+        },
+        "success_rate_error_percentage_points": 14.000000000000002
+      },
+      "task": "tworoom"
+    }
+  ],
+  "matrix_contract": {
+    "pairs_per_cell": 100,
+    "pooling": "none; report every task/protocol cell separately",
+    "protocols": [
+      "moderate",
+      "strict"
+    ],
+    "tasks": [
+      "pusht",
+      "cube",
+      "tworoom"
+    ],
+    "total_pairs_when_complete": 600
+  },
+  "missing_cells": [
+    {
+      "protocol": "moderate",
+      "task": "cube"
+    },
+    {
+      "protocol": "strict",
+      "task": "cube"
+    }
+  ],
+  "status": "INCOMPLETE"
+}

@@ -1,0 +1,38 @@
+[2026-08-21 12:54:01,211][datasets][INFO] - JAX version 0.6.2 available.
+12:54:10 | INFO  | atomic_chec~| [atomic_save] installed crash-safe checkpoint plugin (write to sibling .tmp + fsync + atomic rename)
+[2026-08-21 12:54:11,746][root][INFO] - Cached 'action' from '/public/home/xsy0001/workspace/data/stable-worldmodel/tworoom/tworoom.h5'
+[2026-08-21 12:54:11,753][root][INFO] - Cached 'proprio' from '/public/home/xsy0001/workspace/data/stable-worldmodel/tworoom/tworoom.h5'
+12:54:12 | INFO  | utils.py    | Created ViT-tiny from scratch with config: {'hidden_size': 192, 'num_hidden_layers': 12, 'num_attention_heads': 3, 'intermediate_size': 768, 'image_size': 224, 'patch_size': 14}
+/public/home/xsy0001/miniconda3/envs/lewm/lib/python3.10/site-packages/gymnasium/utils/passive_env_checker.py:129: UserWarning: [33mWARN: The obs returned by the `reset()` method was expecting a numpy array, actual type: <class 'torch.Tensor'>[0m
+  logger.warn(
+/public/home/xsy0001/miniconda3/envs/lewm/lib/python3.10/site-packages/gymnasium/spaces/box.py:415: UserWarning: [33mWARN: Casting input x to numpy array.[0m
+  gym.logger.warn("Casting input x to numpy array.")
+/public/home/xsy0001/miniconda3/envs/lewm/lib/python3.10/site-packages/gymnasium/utils/passive_env_checker.py:129: UserWarning: [33mWARN: The obs returned by the `step()` method was expecting a numpy array, actual type: <class 'torch.Tensor'>[0m
+  logger.warn(
+/public/home/xsy0001/miniconda3/envs/lewm/lib/python3.10/site-packages/gymnasium/spaces/box.py:415: UserWarning: [33mWARN: Casting input x to numpy array.[0m
+  gym.logger.warn("Casting input x to numpy array.")
+[ 38974  58456  59930  73510  78665  79237  82491  82637  89420 115139
+ 121827 130352 142093 149937 163622 173545 177506 204038 215633 231142
+ 253856 276080 298652 303469 309740 319541 325859 326422 330841 332822
+ 353140 355915 373853 379400 383557 391411 397290 400032 402456 403103
+ 418079 421041 428226 437767 440187 454424 455342 467057 492899 503465
+ 505585 528685 568259 571977 572128 583919 596653 613976 614615 622390
+ 624329 631696 634122 639976 648336 649492 662143 667208 669071 675112
+ 676623 683715 690511 690756 701363 708929 723609 724441 733459 733551
+ 742233 743449 763612 765474 767816 778856 786126 795570 809505 819401
+ 826966 828583 843033 853365 857643 866908 887063 889801 904303 908213]
+[eval] video output disabled
+CEM solve time: 48.0112 seconds
+CEM solve time: 31.2049 seconds
+{'success_rate': 82.0, 'episode_successes': array([ True,  True,  True, False,  True,  True, False,  True,  True,
+        True,  True, False,  True,  True,  True,  True, False, False,
+        True,  True, False,  True,  True,  True,  True,  True,  True,
+        True,  True,  True,  True,  True, False,  True, False,  True,
+        True,  True,  True,  True,  True,  True, False,  True,  True,
+        True, False,  True, False,  True,  True,  True,  True, False,
+        True, False,  True,  True,  True,  True,  True,  True,  True,
+        True,  True,  True,  True,  True,  True,  True,  True,  True,
+        True,  True,  True,  True,  True,  True,  True,  True,  True,
+        True,  True,  True, False,  True, False, False,  True,  True,
+        True,  True,  True, False, False,  True,  True,  True,  True,
+        True]), 'seeds': None, 'find_goal_threshold_self_eval': {'pairs': 100, 'actual_successes': 82, 'actual_failures': 18, 'predicted_successes': 96, 'predicted_failures': 4, 'confusion': {'tp': 82, 'tn': 4, 'fp': 14, 'fn': 0}, 'accuracy': 0.86, 'accuracy_wilson_95ci': {'low': 0.7786281178903616, 'high': 0.9147365634006086}, 'sensitivity_tpr': 1.0, 'specificity_tnr': 0.2222222222222222, 'false_positive_rate': 0.7777777777777778, 'false_negative_rate': 0.0, 'precision': 0.8541666666666666, 'negative_predictive_value': 1.0, 'balanced_accuracy': 0.6111111111111112, 'actual_success_rate_percent': 82.0, 'predicted_success_rate_percent': 96.0, 'success_rate_error_percentage_points': 14.000000000000002, 'success_rate_error_paired_bootstrap_95ci': {'low': 8.0, 'high': 21.0, 'replicates': 10000, 'seed': 20260821, 'unit': 'percentage_points'}, 'absolute_success_rate_error_percentage_points': 14.000000000000002}}

@@ -1,0 +1,105 @@
+{
+  "artifact_schema_version": "find-goal-threshold-self-eval-run-v1",
+  "status": "INCOMPLETE_THRESHOLD_UNAVAILABLE",
+  "source_revision": "d0c466ba333d98f4b8aaae2b50cd0b86eddaf8d4",
+  "remote_source": "/public/home/xsy0001/workspace/code/stable-worldmodel-find-goal-threshold-d0c466b",
+  "remote_output_root": "/public/home/xsy0001/workspace/data/stable-worldmodel/experiments/observation_goal_threshold/self-eval-d0c466b-20260821-available-thresholds",
+  "calibration_source": {
+    "formal_commit": "142ffa7156ad79eaefd7f8d757b7ed0e4a6d54ea",
+    "formal_root": "/public/home/xsy0001/workspace/data/stable-worldmodel/experiments/observation_goal_threshold/formal-142ffa7-20260820",
+    "pusht_selected_threshold_sha256": "5dc633561a94928eb37dcf2506423ba58c8cf35994cf3e8d7a74867880ae98fb",
+    "tworoom_selected_threshold_sha256": "e2b00f0b38f42b37373e8d4576d915d0140943f5f8b0d0569d61f5b3b41ece4d",
+    "cube_status": "THRESHOLD_CALIBRATION_NO_FEASIBLE_OPERATING_POINT",
+    "cube_selected_threshold_exists": false
+  },
+  "matrix_contract": {
+    "tasks": ["pusht", "cube", "tworoom"],
+    "protocols": ["moderate", "strict"],
+    "pairs_per_cell": 100,
+    "expected_cells": 6,
+    "executed_cells": 4,
+    "missing_cells": ["cube/moderate", "cube/strict"],
+    "missing_reason": "Cube has no promoted epsilon; no diagnostic fit point was substituted"
+  },
+  "clear_contract": {
+    "version": "0.5.0",
+    "source_revision": "df026185a36bd9997c69d94753854db0b1a46f54",
+    "policy_seed": 42,
+    "batch_size": 1,
+    "num_samples": 300,
+    "n_steps": 30,
+    "topk": 30,
+    "cpu_threads": 1,
+    "goal_offset": 25,
+    "eval_budget": 50,
+    "video": false
+  },
+  "preflight": {
+    "pusht": {
+      "checkpoint_sha256": "e4f14a2276918bcb34876fb8d86d16dbd8683ae6077a13a2275dee008a68c775",
+      "checkpoint_config_sha256": "c4a21dab4e6ab5803e9ae159bc7345104e4fe083116580fa5719357aea0af5b8",
+      "dataset_bytes": 46300921856,
+      "moderate_manifest_sha256": "dcdce1f5e90c29246b70670d6a61171bd8ba17814bc88726ac65994714c14afa",
+      "strict_manifest_sha256": "2042018fc346927af5da75cce2565db8476121d1db67a99d0fc50f218eddcbc9"
+    },
+    "cube": {
+      "checkpoint_sha256": "eece65ce87e451d8ee953d83da0c566f77ad2d8f8f6ee5e77f7ddbae5bedf883",
+      "checkpoint_config_sha256": "86f2ed24c61b48354416c23af51aa51279ae28a33cb36b7ebc3d057eec2b8c0d",
+      "dataset_bytes": 101942558720,
+      "moderate_manifest_sha256": "03f9c3a375707bdcd40d32aa1be26ef15ab2529fe513e67eea59789b36c70d63",
+      "strict_manifest_sha256": "fccf9d6de3336431a09f146b4fadbf1a1150aff4b2d699e75ca32835b3242ecd"
+    },
+    "tworoom": {
+      "checkpoint_sha256": "68e6ca32ec5f7bdfb728ef89164ab62f566147e7724b74e5cf8e5858db746a65",
+      "checkpoint_config_sha256": "c4a21dab4e6ab5803e9ae159bc7345104e4fe083116580fa5719357aea0af5b8",
+      "dataset_bytes": 12775849984,
+      "moderate_manifest_sha256": "216250de76495a17a58bb16538b678408063798c3e4f55381943b79214ac83f6",
+      "strict_manifest_sha256": "b1833f5e500db94157b5f091bef8c77380a8d49a4862701eba7c2cad8b87fc35"
+    }
+  },
+  "execution": {
+    "gpu_mapping": {
+      "pusht/moderate": 1,
+      "pusht/strict": 2,
+      "tworoom/moderate": 3,
+      "tworoom/strict": 4
+    },
+    "exit_codes": {
+      "pusht/moderate": 0,
+      "pusht/strict": 0,
+      "tworoom/moderate": 0,
+      "tworoom/strict": 0
+    },
+    "completed_trajectories_per_cell": 100,
+    "encoder_projector_hash_unchanged_in_all_cells": true,
+    "solver_contract_matched_in_all_cells": true
+  },
+  "validation": {
+    "source_targeted_tests": "55 passed",
+    "parent_revision_full_suite": {
+      "revision": "91aea848c5c5f0e21848999e72360e3dd8fa6b66",
+      "result": "1106 passed, 11 skipped, 1 xfailed"
+    },
+    "targeted_ruff": "passed",
+    "targeted_format_check": "passed"
+  },
+  "primary_results": {
+    "pusht/moderate": "4401ae1f554e6d35931081e0ed12bcf1ee2c78b8a268bbcc507efd69ae6ab15f",
+    "pusht/strict": "d4782cca9a8337e48d2b322561af7a47586742f8c580ec5d067aef3e4c70f308",
+    "tworoom/moderate": "5650e2450f6d9573328d12c8947613adca52e5aecd8dd0b1215035cff9ea4b17",
+    "tworoom/strict": "a8d330b1f26796ffb4c3ff498bb18ba9773699eb3e8aae62518d0bb6800cd672",
+    "summary_json_sha256": "dcfa5e9e2a9f1bb70d63dae1d50013c89b00b3a0bbcc79399f17cf8fef4f4a01",
+    "summary_report_sha256": "42ebf3045d93e405d760de13e3b215be5eacc1f3d6e0f29758d312d5d743093d"
+  },
+  "retry_lineage": {
+    "historical_root": "/public/home/xsy0001/workspace/data/stable-worldmodel/experiments/observation_goal_threshold/self-eval-91aea84-20260821-available-thresholds",
+    "reason_for_replacement": "d0c466b adds pre-registered paired bootstrap uncertainty to the raw result artifact",
+    "comparison": {
+      "pusht/moderate": {"evaluator_flips": 0, "prediction_flips": 0},
+      "pusht/strict": {"evaluator_flips": 2, "prediction_flips": 0},
+      "tworoom/moderate": {"evaluator_flips": 0, "prediction_flips": 0},
+      "tworoom/strict": {"evaluator_flips": 0, "prediction_flips": 0}
+    },
+    "interpretation": "The d0c466b run is primary; the earlier run remains historical provenance and shows two PushT Strict evaluator flips from GPU/CEM runtime drift"
+  }
+}

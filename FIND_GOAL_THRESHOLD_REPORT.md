@@ -65,6 +65,47 @@ Audit macro-TPR 的 clustered 95% CI 為 `[1.000000, 1.000000]`，
 macro-FPR CI 為 `[0.027207, 0.029153]`。這個 threshold 在三個 split
 都保留很大的預註冊 operating margin。
 
+## CLEAR endpoint self-eval（post-lock）
+
+Self-eval 使用 source commit
+`d0c466ba333d98f4b8aaae2b50cd0b86eddaf8d4`，對每個可用 threshold
+各跑 CLEAR v0.5 Moderate 與 Strict 的固定 seed-42、100-pair manifest。
+實際 S/F 由 CLEAR evaluator 回傳；每個 pair 結束後，再用同一 checkpoint
+的 frozen encoder/projector 計算 final observation 到 goal 的
+`mean_D((z_final-z_goal)^2)`，並以 `distance <= epsilon` 預測 S/F。
+
+| Task | CLEAR rule | ε | Actual SR | ε-predicted SR | Predicted−actual SR [paired bootstrap 95% CI] | Pair accuracy [Wilson 95% CI] | TP/TN/FP/FN |
+|---|---|---:|---:|---:|---:|---:|---:|
+| PushT | Moderate | `1.641965866` | `90%` | `99%` | `+9 pp [4, 15]` | `0.91 [0.838, 0.952]` | `90/1/9/0` |
+| PushT | Strict | `1.641965866` | `67%` | `98%` | `+31 pp [22, 40]` | `0.69 [0.594, 0.772]` | `67/2/31/0` |
+| TwoRoom | Moderate | `1.392462969` | `92%` | `41%` | `−51 pp [−61, −41]` | `0.49 [0.394, 0.587]` | `41/8/0/51` |
+| TwoRoom | Strict | `1.392462969` | `82%` | `96%` | `+14 pp [8, 21]` | `0.86 [0.779, 0.915]` | `82/4/14/0` |
+
+主要結論是：目前 ε **不能可靠預測 CLEAR evaluation SR**。四個可執行
+cell 的 paired SR-error CI 都不含 0；即使 PushT Moderate 或 TwoRoom
+Strict 的 pair accuracy 看起來較高，predicted SR 仍分別高估 9 與 14 個
+百分點，而且 class imbalance 使 accuracy 高估了失敗辨識能力。
+
+錯誤方向符合預註冊語義邊界：
+
+- PushT 的 pointwise calibration 忽略角度與 sustained success，因此
+  Moderate/Strict 都以 false positive 為主，Strict 更嚴重。
+- TwoRoom 的 ε 是以 `<8 px` positive gap 校準；Moderate evaluator 使用
+  `<16 px`，因此出現 51 個 false negative。Strict 雖同樣是 8 px 距離，
+  仍要求 goal side、合法 route 與 collision semantics，因此有 14 個
+  false positive。
+
+完整矩陣狀態是 **INCOMPLETE**，不能稱為正式三 task self-eval：Cube 的
+calibration 結論是沒有 promotable ε，所以 `cube/moderate` 與
+`cube/strict` 都是 `THRESHOLD_UNAVAILABLE`，沒有拿 failed-fit diagnostic
+point 代替。逐 pair distance、S/F、prediction、confusion、hash 與結果位於
+`results/find-goal-threshold/self-eval/self-eval-d0c466b-20260821-available-thresholds/`。
+
+前一個 `91aea84` run 因後續加入 paired-bootstrap uncertainty 而被本次
+結果取代，但保留為 historical provenance。兩次之間只有 PushT Strict 有
+2 個 evaluator S/F flips；四個 cell 的 ε prediction 都沒有 flip。這是
+GPU/CEM runtime drift，不是 threshold retuning。
+
 ## 固定合約與 provenance
 
 - 每個 task 都實現 `100,000,000` 個 latent-blind uniform pairs 加
@@ -101,6 +142,9 @@ checkpoint 已不存在，因此這是報告中明示的 compatibility fallback�
 ## 測試與失敗保留
 
 - 修正版 remote 全 repository suite：`1102 passed, 11 skipped, 1 xfailed`。
+- Self-eval parent revision 的 remote 全套測試：
+  `1106 passed, 11 skipped, 1 xfailed`；primary `d0c466b` 的 targeted
+  self-eval/CLEAR suite 為 `55 passed`。
 - 實驗專屬測試包含 state contracts、group-first split、latent-blind sampling、
   no-replacement refill、exact preprocessing parity、selection/validation、
   clustered bootstrap 與 audit-lock guard。
@@ -113,7 +157,9 @@ checkpoint 已不存在，因此這是報告中明示的 compatibility fallback�
 
 ## 能支持與不能支持的主張
 
-結果支持的是 frozen project-trained encoder/projector 的 pointwise latent
-geometry threshold calibration。它不是 predictor、reachability、planner，
-也不是官方 CLEAR Moderate/Strict 成功率結果；不能由此推論 closed-loop
-planning performance。
+Calibration 主結果支持的是 frozen project-trained encoder/projector 的
+pointwise latent geometry threshold，不是 predictor、reachability 或
+planner 證據。Post-lock self-eval 的四個 cells 是正常 CLEAR execution，
+但它們檢驗的是 endpoint predicate 與 evaluator 的 paired agreement；不能
+把 ε 的高 pair accuracy 當成 planner quality，也不能把缺少 Cube ε 的矩陣
+說成完整三 task 結果。

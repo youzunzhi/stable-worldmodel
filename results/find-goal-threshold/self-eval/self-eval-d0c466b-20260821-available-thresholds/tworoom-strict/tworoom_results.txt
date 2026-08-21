@@ -1,0 +1,68 @@
+==== CONFIG ====
+cache_dir: null
+solver:
+  _target_: stable_worldmodel.planning.solver.CEMSolver
+  cost: ???
+  batch_size: 1
+  num_samples: 300
+  var_scale: 1.0
+  n_steps: 30
+  topk: 30
+  device: cuda
+  seed: ${seed}
+objective:
+  _target_: stable_worldmodel.planning.GoalMSE
+world:
+  env_name: swm/TwoRoom-v1
+  num_envs: ${eval.num_eval}
+  max_episode_steps: 100
+dataset:
+  stats: ${eval.dataset_name}
+  keys_to_cache:
+  - action
+  - proprio
+seed: 42
+policy: /public/home/xsy0001/workspace/code/stable-worldmodel/outputs/worktrees/lewm-dagger/outputs/experiments/lewm-dagger-r1-cube-tworoom-v2-73e9902d/tworoom/seed-3072/runtime/checkpoints/lewm-dagger-tworoom-m0-seed3072/weights_epoch_10.pt
+plan_config:
+  horizon: 5
+  receding_horizon: 5
+  action_block: 5
+eval:
+  num_eval: 100
+  goal_offset_steps: 25
+  eval_budget: 50
+  video: false
+  manifest: /public/home/xsy0001/workspace/code/stable-worldmodel-find-goal-threshold-d0c466b/results/clear_eval/v0.5/manifests/tworoom/strict-seed42-n100.json
+  find_goal_threshold: /public/home/xsy0001/workspace/data/stable-worldmodel/experiments/observation_goal_threshold/formal-142ffa7-20260820/tworoom/selected_threshold.json
+  solver_ablation: false
+  img_size: 224
+  dataset_name: /public/home/xsy0001/workspace/data/stable-worldmodel/tworoom/tworoom.h5
+  callables:
+  - method: _set_state
+    args:
+      state:
+        value: pos_agent
+  - method: _set_goal_state
+    args:
+      goal_state:
+        value: goal_pos_agent
+compile: false
+bf16: false
+output:
+  dir: /public/home/xsy0001/workspace/data/stable-worldmodel/experiments/observation_goal_threshold/self-eval-d0c466b-20260821-available-thresholds/tworoom-strict
+  filename: tworoom_results.txt
+
+==== RESULTS ====
+metrics: {'success_rate': 82.0, 'episode_successes': array([ True,  True,  True, False,  True,  True, False,  True,  True,
+        True,  True, False,  True,  True,  True,  True, False, False,
+        True,  True, False,  True,  True,  True,  True,  True,  True,
+        True,  True,  True,  True,  True, False,  True, False,  True,
+        True,  True,  True,  True,  True,  True, False,  True,  True,
+        True, False,  True, False,  True,  True,  True,  True, False,
+        True, False,  True,  True,  True,  True,  True,  True,  True,
+        True,  True,  True,  True,  True,  True,  True,  True,  True,
+        True,  True,  True,  True,  True,  True,  True,  True,  True,
+        True,  True,  True, False,  True, False, False,  True,  True,
+        True,  True,  True, False, False,  True,  True,  True,  True,
+        True]), 'seeds': None, 'find_goal_threshold_self_eval': {'pairs': 100, 'actual_successes': 82, 'actual_failures': 18, 'predicted_successes': 96, 'predicted_failures': 4, 'confusion': {'tp': 82, 'tn': 4, 'fp': 14, 'fn': 0}, 'accuracy': 0.86, 'accuracy_wilson_95ci': {'low': 0.7786281178903616, 'high': 0.9147365634006086}, 'sensitivity_tpr': 1.0, 'specificity_tnr': 0.2222222222222222, 'false_positive_rate': 0.7777777777777778, 'false_negative_rate': 0.0, 'precision': 0.8541666666666666, 'negative_predictive_value': 1.0, 'balanced_accuracy': 0.6111111111111112, 'actual_success_rate_percent': 82.0, 'predicted_success_rate_percent': 96.0, 'success_rate_error_percentage_points': 14.000000000000002, 'success_rate_error_paired_bootstrap_95ci': {'low': 8.0, 'high': 21.0, 'replicates': 10000, 'seed': 20260821, 'unit': 'percentage_points'}, 'absolute_success_rate_error_percentage_points': 14.000000000000002}}
+evaluation_time: 95.20594525337219 seconds
