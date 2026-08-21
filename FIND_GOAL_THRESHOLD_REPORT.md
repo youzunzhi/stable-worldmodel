@@ -106,6 +106,35 @@ point 代替。逐 pair distance、S/F、prediction、confusion、hash 與結果
 2 個 evaluator S/F flips；四個 cell 的 ε prediction 都沒有 flip。這是
 GPU/CEM runtime drift，不是 threshold retuning。
 
+## Epsilon–pair-accuracy curves（3 tasks x 2 CLEAR rules）
+
+下圖在每個 100-pair cell 內，對所有觀察到的 endpoint-distance breakpoints
+掃描非負 ε，計算 `distance <= epsilon` 與 evaluator S/F 的 paired accuracy。
+六個 panel 各自報告、不 pooling；PushT/TwoRoom 標出原本已鎖定的 ε，Cube
+只記錄 score curve，沒有選擇或套用 ε。
+
+![3x2 epsilon–pair-accuracy curves](results/find-goal-threshold/self-eval/epsilon-accuracy-fb37755-20260821-cube-score-only/curve-v1/epsilon_pair_accuracy_3x2.png)
+
+| Task | CLEAR rule | Actual SR | Locked ε | Accuracy at locked ε | Curve內觀察到的最高 accuracy |
+|---|---|---:|---:|---:|---:|
+| PushT | Moderate | `90%` | `1.641965866` | `0.91` | `0.93` |
+| PushT | Strict | `67%` | `1.641965866` | `0.69` | `0.69` |
+| Cube | Moderate | `52%` | — | — | `0.67` |
+| Cube | Strict | `25%` | — | — | `0.75` |
+| TwoRoom | Moderate | `92%` | `1.392462969` | `0.49` | `0.92` |
+| TwoRoom | Strict | `82%` | `1.392462969` | `0.86` | `0.86` |
+
+這張圖是 **post-lock descriptive diagnostic**，不能用 curve maximum 回選
+新 ε。尤其 Cube Strict 在 ε=0 的全失敗預測就因 25% actual SR 得到 75%
+accuracy；TwoRoom Moderate 在大 ε 的近全成功預測則可接近其 92% actual
+SR。這些是 class-prevalence baseline，不代表良好的 S/F discrimination。
+
+曲線資料矩陣是完整 3x2，但 fixed-threshold self-eval 仍然不完整：Cube
+沒有 promoted ε，所以圖中沒有 Cube 垂直線，也沒有 Cube 的正式
+fixed-ε prediction/confusion。Curve manifest 以六個 hashed result artifacts
+指向 600 個 endpoint labels，並保留每個 cell 的 101 個 exact breakpoints、
+來源 checkpoint/manifest SHA。
+
 ## 固定合約與 provenance
 
 - 每個 task 都實現 `100,000,000` 個 latent-blind uniform pairs 加
@@ -145,6 +174,9 @@ checkpoint 已不存在，因此這是報告中明示的 compatibility fallback�
 - Self-eval parent revision 的 remote 全套測試：
   `1106 passed, 11 skipped, 1 xfailed`；primary `d0c466b` 的 targeted
   self-eval/CLEAR suite 為 `55 passed`。
+- Epsilon–pair-accuracy revision `fb37755` 的 remote targeted suite 為
+  `61 passed`，remote 全 repository suite 為
+  `1113 passed, 11 skipped, 1 xfailed`；六面板 PNG 已做原始解析度視覺檢查。
 - 實驗專屬測試包含 state contracts、group-first split、latent-blind sampling、
   no-replacement refill、exact preprocessing parity、selection/validation、
   clustered bootstrap 與 audit-lock guard。
@@ -162,4 +194,6 @@ pointwise latent geometry threshold，不是 predictor、reachability 或
 planner 證據。Post-lock self-eval 的四個 cells 是正常 CLEAR execution，
 但它們檢驗的是 endpoint predicate 與 evaluator 的 paired agreement；不能
 把 ε 的高 pair accuracy 當成 planner quality，也不能把缺少 Cube ε 的矩陣
-說成完整三 task 結果。
+說成完整三 task fixed-threshold 結果。六個 cells 的 accuracy curve 現在是
+完整的，但 Cube 兩格只是 score-only descriptive sweep，不能用其 curve
+maximum 補造 ε 或改寫原本的 calibration failure。

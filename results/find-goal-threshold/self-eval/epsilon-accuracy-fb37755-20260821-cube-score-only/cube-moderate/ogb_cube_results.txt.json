@@ -1,0 +1,1122 @@
+{
+  "checkpoint": "/public/home/xsy0001/workspace/code/stable-worldmodel/outputs/worktrees/lewm-dagger/outputs/experiments/lewm-dagger-r1-cube-tworoom-v2-73e9902d/cube/seed-3072/runtime/checkpoints/lewm-dagger-cube-m0-seed3072/weights_epoch_10.pt",
+  "checkpoint_config_sha256": "86f2ed24c61b48354416c23af51aa51279ae28a33cb36b7ebc3d057eec2b8c0d",
+  "checkpoint_provenance": null,
+  "checkpoint_sha256": "eece65ce87e451d8ee953d83da0c566f77ad2d8f8f6ee5e77f7ddbae5bedf883",
+  "clear_lewm": {
+    "cpu_threads": 1,
+    "manifest_path": "/public/home/xsy0001/workspace/code/stable-worldmodel-find-goal-threshold-fb37755/results/clear_eval/v0.5/manifests/cube/moderate-seed42-n100.json",
+    "manifest_sha256": "03f9c3a375707bdcd40d32aa1be26ef15ab2529fe513e67eea59789b36c70d63",
+    "protocol": {
+      "cube_orientation_threshold_deg": null,
+      "cube_position_threshold_m": 0.04,
+      "cube_sustained_steps": null,
+      "cube_symmetry_aware": false,
+      "description": "Minimal LeWM-compatible correction: remove initially solved pairs, repair Reacher joint topology and TwoRoom collision/data defects, and otherwise preserve the released task predicates.",
+      "eval_budget": 50,
+      "exclude_initial_success": true,
+      "goal_offset": 25,
+      "heldout_fraction": 0,
+      "min_difficulty": {},
+      "name": "moderate",
+      "pusht_angle_threshold_deg": 20,
+      "pusht_block_only": false,
+      "pusht_position_threshold": 20,
+      "pusht_sustained_steps": null,
+      "reacher_angle_mode": "shoulder-periodic",
+      "reacher_joint_threshold_rad": 0.05,
+      "reacher_sustained_steps": null,
+      "reacher_wrap_angles": false,
+      "reproduce_upstream_off_by_one": false,
+      "sampling": "episode-balanced",
+      "split": "all",
+      "success_mode": "task-sustained",
+      "sustained_steps": 1,
+      "tworoom_collision_mode": "swept",
+      "tworoom_crossroom_only": true,
+      "tworoom_distance_threshold": 16,
+      "tworoom_route_required": false,
+      "tworoom_source_window_clean": true,
+      "tworoom_sustained_steps": null
+    },
+    "solver_ablation_opt_in": false,
+    "solver_contract_matched": true,
+    "source_revision": "df026185a36bd9997c69d94753854db0b1a46f54",
+    "task": "cube",
+    "version": "0.5.0"
+  },
+  "completed_trajectories": 100,
+  "dataset": "/public/home/xsy0001/workspace/data/stable-worldmodel/hf/datasets/quentinll--lewm-cube/02a19a67a0dc8c9d6215f89c19e0a597691e152a/cube_single_expert.h5",
+  "evaluation_time_per_trajectory_seconds": 1.2858832931518556,
+  "evaluation_time_seconds": 128.58832931518555,
+  "find_goal_threshold_endpoint_scores": {
+    "artifact_schema_version": "find-goal-threshold-endpoint-scores-v1",
+    "clear_protocol": "moderate",
+    "endpoint_contract": {
+      "epsilon_use": "none; distances are recorded for a diagnostic sweep",
+      "evaluator_label": "CLEAR task predicate termination observed at any executed step",
+      "goal": "fixed CLEAR manifest goal observation",
+      "observation": "final executed observation at evaluator termination or the 50-step budget",
+      "rendering": "fresh pixels rendered after every environment step"
+    },
+    "pairs": [
+      {
+        "endpoint_latent_distance": 0.3011047840118408,
+        "evaluator_success": false,
+        "pair_id": 0
+      },
+      {
+        "endpoint_latent_distance": 0.3808651864528656,
+        "evaluator_success": false,
+        "pair_id": 1
+      },
+      {
+        "endpoint_latent_distance": 0.1615498661994934,
+        "evaluator_success": true,
+        "pair_id": 2
+      },
+      {
+        "endpoint_latent_distance": 0.6940021514892578,
+        "evaluator_success": true,
+        "pair_id": 3
+      },
+      {
+        "endpoint_latent_distance": 1.6044034957885742,
+        "evaluator_success": false,
+        "pair_id": 4
+      },
+      {
+        "endpoint_latent_distance": 0.09615597128868103,
+        "evaluator_success": true,
+        "pair_id": 5
+      },
+      {
+        "endpoint_latent_distance": 0.02851526252925396,
+        "evaluator_success": true,
+        "pair_id": 6
+      },
+      {
+        "endpoint_latent_distance": 0.8932870626449585,
+        "evaluator_success": false,
+        "pair_id": 7
+      },
+      {
+        "endpoint_latent_distance": 1.214632511138916,
+        "evaluator_success": false,
+        "pair_id": 8
+      },
+      {
+        "endpoint_latent_distance": 0.10160790383815765,
+        "evaluator_success": true,
+        "pair_id": 9
+      },
+      {
+        "endpoint_latent_distance": 0.052409570664167404,
+        "evaluator_success": false,
+        "pair_id": 10
+      },
+      {
+        "endpoint_latent_distance": 0.36181434988975525,
+        "evaluator_success": false,
+        "pair_id": 11
+      },
+      {
+        "endpoint_latent_distance": 1.3716421127319336,
+        "evaluator_success": false,
+        "pair_id": 12
+      },
+      {
+        "endpoint_latent_distance": 1.8762574195861816,
+        "evaluator_success": false,
+        "pair_id": 13
+      },
+      {
+        "endpoint_latent_distance": 0.7542979121208191,
+        "evaluator_success": true,
+        "pair_id": 14
+      },
+      {
+        "endpoint_latent_distance": 0.41177040338516235,
+        "evaluator_success": true,
+        "pair_id": 15
+      },
+      {
+        "endpoint_latent_distance": 0.2140081822872162,
+        "evaluator_success": true,
+        "pair_id": 16
+      },
+      {
+        "endpoint_latent_distance": 0.536903977394104,
+        "evaluator_success": true,
+        "pair_id": 17
+      },
+      {
+        "endpoint_latent_distance": 0.09777839481830597,
+        "evaluator_success": true,
+        "pair_id": 18
+      },
+      {
+        "endpoint_latent_distance": 0.03134748339653015,
+        "evaluator_success": true,
+        "pair_id": 19
+      },
+      {
+        "endpoint_latent_distance": 0.20120692253112793,
+        "evaluator_success": true,
+        "pair_id": 20
+      },
+      {
+        "endpoint_latent_distance": 1.7585468292236328,
+        "evaluator_success": false,
+        "pair_id": 21
+      },
+      {
+        "endpoint_latent_distance": 1.2156107425689697,
+        "evaluator_success": true,
+        "pair_id": 22
+      },
+      {
+        "endpoint_latent_distance": 2.115078926086426,
+        "evaluator_success": true,
+        "pair_id": 23
+      },
+      {
+        "endpoint_latent_distance": 1.7045836448669434,
+        "evaluator_success": true,
+        "pair_id": 24
+      },
+      {
+        "endpoint_latent_distance": 0.4417104423046112,
+        "evaluator_success": true,
+        "pair_id": 25
+      },
+      {
+        "endpoint_latent_distance": 0.3218913674354553,
+        "evaluator_success": false,
+        "pair_id": 26
+      },
+      {
+        "endpoint_latent_distance": 1.4835675954818726,
+        "evaluator_success": true,
+        "pair_id": 27
+      },
+      {
+        "endpoint_latent_distance": 0.3196173310279846,
+        "evaluator_success": true,
+        "pair_id": 28
+      },
+      {
+        "endpoint_latent_distance": 0.7906152009963989,
+        "evaluator_success": false,
+        "pair_id": 29
+      },
+      {
+        "endpoint_latent_distance": 1.6960420608520508,
+        "evaluator_success": true,
+        "pair_id": 30
+      },
+      {
+        "endpoint_latent_distance": 0.21013343334197998,
+        "evaluator_success": false,
+        "pair_id": 31
+      },
+      {
+        "endpoint_latent_distance": 1.6241710186004639,
+        "evaluator_success": false,
+        "pair_id": 32
+      },
+      {
+        "endpoint_latent_distance": 0.6093560457229614,
+        "evaluator_success": false,
+        "pair_id": 33
+      },
+      {
+        "endpoint_latent_distance": 0.211221382021904,
+        "evaluator_success": false,
+        "pair_id": 34
+      },
+      {
+        "endpoint_latent_distance": 0.009632404893636703,
+        "evaluator_success": true,
+        "pair_id": 35
+      },
+      {
+        "endpoint_latent_distance": 0.9021849632263184,
+        "evaluator_success": false,
+        "pair_id": 36
+      },
+      {
+        "endpoint_latent_distance": 0.05070929229259491,
+        "evaluator_success": false,
+        "pair_id": 37
+      },
+      {
+        "endpoint_latent_distance": 1.2430871725082397,
+        "evaluator_success": true,
+        "pair_id": 38
+      },
+      {
+        "endpoint_latent_distance": 0.01690499857068062,
+        "evaluator_success": true,
+        "pair_id": 39
+      },
+      {
+        "endpoint_latent_distance": 0.42375802993774414,
+        "evaluator_success": false,
+        "pair_id": 40
+      },
+      {
+        "endpoint_latent_distance": 0.4812799394130707,
+        "evaluator_success": true,
+        "pair_id": 41
+      },
+      {
+        "endpoint_latent_distance": 0.4538296163082123,
+        "evaluator_success": false,
+        "pair_id": 42
+      },
+      {
+        "endpoint_latent_distance": 0.010654295794665813,
+        "evaluator_success": true,
+        "pair_id": 43
+      },
+      {
+        "endpoint_latent_distance": 0.0739993155002594,
+        "evaluator_success": false,
+        "pair_id": 44
+      },
+      {
+        "endpoint_latent_distance": 1.0321285724639893,
+        "evaluator_success": false,
+        "pair_id": 45
+      },
+      {
+        "endpoint_latent_distance": 0.015076006762683392,
+        "evaluator_success": true,
+        "pair_id": 46
+      },
+      {
+        "endpoint_latent_distance": 0.6392991542816162,
+        "evaluator_success": false,
+        "pair_id": 47
+      },
+      {
+        "endpoint_latent_distance": 1.442766547203064,
+        "evaluator_success": false,
+        "pair_id": 48
+      },
+      {
+        "endpoint_latent_distance": 0.19490961730480194,
+        "evaluator_success": true,
+        "pair_id": 49
+      },
+      {
+        "endpoint_latent_distance": 0.6281948089599609,
+        "evaluator_success": false,
+        "pair_id": 50
+      },
+      {
+        "endpoint_latent_distance": 0.1280030608177185,
+        "evaluator_success": true,
+        "pair_id": 51
+      },
+      {
+        "endpoint_latent_distance": 0.5220909118652344,
+        "evaluator_success": false,
+        "pair_id": 52
+      },
+      {
+        "endpoint_latent_distance": 0.12612897157669067,
+        "evaluator_success": true,
+        "pair_id": 53
+      },
+      {
+        "endpoint_latent_distance": 0.35422807931900024,
+        "evaluator_success": true,
+        "pair_id": 54
+      },
+      {
+        "endpoint_latent_distance": 0.5402702689170837,
+        "evaluator_success": true,
+        "pair_id": 55
+      },
+      {
+        "endpoint_latent_distance": 1.17287278175354,
+        "evaluator_success": false,
+        "pair_id": 56
+      },
+      {
+        "endpoint_latent_distance": 0.8389369249343872,
+        "evaluator_success": true,
+        "pair_id": 57
+      },
+      {
+        "endpoint_latent_distance": 0.8281334638595581,
+        "evaluator_success": true,
+        "pair_id": 58
+      },
+      {
+        "endpoint_latent_distance": 0.8636372089385986,
+        "evaluator_success": false,
+        "pair_id": 59
+      },
+      {
+        "endpoint_latent_distance": 0.05674842745065689,
+        "evaluator_success": false,
+        "pair_id": 60
+      },
+      {
+        "endpoint_latent_distance": 0.4586986005306244,
+        "evaluator_success": false,
+        "pair_id": 61
+      },
+      {
+        "endpoint_latent_distance": 1.995723009109497,
+        "evaluator_success": true,
+        "pair_id": 62
+      },
+      {
+        "endpoint_latent_distance": 1.913582682609558,
+        "evaluator_success": true,
+        "pair_id": 63
+      },
+      {
+        "endpoint_latent_distance": 0.35984787344932556,
+        "evaluator_success": false,
+        "pair_id": 64
+      },
+      {
+        "endpoint_latent_distance": 0.30877983570098877,
+        "evaluator_success": true,
+        "pair_id": 65
+      },
+      {
+        "endpoint_latent_distance": 1.357057809829712,
+        "evaluator_success": true,
+        "pair_id": 66
+      },
+      {
+        "endpoint_latent_distance": 0.1090308427810669,
+        "evaluator_success": false,
+        "pair_id": 67
+      },
+      {
+        "endpoint_latent_distance": 0.24893996119499207,
+        "evaluator_success": true,
+        "pair_id": 68
+      },
+      {
+        "endpoint_latent_distance": 0.4667629599571228,
+        "evaluator_success": false,
+        "pair_id": 69
+      },
+      {
+        "endpoint_latent_distance": 2.3575873374938965,
+        "evaluator_success": false,
+        "pair_id": 70
+      },
+      {
+        "endpoint_latent_distance": 1.542894721031189,
+        "evaluator_success": false,
+        "pair_id": 71
+      },
+      {
+        "endpoint_latent_distance": 0.11852514743804932,
+        "evaluator_success": true,
+        "pair_id": 72
+      },
+      {
+        "endpoint_latent_distance": 0.0472470223903656,
+        "evaluator_success": true,
+        "pair_id": 73
+      },
+      {
+        "endpoint_latent_distance": 0.7203680872917175,
+        "evaluator_success": false,
+        "pair_id": 74
+      },
+      {
+        "endpoint_latent_distance": 0.5174264907836914,
+        "evaluator_success": false,
+        "pair_id": 75
+      },
+      {
+        "endpoint_latent_distance": 1.3576884269714355,
+        "evaluator_success": false,
+        "pair_id": 76
+      },
+      {
+        "endpoint_latent_distance": 0.748659074306488,
+        "evaluator_success": true,
+        "pair_id": 77
+      },
+      {
+        "endpoint_latent_distance": 0.8028069734573364,
+        "evaluator_success": false,
+        "pair_id": 78
+      },
+      {
+        "endpoint_latent_distance": 0.03516619652509689,
+        "evaluator_success": true,
+        "pair_id": 79
+      },
+      {
+        "endpoint_latent_distance": 0.35896915197372437,
+        "evaluator_success": true,
+        "pair_id": 80
+      },
+      {
+        "endpoint_latent_distance": 0.5121587514877319,
+        "evaluator_success": true,
+        "pair_id": 81
+      },
+      {
+        "endpoint_latent_distance": 0.2287285327911377,
+        "evaluator_success": true,
+        "pair_id": 82
+      },
+      {
+        "endpoint_latent_distance": 0.9935992956161499,
+        "evaluator_success": false,
+        "pair_id": 83
+      },
+      {
+        "endpoint_latent_distance": 0.4372439384460449,
+        "evaluator_success": false,
+        "pair_id": 84
+      },
+      {
+        "endpoint_latent_distance": 1.4468541145324707,
+        "evaluator_success": false,
+        "pair_id": 85
+      },
+      {
+        "endpoint_latent_distance": 0.5282690525054932,
+        "evaluator_success": false,
+        "pair_id": 86
+      },
+      {
+        "endpoint_latent_distance": 0.06517738103866577,
+        "evaluator_success": true,
+        "pair_id": 87
+      },
+      {
+        "endpoint_latent_distance": 0.04832526296377182,
+        "evaluator_success": true,
+        "pair_id": 88
+      },
+      {
+        "endpoint_latent_distance": 1.366361379623413,
+        "evaluator_success": true,
+        "pair_id": 89
+      },
+      {
+        "endpoint_latent_distance": 0.05143597722053528,
+        "evaluator_success": true,
+        "pair_id": 90
+      },
+      {
+        "endpoint_latent_distance": 0.0670335590839386,
+        "evaluator_success": true,
+        "pair_id": 91
+      },
+      {
+        "endpoint_latent_distance": 0.7281678915023804,
+        "evaluator_success": false,
+        "pair_id": 92
+      },
+      {
+        "endpoint_latent_distance": 0.0770440325140953,
+        "evaluator_success": true,
+        "pair_id": 93
+      },
+      {
+        "endpoint_latent_distance": 0.23420068621635437,
+        "evaluator_success": false,
+        "pair_id": 94
+      },
+      {
+        "endpoint_latent_distance": 0.5405463576316833,
+        "evaluator_success": false,
+        "pair_id": 95
+      },
+      {
+        "endpoint_latent_distance": 2.031562328338623,
+        "evaluator_success": false,
+        "pair_id": 96
+      },
+      {
+        "endpoint_latent_distance": 0.42216813564300537,
+        "evaluator_success": true,
+        "pair_id": 97
+      },
+      {
+        "endpoint_latent_distance": 0.9176737070083618,
+        "evaluator_success": false,
+        "pair_id": 98
+      },
+      {
+        "endpoint_latent_distance": 1.8452056646347046,
+        "evaluator_success": true,
+        "pair_id": 99
+      }
+    ],
+    "score_contract": {
+      "calibration_run_dir": "/public/home/xsy0001/workspace/data/stable-worldmodel/experiments/observation_goal_threshold/formal-142ffa7-20260820/cube",
+      "calibration_stage": "fit",
+      "calibration_status": "THRESHOLD_CALIBRATION_NO_FEASIBLE_OPERATING_POINT",
+      "dtype": "float32",
+      "encoder_checkpoint_config_sha256": "86f2ed24c61b48354416c23af51aa51279ae28a33cb36b7ebc3d057eec2b8c0d",
+      "encoder_checkpoint_provenance": "canonical repaired DAgger R1 M0 v2, seed 3072, trained from scratch on the precommitted offline D0 split; compatibility fallback because the former /ssd full-demo checkpoint is unavailable",
+      "encoder_checkpoint_sha256": "eece65ce87e451d8ee953d83da0c566f77ad2d8f8f6ee5e77f7ddbae5bedf883",
+      "encoder_projector_parameter_hash_after_evaluation": "00c527858b1cf10236718b42c5215ef1e77fd833543b4b3904c7d351b1322b80",
+      "encoder_projector_parameter_hash_before_evaluation": "00c527858b1cf10236718b42c5215ef1e77fd833543b4b3904c7d351b1322b80",
+      "latent_dim": 192,
+      "mode": "score-only diagnostic epsilon sweep",
+      "pointwise_label_variant": "cube_block_xyz_pointwise_gap03_04",
+      "pre_registered_config_path": "/public/home/xsy0001/workspace/data/stable-worldmodel/experiments/observation_goal_threshold/formal-142ffa7-20260820/cube/pre_registered_config.json",
+      "pre_registered_config_sha256": "10b081958fecf34313cef340d783bea97bd38e8e4d34f920dc2390bb095d2422",
+      "preprocessing": {
+        "channel_order": "RGB",
+        "dtype": "float32",
+        "encoder_symbol": "model.encoder(..., interpolate_pos_encoding=True).last_hidden_state[:, 0]",
+        "interpolation": "bilinear antialias",
+        "latent_dim": 192,
+        "normalization": "ImageNet mean/std from stable_pretraining",
+        "pixel_source": "HDF5 pixels HWC RGB uint8",
+        "projector_symbol": "model.projector",
+        "residual": "mean_D((z_i-z_j)^2)",
+        "resize": [
+          224,
+          224
+        ],
+        "scale": "uint8 / 255"
+      },
+      "residual_definition": "mean_D((z_i-z_j)^2)",
+      "selected_threshold_exists": false,
+      "status_path": "/public/home/xsy0001/workspace/data/stable-worldmodel/experiments/observation_goal_threshold/formal-142ffa7-20260820/cube/status.json",
+      "status_sha256": "77e999f03f35c77d3baf120fba7d85c74b385af33301e8c3edb72a770d933272",
+      "task": "cube",
+      "threshold_applied": false,
+      "threshold_selection_permitted": false
+    },
+    "score_time_seconds": 0.16762280464172363,
+    "summary": {
+      "actual_failures": 48,
+      "actual_success_rate_percent": 52.0,
+      "actual_successes": 52,
+      "epsilon_applied": false,
+      "pairs": 100
+    },
+    "task": "cube"
+  },
+  "find_goal_threshold_self_eval": null,
+  "metrics": {
+    "episode_successes": [
+      false,
+      false,
+      true,
+      true,
+      false,
+      true,
+      true,
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      true,
+      true,
+      false,
+      true,
+      false,
+      true,
+      false,
+      false,
+      true,
+      false,
+      false,
+      true,
+      false,
+      true,
+      false,
+      true,
+      true,
+      true,
+      false,
+      true,
+      true,
+      false,
+      false,
+      false,
+      true,
+      true,
+      false,
+      true,
+      true,
+      false,
+      true,
+      false,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      false,
+      true,
+      false,
+      true,
+      true,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false,
+      true,
+      false,
+      false,
+      false,
+      true,
+      false,
+      true
+    ],
+    "find_goal_threshold_endpoint_scores": {
+      "actual_failures": 48,
+      "actual_success_rate_percent": 52.0,
+      "actual_successes": 52,
+      "epsilon_applied": false,
+      "pairs": 100
+    },
+    "seeds": null,
+    "success_rate": 52.0
+  },
+  "requested_trajectories": 100,
+  "resolved_config": {
+    "cache_dir": null,
+    "dataset": {
+      "keys_to_cache": [
+        "action"
+      ],
+      "stats": "/public/home/xsy0001/workspace/data/stable-worldmodel/hf/datasets/quentinll--lewm-cube/02a19a67a0dc8c9d6215f89c19e0a597691e152a/cube_single_expert.h5"
+    },
+    "eval": {
+      "callables": [
+        {
+          "args": {
+            "qpos": {
+              "value": "qpos"
+            },
+            "qvel": {
+              "value": "qvel"
+            }
+          },
+          "method": "set_state"
+        },
+        {
+          "args": {
+            "cube_id": {
+              "in_dataset": false,
+              "value": 0
+            },
+            "target_pos": {
+              "value": "goal_privileged_block_0_pos"
+            },
+            "target_quat": {
+              "value": "goal_privileged_block_0_quat"
+            }
+          },
+          "method": "set_target_pos"
+        }
+      ],
+      "dataset_name": "/public/home/xsy0001/workspace/data/stable-worldmodel/hf/datasets/quentinll--lewm-cube/02a19a67a0dc8c9d6215f89c19e0a597691e152a/cube_single_expert.h5",
+      "eval_budget": 50,
+      "find_goal_threshold": null,
+      "find_goal_threshold_score_contract": "/public/home/xsy0001/workspace/data/stable-worldmodel/experiments/observation_goal_threshold/formal-142ffa7-20260820/cube",
+      "goal_offset_steps": 25,
+      "img_size": 224,
+      "manifest": "/public/home/xsy0001/workspace/code/stable-worldmodel-find-goal-threshold-fb37755/results/clear_eval/v0.5/manifests/cube/moderate-seed42-n100.json",
+      "num_eval": 100,
+      "solver_ablation": false,
+      "video": false
+    },
+    "objective": {
+      "_target_": "stable_worldmodel.planning.GoalMSE"
+    },
+    "output": {
+      "dir": "/public/home/xsy0001/workspace/data/stable-worldmodel/experiments/observation_goal_threshold/epsilon-accuracy-fb37755-20260821-cube-score-only/cube-moderate",
+      "filename": "ogb_cube_results.txt"
+    },
+    "plan_config": {
+      "action_block": 5,
+      "horizon": 5,
+      "receding_horizon": 5
+    },
+    "policy": "/public/home/xsy0001/workspace/code/stable-worldmodel/outputs/worktrees/lewm-dagger/outputs/experiments/lewm-dagger-r1-cube-tworoom-v2-73e9902d/cube/seed-3072/runtime/checkpoints/lewm-dagger-cube-m0-seed3072/weights_epoch_10.pt",
+    "seed": 42,
+    "solver": {
+      "_target_": "stable_worldmodel.planning.solver.CEMSolver",
+      "batch_size": 1,
+      "cost": "???",
+      "device": "cuda",
+      "n_steps": 30,
+      "num_samples": 300,
+      "seed": 42,
+      "topk": 30,
+      "var_scale": 1.0
+    },
+    "world": {
+      "env_name": "swm/OGBCube-v0",
+      "env_type": "single",
+      "height": 224,
+      "max_episode_steps": 100,
+      "multiview": false,
+      "num_envs": 100,
+      "ob_type": "states",
+      "terminate_at_goal": true,
+      "visualize_info": false,
+      "width": 224
+    }
+  },
+  "sampled_episode_indices": [
+    436,
+    634,
+    675,
+    761,
+    851,
+    883,
+    915,
+    933,
+    971,
+    1270,
+    1295,
+    1397,
+    1536,
+    1604,
+    1642,
+    1811,
+    1889,
+    1937,
+    1996,
+    2256,
+    2264,
+    2394,
+    2750,
+    2882,
+    3119,
+    3247,
+    3294,
+    3525,
+    3621,
+    3652,
+    3679,
+    3692,
+    3872,
+    3994,
+    4094,
+    4289,
+    4346,
+    4348,
+    4363,
+    4403,
+    4433,
+    4467,
+    4473,
+    4616,
+    4645,
+    4681,
+    4745,
+    4955,
+    4963,
+    5089,
+    5217,
+    5415,
+    5442,
+    5509,
+    5633,
+    6278,
+    6288,
+    6366,
+    6391,
+    6482,
+    6684,
+    6744,
+    6803,
+    6823,
+    6847,
+    6909,
+    6965,
+    6992,
+    7113,
+    7293,
+    7403,
+    7419,
+    7536,
+    7545,
+    7561,
+    7663,
+    7669,
+    7744,
+    7757,
+    7794,
+    7933,
+    8041,
+    8168,
+    8224,
+    8313,
+    8314,
+    8329,
+    8411,
+    8505,
+    8528,
+    8821,
+    8884,
+    8976,
+    9025,
+    9189,
+    9197,
+    9385,
+    9640,
+    9654,
+    9670
+  ],
+  "sampled_flat_indices": [
+    87645,
+    127450,
+    135797,
+    152998,
+    171106,
+    177581,
+    184021,
+    187550,
+    195278,
+    255387,
+    260440,
+    280897,
+    308773,
+    322433,
+    330188,
+    364137,
+    379820,
+    389395,
+    401213,
+    453596,
+    455190,
+    481220,
+    552795,
+    579344,
+    626981,
+    652771,
+    662193,
+    708655,
+    727947,
+    734081,
+    739606,
+    742149,
+    778291,
+    802900,
+    822951,
+    862205,
+    873658,
+    874001,
+    877108,
+    885113,
+    891078,
+    897922,
+    899187,
+    927928,
+    933707,
+    940982,
+    953853,
+    995990,
+    997601,
+    1023002,
+    1048627,
+    1088535,
+    1093944,
+    1107365,
+    1132368,
+    1262021,
+    1263905,
+    1279710,
+    1284646,
+    1302893,
+    1343622,
+    1355569,
+    1367464,
+    1371572,
+    1376292,
+    1388829,
+    1400113,
+    1405524,
+    1429749,
+    1465912,
+    1488029,
+    1491256,
+    1514778,
+    1516598,
+    1519862,
+    1540289,
+    1541510,
+    1556602,
+    1559258,
+    1566704,
+    1594575,
+    1616295,
+    1641896,
+    1653129,
+    1670951,
+    1671152,
+    1674244,
+    1690634,
+    1709530,
+    1714188,
+    1773038,
+    1785741,
+    1804202,
+    1814142,
+    1847010,
+    1848619,
+    1886431,
+    1937696,
+    1940557,
+    1943729
+  ],
+  "sampled_start_steps": [
+    9,
+    16,
+    122,
+    37,
+    55,
+    98,
+    106,
+    17,
+    107,
+    117,
+    145,
+    100,
+    37,
+    29,
+    146,
+    126,
+    131,
+    58,
+    17,
+    140,
+    126,
+    26,
+    45,
+    62,
+    62,
+    124,
+    99,
+    130,
+    126,
+    29,
+    127,
+    57,
+    19,
+    106,
+    57,
+    116,
+    112,
+    53,
+    145,
+    110,
+    45,
+    55,
+    114,
+    112,
+    62,
+    101,
+    108,
+    35,
+    38,
+    113,
+    10,
+    120,
+    102,
+    56,
+    135,
+    143,
+    17,
+    144,
+    55,
+    11,
+    138,
+    25,
+    61,
+    149,
+    45,
+    120,
+    148,
+    132,
+    36,
+    19,
+    26,
+    37,
+    42,
+    53,
+    101,
+    26,
+    41,
+    58,
+    101,
+    110,
+    42,
+    54,
+    128,
+    105,
+    38,
+    38,
+    115,
+    23,
+    25,
+    60,
+    17,
+    57,
+    26,
+    117,
+    21,
+    22,
+    46,
+    56,
+    103,
+    59
+  ],
+  "seed": 42,
+  "topology": null
+}

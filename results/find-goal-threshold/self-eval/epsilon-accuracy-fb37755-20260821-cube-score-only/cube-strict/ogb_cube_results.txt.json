@@ -1,0 +1,1125 @@
+{
+  "checkpoint": "/public/home/xsy0001/workspace/code/stable-worldmodel/outputs/worktrees/lewm-dagger/outputs/experiments/lewm-dagger-r1-cube-tworoom-v2-73e9902d/cube/seed-3072/runtime/checkpoints/lewm-dagger-cube-m0-seed3072/weights_epoch_10.pt",
+  "checkpoint_config_sha256": "86f2ed24c61b48354416c23af51aa51279ae28a33cb36b7ebc3d057eec2b8c0d",
+  "checkpoint_provenance": null,
+  "checkpoint_sha256": "eece65ce87e451d8ee953d83da0c566f77ad2d8f8f6ee5e77f7ddbae5bedf883",
+  "clear_lewm": {
+    "cpu_threads": 1,
+    "manifest_path": "/public/home/xsy0001/workspace/code/stable-worldmodel-find-goal-threshold-fb37755/results/clear_eval/v0.5/manifests/cube/strict-seed42-n100.json",
+    "manifest_sha256": "fccf9d6de3336431a09f146b4fadbf1a1150aff4b2d699e75ca32835b3242ecd",
+    "protocol": {
+      "cube_orientation_threshold_deg": 15,
+      "cube_position_threshold_m": 0.03,
+      "cube_sustained_steps": 3,
+      "cube_symmetry_aware": true,
+      "description": "Task-semantic completion built on Moderate data hygiene and physics, with tighter object, endpoint, persistence, and topology criteria.",
+      "eval_budget": 50,
+      "exclude_initial_success": true,
+      "goal_offset": 25,
+      "heldout_fraction": 0,
+      "min_difficulty": {},
+      "name": "strict",
+      "pusht_angle_threshold_deg": 10,
+      "pusht_block_only": true,
+      "pusht_position_threshold": 10,
+      "pusht_sustained_steps": 3,
+      "reacher_angle_mode": null,
+      "reacher_endpoint_threshold_m": 0.01,
+      "reacher_joint_threshold_rad": 0.05,
+      "reacher_success_mode": "endpoint",
+      "reacher_sustained_steps": 2,
+      "reacher_wrap_angles": false,
+      "reproduce_upstream_off_by_one": false,
+      "sampling": "episode-balanced",
+      "split": "all",
+      "success_mode": "task-sustained",
+      "sustained_steps": 1,
+      "tworoom_collision_mode": "swept",
+      "tworoom_crossroom_only": true,
+      "tworoom_distance_threshold": 8,
+      "tworoom_goal_side_required": true,
+      "tworoom_route_required": true,
+      "tworoom_source_window_clean": true,
+      "tworoom_sustained_steps": null
+    },
+    "solver_ablation_opt_in": false,
+    "solver_contract_matched": true,
+    "source_revision": "df026185a36bd9997c69d94753854db0b1a46f54",
+    "task": "cube",
+    "version": "0.5.0"
+  },
+  "completed_trajectories": 100,
+  "dataset": "/public/home/xsy0001/workspace/data/stable-worldmodel/hf/datasets/quentinll--lewm-cube/02a19a67a0dc8c9d6215f89c19e0a597691e152a/cube_single_expert.h5",
+  "evaluation_time_per_trajectory_seconds": 1.4983105754852295,
+  "evaluation_time_seconds": 149.83105754852295,
+  "find_goal_threshold_endpoint_scores": {
+    "artifact_schema_version": "find-goal-threshold-endpoint-scores-v1",
+    "clear_protocol": "strict",
+    "endpoint_contract": {
+      "epsilon_use": "none; distances are recorded for a diagnostic sweep",
+      "evaluator_label": "CLEAR task predicate termination observed at any executed step",
+      "goal": "fixed CLEAR manifest goal observation",
+      "observation": "final executed observation at evaluator termination or the 50-step budget",
+      "rendering": "fresh pixels rendered after every environment step"
+    },
+    "pairs": [
+      {
+        "endpoint_latent_distance": 0.09577381610870361,
+        "evaluator_success": false,
+        "pair_id": 0
+      },
+      {
+        "endpoint_latent_distance": 0.3808651864528656,
+        "evaluator_success": false,
+        "pair_id": 1
+      },
+      {
+        "endpoint_latent_distance": 0.11863259971141815,
+        "evaluator_success": true,
+        "pair_id": 2
+      },
+      {
+        "endpoint_latent_distance": 0.06126171350479126,
+        "evaluator_success": false,
+        "pair_id": 3
+      },
+      {
+        "endpoint_latent_distance": 0.11286020278930664,
+        "evaluator_success": false,
+        "pair_id": 4
+      },
+      {
+        "endpoint_latent_distance": 0.789260745048523,
+        "evaluator_success": false,
+        "pair_id": 5
+      },
+      {
+        "endpoint_latent_distance": 1.000501036643982,
+        "evaluator_success": false,
+        "pair_id": 6
+      },
+      {
+        "endpoint_latent_distance": 0.8754382133483887,
+        "evaluator_success": false,
+        "pair_id": 7
+      },
+      {
+        "endpoint_latent_distance": 1.2847259044647217,
+        "evaluator_success": false,
+        "pair_id": 8
+      },
+      {
+        "endpoint_latent_distance": 0.16134589910507202,
+        "evaluator_success": true,
+        "pair_id": 9
+      },
+      {
+        "endpoint_latent_distance": 0.046005360782146454,
+        "evaluator_success": false,
+        "pair_id": 10
+      },
+      {
+        "endpoint_latent_distance": 0.32025617361068726,
+        "evaluator_success": false,
+        "pair_id": 11
+      },
+      {
+        "endpoint_latent_distance": 1.4177731275558472,
+        "evaluator_success": false,
+        "pair_id": 12
+      },
+      {
+        "endpoint_latent_distance": 1.8539127111434937,
+        "evaluator_success": false,
+        "pair_id": 13
+      },
+      {
+        "endpoint_latent_distance": 0.027965551242232323,
+        "evaluator_success": false,
+        "pair_id": 14
+      },
+      {
+        "endpoint_latent_distance": 0.2131752371788025,
+        "evaluator_success": false,
+        "pair_id": 15
+      },
+      {
+        "endpoint_latent_distance": 0.05133451148867607,
+        "evaluator_success": true,
+        "pair_id": 16
+      },
+      {
+        "endpoint_latent_distance": 0.06828942894935608,
+        "evaluator_success": false,
+        "pair_id": 17
+      },
+      {
+        "endpoint_latent_distance": 0.09743842482566833,
+        "evaluator_success": true,
+        "pair_id": 18
+      },
+      {
+        "endpoint_latent_distance": 0.043608687818050385,
+        "evaluator_success": true,
+        "pair_id": 19
+      },
+      {
+        "endpoint_latent_distance": 0.04452691227197647,
+        "evaluator_success": true,
+        "pair_id": 20
+      },
+      {
+        "endpoint_latent_distance": 1.664576768875122,
+        "evaluator_success": false,
+        "pair_id": 21
+      },
+      {
+        "endpoint_latent_distance": 0.3603244721889496,
+        "evaluator_success": false,
+        "pair_id": 22
+      },
+      {
+        "endpoint_latent_distance": 2.029987335205078,
+        "evaluator_success": true,
+        "pair_id": 23
+      },
+      {
+        "endpoint_latent_distance": 1.867685079574585,
+        "evaluator_success": true,
+        "pair_id": 24
+      },
+      {
+        "endpoint_latent_distance": 0.38408154249191284,
+        "evaluator_success": true,
+        "pair_id": 25
+      },
+      {
+        "endpoint_latent_distance": 0.14297424256801605,
+        "evaluator_success": false,
+        "pair_id": 26
+      },
+      {
+        "endpoint_latent_distance": 0.018308190628886223,
+        "evaluator_success": false,
+        "pair_id": 27
+      },
+      {
+        "endpoint_latent_distance": 0.2186240255832672,
+        "evaluator_success": true,
+        "pair_id": 28
+      },
+      {
+        "endpoint_latent_distance": 1.846606969833374,
+        "evaluator_success": false,
+        "pair_id": 29
+      },
+      {
+        "endpoint_latent_distance": 0.561460018157959,
+        "evaluator_success": false,
+        "pair_id": 30
+      },
+      {
+        "endpoint_latent_distance": 0.3373628556728363,
+        "evaluator_success": false,
+        "pair_id": 31
+      },
+      {
+        "endpoint_latent_distance": 1.0565159320831299,
+        "evaluator_success": false,
+        "pair_id": 32
+      },
+      {
+        "endpoint_latent_distance": 0.7779830694198608,
+        "evaluator_success": false,
+        "pair_id": 33
+      },
+      {
+        "endpoint_latent_distance": 0.04187668859958649,
+        "evaluator_success": false,
+        "pair_id": 34
+      },
+      {
+        "endpoint_latent_distance": 0.0662512481212616,
+        "evaluator_success": true,
+        "pair_id": 35
+      },
+      {
+        "endpoint_latent_distance": 0.01308742817491293,
+        "evaluator_success": false,
+        "pair_id": 36
+      },
+      {
+        "endpoint_latent_distance": 0.06633754074573517,
+        "evaluator_success": false,
+        "pair_id": 37
+      },
+      {
+        "endpoint_latent_distance": 1.487932562828064,
+        "evaluator_success": true,
+        "pair_id": 38
+      },
+      {
+        "endpoint_latent_distance": 0.01779504492878914,
+        "evaluator_success": true,
+        "pair_id": 39
+      },
+      {
+        "endpoint_latent_distance": 0.3483353555202484,
+        "evaluator_success": false,
+        "pair_id": 40
+      },
+      {
+        "endpoint_latent_distance": 0.039670445024967194,
+        "evaluator_success": false,
+        "pair_id": 41
+      },
+      {
+        "endpoint_latent_distance": 0.054509054869413376,
+        "evaluator_success": false,
+        "pair_id": 42
+      },
+      {
+        "endpoint_latent_distance": 0.027806637808680534,
+        "evaluator_success": true,
+        "pair_id": 43
+      },
+      {
+        "endpoint_latent_distance": 0.07012684643268585,
+        "evaluator_success": false,
+        "pair_id": 44
+      },
+      {
+        "endpoint_latent_distance": 1.0440478324890137,
+        "evaluator_success": false,
+        "pair_id": 45
+      },
+      {
+        "endpoint_latent_distance": 0.038731545209884644,
+        "evaluator_success": true,
+        "pair_id": 46
+      },
+      {
+        "endpoint_latent_distance": 0.5395385026931763,
+        "evaluator_success": false,
+        "pair_id": 47
+      },
+      {
+        "endpoint_latent_distance": 1.9382786750793457,
+        "evaluator_success": false,
+        "pair_id": 48
+      },
+      {
+        "endpoint_latent_distance": 0.1116296648979187,
+        "evaluator_success": true,
+        "pair_id": 49
+      },
+      {
+        "endpoint_latent_distance": 0.507542610168457,
+        "evaluator_success": false,
+        "pair_id": 50
+      },
+      {
+        "endpoint_latent_distance": 0.06903120875358582,
+        "evaluator_success": true,
+        "pair_id": 51
+      },
+      {
+        "endpoint_latent_distance": 0.4938337206840515,
+        "evaluator_success": false,
+        "pair_id": 52
+      },
+      {
+        "endpoint_latent_distance": 0.0628076046705246,
+        "evaluator_success": false,
+        "pair_id": 53
+      },
+      {
+        "endpoint_latent_distance": 0.1312478929758072,
+        "evaluator_success": true,
+        "pair_id": 54
+      },
+      {
+        "endpoint_latent_distance": 0.9124789237976074,
+        "evaluator_success": true,
+        "pair_id": 55
+      },
+      {
+        "endpoint_latent_distance": 1.262030839920044,
+        "evaluator_success": false,
+        "pair_id": 56
+      },
+      {
+        "endpoint_latent_distance": 0.06981595605611801,
+        "evaluator_success": false,
+        "pair_id": 57
+      },
+      {
+        "endpoint_latent_distance": 0.2334277480840683,
+        "evaluator_success": false,
+        "pair_id": 58
+      },
+      {
+        "endpoint_latent_distance": 0.7928515672683716,
+        "evaluator_success": false,
+        "pair_id": 59
+      },
+      {
+        "endpoint_latent_distance": 0.07048144936561584,
+        "evaluator_success": false,
+        "pair_id": 60
+      },
+      {
+        "endpoint_latent_distance": 0.3324286639690399,
+        "evaluator_success": false,
+        "pair_id": 61
+      },
+      {
+        "endpoint_latent_distance": 0.12017105519771576,
+        "evaluator_success": false,
+        "pair_id": 62
+      },
+      {
+        "endpoint_latent_distance": 0.08766873925924301,
+        "evaluator_success": false,
+        "pair_id": 63
+      },
+      {
+        "endpoint_latent_distance": 0.34470951557159424,
+        "evaluator_success": false,
+        "pair_id": 64
+      },
+      {
+        "endpoint_latent_distance": 0.510113000869751,
+        "evaluator_success": false,
+        "pair_id": 65
+      },
+      {
+        "endpoint_latent_distance": 1.8107435703277588,
+        "evaluator_success": true,
+        "pair_id": 66
+      },
+      {
+        "endpoint_latent_distance": 0.1561032235622406,
+        "evaluator_success": false,
+        "pair_id": 67
+      },
+      {
+        "endpoint_latent_distance": 0.4236801564693451,
+        "evaluator_success": true,
+        "pair_id": 68
+      },
+      {
+        "endpoint_latent_distance": 0.5653681755065918,
+        "evaluator_success": false,
+        "pair_id": 69
+      },
+      {
+        "endpoint_latent_distance": 1.799753189086914,
+        "evaluator_success": false,
+        "pair_id": 70
+      },
+      {
+        "endpoint_latent_distance": 1.5795843601226807,
+        "evaluator_success": false,
+        "pair_id": 71
+      },
+      {
+        "endpoint_latent_distance": 0.024597052484750748,
+        "evaluator_success": false,
+        "pair_id": 72
+      },
+      {
+        "endpoint_latent_distance": 0.8508005142211914,
+        "evaluator_success": true,
+        "pair_id": 73
+      },
+      {
+        "endpoint_latent_distance": 0.7972699999809265,
+        "evaluator_success": false,
+        "pair_id": 74
+      },
+      {
+        "endpoint_latent_distance": 1.9700946807861328,
+        "evaluator_success": false,
+        "pair_id": 75
+      },
+      {
+        "endpoint_latent_distance": 1.3561458587646484,
+        "evaluator_success": false,
+        "pair_id": 76
+      },
+      {
+        "endpoint_latent_distance": 0.0526997372508049,
+        "evaluator_success": false,
+        "pair_id": 77
+      },
+      {
+        "endpoint_latent_distance": 0.4582328200340271,
+        "evaluator_success": false,
+        "pair_id": 78
+      },
+      {
+        "endpoint_latent_distance": 0.0993676707148552,
+        "evaluator_success": true,
+        "pair_id": 79
+      },
+      {
+        "endpoint_latent_distance": 0.5848891139030457,
+        "evaluator_success": false,
+        "pair_id": 80
+      },
+      {
+        "endpoint_latent_distance": 0.12319343537092209,
+        "evaluator_success": false,
+        "pair_id": 81
+      },
+      {
+        "endpoint_latent_distance": 0.07209770381450653,
+        "evaluator_success": true,
+        "pair_id": 82
+      },
+      {
+        "endpoint_latent_distance": 1.1841950416564941,
+        "evaluator_success": false,
+        "pair_id": 83
+      },
+      {
+        "endpoint_latent_distance": 0.4292412996292114,
+        "evaluator_success": false,
+        "pair_id": 84
+      },
+      {
+        "endpoint_latent_distance": 1.504641056060791,
+        "evaluator_success": false,
+        "pair_id": 85
+      },
+      {
+        "endpoint_latent_distance": 0.4598686099052429,
+        "evaluator_success": false,
+        "pair_id": 86
+      },
+      {
+        "endpoint_latent_distance": 1.8203911781311035,
+        "evaluator_success": false,
+        "pair_id": 87
+      },
+      {
+        "endpoint_latent_distance": 0.06013883650302887,
+        "evaluator_success": false,
+        "pair_id": 88
+      },
+      {
+        "endpoint_latent_distance": 0.03276119381189346,
+        "evaluator_success": false,
+        "pair_id": 89
+      },
+      {
+        "endpoint_latent_distance": 0.03804410994052887,
+        "evaluator_success": false,
+        "pair_id": 90
+      },
+      {
+        "endpoint_latent_distance": 0.0621725432574749,
+        "evaluator_success": false,
+        "pair_id": 91
+      },
+      {
+        "endpoint_latent_distance": 0.7857515215873718,
+        "evaluator_success": false,
+        "pair_id": 92
+      },
+      {
+        "endpoint_latent_distance": 0.015817081555724144,
+        "evaluator_success": true,
+        "pair_id": 93
+      },
+      {
+        "endpoint_latent_distance": 0.22492030262947083,
+        "evaluator_success": false,
+        "pair_id": 94
+      },
+      {
+        "endpoint_latent_distance": 1.7974151372909546,
+        "evaluator_success": false,
+        "pair_id": 95
+      },
+      {
+        "endpoint_latent_distance": 2.1022303104400635,
+        "evaluator_success": false,
+        "pair_id": 96
+      },
+      {
+        "endpoint_latent_distance": 0.017515098676085472,
+        "evaluator_success": false,
+        "pair_id": 97
+      },
+      {
+        "endpoint_latent_distance": 1.2469422817230225,
+        "evaluator_success": false,
+        "pair_id": 98
+      },
+      {
+        "endpoint_latent_distance": 0.12613944709300995,
+        "evaluator_success": false,
+        "pair_id": 99
+      }
+    ],
+    "score_contract": {
+      "calibration_run_dir": "/public/home/xsy0001/workspace/data/stable-worldmodel/experiments/observation_goal_threshold/formal-142ffa7-20260820/cube",
+      "calibration_stage": "fit",
+      "calibration_status": "THRESHOLD_CALIBRATION_NO_FEASIBLE_OPERATING_POINT",
+      "dtype": "float32",
+      "encoder_checkpoint_config_sha256": "86f2ed24c61b48354416c23af51aa51279ae28a33cb36b7ebc3d057eec2b8c0d",
+      "encoder_checkpoint_provenance": "canonical repaired DAgger R1 M0 v2, seed 3072, trained from scratch on the precommitted offline D0 split; compatibility fallback because the former /ssd full-demo checkpoint is unavailable",
+      "encoder_checkpoint_sha256": "eece65ce87e451d8ee953d83da0c566f77ad2d8f8f6ee5e77f7ddbae5bedf883",
+      "encoder_projector_parameter_hash_after_evaluation": "00c527858b1cf10236718b42c5215ef1e77fd833543b4b3904c7d351b1322b80",
+      "encoder_projector_parameter_hash_before_evaluation": "00c527858b1cf10236718b42c5215ef1e77fd833543b4b3904c7d351b1322b80",
+      "latent_dim": 192,
+      "mode": "score-only diagnostic epsilon sweep",
+      "pointwise_label_variant": "cube_block_xyz_pointwise_gap03_04",
+      "pre_registered_config_path": "/public/home/xsy0001/workspace/data/stable-worldmodel/experiments/observation_goal_threshold/formal-142ffa7-20260820/cube/pre_registered_config.json",
+      "pre_registered_config_sha256": "10b081958fecf34313cef340d783bea97bd38e8e4d34f920dc2390bb095d2422",
+      "preprocessing": {
+        "channel_order": "RGB",
+        "dtype": "float32",
+        "encoder_symbol": "model.encoder(..., interpolate_pos_encoding=True).last_hidden_state[:, 0]",
+        "interpolation": "bilinear antialias",
+        "latent_dim": 192,
+        "normalization": "ImageNet mean/std from stable_pretraining",
+        "pixel_source": "HDF5 pixels HWC RGB uint8",
+        "projector_symbol": "model.projector",
+        "residual": "mean_D((z_i-z_j)^2)",
+        "resize": [
+          224,
+          224
+        ],
+        "scale": "uint8 / 255"
+      },
+      "residual_definition": "mean_D((z_i-z_j)^2)",
+      "selected_threshold_exists": false,
+      "status_path": "/public/home/xsy0001/workspace/data/stable-worldmodel/experiments/observation_goal_threshold/formal-142ffa7-20260820/cube/status.json",
+      "status_sha256": "77e999f03f35c77d3baf120fba7d85c74b385af33301e8c3edb72a770d933272",
+      "task": "cube",
+      "threshold_applied": false,
+      "threshold_selection_permitted": false
+    },
+    "score_time_seconds": 0.16893959045410156,
+    "summary": {
+      "actual_failures": 75,
+      "actual_success_rate_percent": 25.0,
+      "actual_successes": 25,
+      "epsilon_applied": false,
+      "pairs": 100
+    },
+    "task": "cube"
+  },
+  "find_goal_threshold_self_eval": null,
+  "metrics": {
+    "episode_successes": [
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      true,
+      true,
+      true,
+      false,
+      false,
+      true,
+      true,
+      true,
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      true,
+      false,
+      false,
+      true,
+      false,
+      true,
+      false,
+      false,
+      true,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ],
+    "find_goal_threshold_endpoint_scores": {
+      "actual_failures": 75,
+      "actual_success_rate_percent": 25.0,
+      "actual_successes": 25,
+      "epsilon_applied": false,
+      "pairs": 100
+    },
+    "seeds": null,
+    "success_rate": 25.0
+  },
+  "requested_trajectories": 100,
+  "resolved_config": {
+    "cache_dir": null,
+    "dataset": {
+      "keys_to_cache": [
+        "action"
+      ],
+      "stats": "/public/home/xsy0001/workspace/data/stable-worldmodel/hf/datasets/quentinll--lewm-cube/02a19a67a0dc8c9d6215f89c19e0a597691e152a/cube_single_expert.h5"
+    },
+    "eval": {
+      "callables": [
+        {
+          "args": {
+            "qpos": {
+              "value": "qpos"
+            },
+            "qvel": {
+              "value": "qvel"
+            }
+          },
+          "method": "set_state"
+        },
+        {
+          "args": {
+            "cube_id": {
+              "in_dataset": false,
+              "value": 0
+            },
+            "target_pos": {
+              "value": "goal_privileged_block_0_pos"
+            },
+            "target_quat": {
+              "value": "goal_privileged_block_0_quat"
+            }
+          },
+          "method": "set_target_pos"
+        }
+      ],
+      "dataset_name": "/public/home/xsy0001/workspace/data/stable-worldmodel/hf/datasets/quentinll--lewm-cube/02a19a67a0dc8c9d6215f89c19e0a597691e152a/cube_single_expert.h5",
+      "eval_budget": 50,
+      "find_goal_threshold": null,
+      "find_goal_threshold_score_contract": "/public/home/xsy0001/workspace/data/stable-worldmodel/experiments/observation_goal_threshold/formal-142ffa7-20260820/cube",
+      "goal_offset_steps": 25,
+      "img_size": 224,
+      "manifest": "/public/home/xsy0001/workspace/code/stable-worldmodel-find-goal-threshold-fb37755/results/clear_eval/v0.5/manifests/cube/strict-seed42-n100.json",
+      "num_eval": 100,
+      "solver_ablation": false,
+      "video": false
+    },
+    "objective": {
+      "_target_": "stable_worldmodel.planning.GoalMSE"
+    },
+    "output": {
+      "dir": "/public/home/xsy0001/workspace/data/stable-worldmodel/experiments/observation_goal_threshold/epsilon-accuracy-fb37755-20260821-cube-score-only/cube-strict",
+      "filename": "ogb_cube_results.txt"
+    },
+    "plan_config": {
+      "action_block": 5,
+      "horizon": 5,
+      "receding_horizon": 5
+    },
+    "policy": "/public/home/xsy0001/workspace/code/stable-worldmodel/outputs/worktrees/lewm-dagger/outputs/experiments/lewm-dagger-r1-cube-tworoom-v2-73e9902d/cube/seed-3072/runtime/checkpoints/lewm-dagger-cube-m0-seed3072/weights_epoch_10.pt",
+    "seed": 42,
+    "solver": {
+      "_target_": "stable_worldmodel.planning.solver.CEMSolver",
+      "batch_size": 1,
+      "cost": "???",
+      "device": "cuda",
+      "n_steps": 30,
+      "num_samples": 300,
+      "seed": 42,
+      "topk": 30,
+      "var_scale": 1.0
+    },
+    "world": {
+      "env_name": "swm/OGBCube-v0",
+      "env_type": "single",
+      "height": 224,
+      "max_episode_steps": 100,
+      "multiview": false,
+      "num_envs": 100,
+      "ob_type": "states",
+      "terminate_at_goal": true,
+      "visualize_info": false,
+      "width": 224
+    }
+  },
+  "sampled_episode_indices": [
+    436,
+    634,
+    675,
+    761,
+    851,
+    883,
+    915,
+    933,
+    971,
+    1270,
+    1295,
+    1397,
+    1536,
+    1604,
+    1642,
+    1811,
+    1889,
+    1937,
+    1996,
+    2256,
+    2264,
+    2394,
+    2750,
+    2882,
+    3119,
+    3247,
+    3294,
+    3525,
+    3621,
+    3652,
+    3679,
+    3692,
+    3872,
+    3994,
+    4094,
+    4289,
+    4346,
+    4348,
+    4363,
+    4403,
+    4433,
+    4467,
+    4473,
+    4616,
+    4645,
+    4681,
+    4745,
+    4955,
+    4963,
+    5089,
+    5217,
+    5415,
+    5442,
+    5509,
+    5633,
+    6278,
+    6288,
+    6366,
+    6391,
+    6482,
+    6684,
+    6744,
+    6803,
+    6823,
+    6847,
+    6909,
+    6965,
+    6992,
+    7113,
+    7293,
+    7403,
+    7419,
+    7536,
+    7545,
+    7561,
+    7663,
+    7669,
+    7744,
+    7757,
+    7794,
+    7933,
+    8041,
+    8168,
+    8224,
+    8313,
+    8314,
+    8329,
+    8411,
+    8505,
+    8528,
+    8821,
+    8884,
+    8976,
+    9025,
+    9189,
+    9197,
+    9385,
+    9640,
+    9654,
+    9670
+  ],
+  "sampled_flat_indices": [
+    87644,
+    127450,
+    135797,
+    153000,
+    171107,
+    177580,
+    184020,
+    187550,
+    195278,
+    255387,
+    260440,
+    280897,
+    308772,
+    322433,
+    330189,
+    364137,
+    379820,
+    389397,
+    401213,
+    453595,
+    455190,
+    481220,
+    552796,
+    579345,
+    626982,
+    652771,
+    662192,
+    708654,
+    727947,
+    734081,
+    739607,
+    742151,
+    778291,
+    802899,
+    822953,
+    862206,
+    873658,
+    874002,
+    877109,
+    885113,
+    891078,
+    897924,
+    899187,
+    927928,
+    933707,
+    940982,
+    953854,
+    995991,
+    997600,
+    1023003,
+    1048627,
+    1088538,
+    1093944,
+    1107367,
+    1132367,
+    1262022,
+    1263905,
+    1279711,
+    1284646,
+    1302893,
+    1343622,
+    1355566,
+    1367466,
+    1371572,
+    1376292,
+    1388830,
+    1400114,
+    1405525,
+    1429748,
+    1465911,
+    1488029,
+    1491256,
+    1514777,
+    1516599,
+    1519863,
+    1540290,
+    1541510,
+    1556603,
+    1559257,
+    1566704,
+    1594574,
+    1616296,
+    1641896,
+    1653129,
+    1670952,
+    1671152,
+    1674245,
+    1690633,
+    1709530,
+    1714189,
+    1773038,
+    1785742,
+    1804202,
+    1814143,
+    1847010,
+    1848619,
+    1886432,
+    1937697,
+    1940558,
+    1943731
+  ],
+  "sampled_start_steps": [
+    8,
+    16,
+    122,
+    39,
+    56,
+    97,
+    105,
+    17,
+    107,
+    117,
+    145,
+    100,
+    36,
+    29,
+    147,
+    126,
+    131,
+    60,
+    17,
+    139,
+    126,
+    26,
+    46,
+    63,
+    63,
+    124,
+    98,
+    129,
+    126,
+    29,
+    128,
+    59,
+    19,
+    105,
+    59,
+    117,
+    112,
+    54,
+    146,
+    110,
+    45,
+    57,
+    114,
+    112,
+    62,
+    101,
+    109,
+    36,
+    37,
+    114,
+    10,
+    123,
+    102,
+    58,
+    134,
+    144,
+    17,
+    145,
+    55,
+    11,
+    138,
+    22,
+    63,
+    149,
+    45,
+    121,
+    149,
+    133,
+    35,
+    18,
+    26,
+    37,
+    41,
+    54,
+    102,
+    27,
+    41,
+    59,
+    100,
+    110,
+    41,
+    55,
+    128,
+    105,
+    39,
+    38,
+    116,
+    22,
+    25,
+    61,
+    17,
+    58,
+    26,
+    118,
+    21,
+    22,
+    47,
+    57,
+    104,
+    61
+  ],
+  "seed": 42,
+  "topology": null
+}

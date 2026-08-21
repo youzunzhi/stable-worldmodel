@@ -72,6 +72,69 @@
       }
     }
   },
+  "epsilon_pair_accuracy_curve": {
+    "status": "COMPLETE_3X2",
+    "source_revision": "fb37755c352698aa6ab7faf8260383850c4d7685",
+    "plot_path": "results/find-goal-threshold/self-eval/epsilon-accuracy-fb37755-20260821-cube-score-only/curve-v1/epsilon_pair_accuracy_3x2.png",
+    "plot_sha256": "bdfda4be33b956f923accd005016023222c0452de4432d1463c614036d46407d",
+    "manifest_path": "results/find-goal-threshold/self-eval/epsilon-accuracy-fb37755-20260821-cube-score-only/curve-v1/curve_manifest.json",
+    "manifest_sha256": "29e76d48fcad6c5d2532b1b4dfe821c9b7083e25902bc10b4c22335ef439375e",
+    "run_provenance_path": "results/find-goal-threshold/self-eval/epsilon-accuracy-fb37755-20260821-cube-score-only/RUN_PROVENANCE.json",
+    "run_provenance_sha256": "ccc912efe4ca5f8a02479a8ce982feb00389fbc379f3317ff5d4b70a666990c5",
+    "matrix_contract": {
+      "tasks": ["pusht", "cube", "tworoom"],
+      "protocols": ["moderate", "strict"],
+      "pairs_per_cell": 100,
+      "total_paired_endpoints": 600,
+      "pooling": "none"
+    },
+    "interpretation_contract": {
+      "analysis": "post-lock descriptive diagnostic",
+      "threshold_selection_permitted": false,
+      "cube_threshold_applied": false,
+      "cube_self_eval_status": "THRESHOLD_UNAVAILABLE"
+    },
+    "cells": {
+      "pusht/moderate": {
+        "actual_success_rate_percent": 90.0,
+        "locked_epsilon": 1.6419658660888672,
+        "locked_epsilon_accuracy": 0.91,
+        "observed_curve_max_accuracy": 0.93
+      },
+      "pusht/strict": {
+        "actual_success_rate_percent": 67.0,
+        "locked_epsilon": 1.6419658660888672,
+        "locked_epsilon_accuracy": 0.69,
+        "observed_curve_max_accuracy": 0.69
+      },
+      "cube/moderate": {
+        "actual_success_rate_percent": 52.0,
+        "locked_epsilon": null,
+        "locked_epsilon_accuracy": null,
+        "observed_curve_max_accuracy": 0.67,
+        "result_sha256": "fdd01d3c175886006508a2a18d9600cd3f90ea43c31b8b29d4e63721199d86f4"
+      },
+      "cube/strict": {
+        "actual_success_rate_percent": 25.0,
+        "locked_epsilon": null,
+        "locked_epsilon_accuracy": null,
+        "observed_curve_max_accuracy": 0.75,
+        "result_sha256": "e0717c21e2250ac0c69fef9f1a9d9a0281f55eca53ae8277f14e2fd716016ad7"
+      },
+      "tworoom/moderate": {
+        "actual_success_rate_percent": 92.0,
+        "locked_epsilon": 1.392462968826294,
+        "locked_epsilon_accuracy": 0.49,
+        "observed_curve_max_accuracy": 0.92
+      },
+      "tworoom/strict": {
+        "actual_success_rate_percent": 82.0,
+        "locked_epsilon": 1.392462968826294,
+        "locked_epsilon_accuracy": 0.86,
+        "observed_curve_max_accuracy": 0.86
+      }
+    }
+  },
   "pair_contract_per_task": {
     "uniform_target": 100000000,
     "uniform_realized": 100000000,

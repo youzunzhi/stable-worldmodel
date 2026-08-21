@@ -1,0 +1,2532 @@
+{
+  "artifact_schema_version": "find-goal-threshold-epsilon-pair-accuracy-curve-v1",
+  "cells": [
+    {
+      "actual_success_rate_percent": 90.0,
+      "checkpoint_sha256": "e4f14a2276918bcb34876fb8d86d16dbd8683ae6077a13a2275dee008a68c775",
+      "curve_points": [
+        {
+          "epsilon": 0.0,
+          "pair_accuracy": 0.1
+        },
+        {
+          "epsilon": 0.005873951129615307,
+          "pair_accuracy": 0.11
+        },
+        {
+          "epsilon": 0.014736334793269634,
+          "pair_accuracy": 0.12
+        },
+        {
+          "epsilon": 0.015093905851244926,
+          "pair_accuracy": 0.13
+        },
+        {
+          "epsilon": 0.017857015132904053,
+          "pair_accuracy": 0.14
+        },
+        {
+          "epsilon": 0.018134022131562233,
+          "pair_accuracy": 0.15
+        },
+        {
+          "epsilon": 0.018701056018471718,
+          "pair_accuracy": 0.16
+        },
+        {
+          "epsilon": 0.021350719034671783,
+          "pair_accuracy": 0.17
+        },
+        {
+          "epsilon": 0.022120270878076553,
+          "pair_accuracy": 0.16
+        },
+        {
+          "epsilon": 0.0243050716817379,
+          "pair_accuracy": 0.17
+        },
+        {
+          "epsilon": 0.03041422925889492,
+          "pair_accuracy": 0.18
+        },
+        {
+          "epsilon": 0.03136415779590607,
+          "pair_accuracy": 0.19
+        },
+        {
+          "epsilon": 0.03310124948620796,
+          "pair_accuracy": 0.2
+        },
+        {
+          "epsilon": 0.03401541709899902,
+          "pair_accuracy": 0.21
+        },
+        {
+          "epsilon": 0.03467612713575363,
+          "pair_accuracy": 0.22
+        },
+        {
+          "epsilon": 0.03474096208810806,
+          "pair_accuracy": 0.23
+        },
+        {
+          "epsilon": 0.03525576740503311,
+          "pair_accuracy": 0.24
+        },
+        {
+          "epsilon": 0.03564317151904106,
+          "pair_accuracy": 0.25
+        },
+        {
+          "epsilon": 0.03629068285226822,
+          "pair_accuracy": 0.26
+        },
+        {
+          "epsilon": 0.03724654018878937,
+          "pair_accuracy": 0.27
+        },
+        {
+          "epsilon": 0.039116837084293365,
+          "pair_accuracy": 0.28
+        },
+        {
+          "epsilon": 0.041328348219394684,
+          "pair_accuracy": 0.29
+        },
+        {
+          "epsilon": 0.04142022505402565,
+          "pair_accuracy": 0.3
+        },
+        {
+          "epsilon": 0.04406177997589111,
+          "pair_accuracy": 0.31
+        },
+        {
+          "epsilon": 0.04612336680293083,
+          "pair_accuracy": 0.32
+        },
+        {
+          "epsilon": 0.04682540521025658,
+          "pair_accuracy": 0.33
+        },
+        {
+          "epsilon": 0.05070960149168968,
+          "pair_accuracy": 0.34
+        },
+        {
+          "epsilon": 0.05108746141195297,
+          "pair_accuracy": 0.35
+        },
+        {
+          "epsilon": 0.05163358896970749,
+          "pair_accuracy": 0.36
+        },
+        {
+          "epsilon": 0.05227318033576012,
+          "pair_accuracy": 0.37
+        },
+        {
+          "epsilon": 0.05334564670920372,
+          "pair_accuracy": 0.38
+        },
+        {
+          "epsilon": 0.05350526422262192,
+          "pair_accuracy": 0.39
+        },
+        {
+          "epsilon": 0.05519716441631317,
+          "pair_accuracy": 0.4
+        },
+        {
+          "epsilon": 0.05638754367828369,
+          "pair_accuracy": 0.41
+        },
+        {
+          "epsilon": 0.05859946832060814,
+          "pair_accuracy": 0.42
+        },
+        {
+          "epsilon": 0.05872492492198944,
+          "pair_accuracy": 0.43
+        },
+        {
+          "epsilon": 0.05948321148753166,
+          "pair_accuracy": 0.44
+        },
+        {
+          "epsilon": 0.06178329512476921,
+          "pair_accuracy": 0.45
+        },
+        {
+          "epsilon": 0.06316125392913818,
+          "pair_accuracy": 0.46
+        },
+        {
+          "epsilon": 0.06536462157964706,
+          "pair_accuracy": 0.47
+        },
+        {
+          "epsilon": 0.0679078996181488,
+          "pair_accuracy": 0.46
+        },
+        {
+          "epsilon": 0.06826856732368469,
+          "pair_accuracy": 0.47
+        },
+        {
+          "epsilon": 0.07623128592967987,
+          "pair_accuracy": 0.48
+        },
+        {
+          "epsilon": 0.07897742092609406,
+          "pair_accuracy": 0.49
+        },
+        {
+          "epsilon": 0.08791598677635193,
+          "pair_accuracy": 0.5
+        },
+        {
+          "epsilon": 0.08930826187133789,
+          "pair_accuracy": 0.51
+        },
+        {
+          "epsilon": 0.08939763158559799,
+          "pair_accuracy": 0.52
+        },
+        {
+          "epsilon": 0.09739192575216293,
+          "pair_accuracy": 0.53
+        },
+        {
+          "epsilon": 0.09957899898290634,
+          "pair_accuracy": 0.54
+        },
+        {
+          "epsilon": 0.10420706123113632,
+          "pair_accuracy": 0.53
+        },
+        {
+          "epsilon": 0.10844774544239044,
+          "pair_accuracy": 0.54
+        },
+        {
+          "epsilon": 0.11104495823383331,
+          "pair_accuracy": 0.55
+        },
+        {
+          "epsilon": 0.11333012580871582,
+          "pair_accuracy": 0.56
+        },
+        {
+          "epsilon": 0.113345205783844,
+          "pair_accuracy": 0.57
+        },
+        {
+          "epsilon": 0.11615519225597382,
+          "pair_accuracy": 0.58
+        },
+        {
+          "epsilon": 0.12004490941762924,
+          "pair_accuracy": 0.59
+        },
+        {
+          "epsilon": 0.1278669834136963,
+          "pair_accuracy": 0.6
+        },
+        {
+          "epsilon": 0.13135749101638794,
+          "pair_accuracy": 0.61
+        },
+        {
+          "epsilon": 0.13420900702476501,
+          "pair_accuracy": 0.62
+        },
+        {
+          "epsilon": 0.13890713453292847,
+          "pair_accuracy": 0.63
+        },
+        {
+          "epsilon": 0.13908527791500092,
+          "pair_accuracy": 0.64
+        },
+        {
+          "epsilon": 0.14003466069698334,
+          "pair_accuracy": 0.65
+        },
+        {
+          "epsilon": 0.15113186836242676,
+          "pair_accuracy": 0.66
+        },
+        {
+          "epsilon": 0.1536731719970703,
+          "pair_accuracy": 0.67
+        },
+        {
+          "epsilon": 0.15939626097679138,
+          "pair_accuracy": 0.68
+        },
+        {
+          "epsilon": 0.1683327853679657,
+          "pair_accuracy": 0.69
+        },
+        {
+          "epsilon": 0.1755731999874115,
+          "pair_accuracy": 0.7
+        },
+        {
+          "epsilon": 0.17751985788345337,
+          "pair_accuracy": 0.71
+        },
+        {
+          "epsilon": 0.1788928210735321,
+          "pair_accuracy": 0.72
+        },
+        {
+          "epsilon": 0.18074467778205872,
+          "pair_accuracy": 0.73
+        },
+        {
+          "epsilon": 0.1837882250547409,
+          "pair_accuracy": 0.74
+        },
+        {
+          "epsilon": 0.19172492623329163,
+          "pair_accuracy": 0.75
+        },
+        {
+          "epsilon": 0.19609156250953674,
+          "pair_accuracy": 0.76
+        },
+        {
+          "epsilon": 0.19836756587028503,
+          "pair_accuracy": 0.77
+        },
+        {
+          "epsilon": 0.20783910155296326,
+          "pair_accuracy": 0.78
+        },
+        {
+          "epsilon": 0.209743469953537,
+          "pair_accuracy": 0.79
+        },
+        {
+          "epsilon": 0.22954235970973969,
+          "pair_accuracy": 0.8
+        },
+        {
+          "epsilon": 0.24087366461753845,
+          "pair_accuracy": 0.81
+        },
+        {
+          "epsilon": 0.2429659217596054,
+          "pair_accuracy": 0.82
+        },
+        {
+          "epsilon": 0.24817803502082825,
+          "pair_accuracy": 0.83
+        },
+        {
+          "epsilon": 0.2500689625740051,
+          "pair_accuracy": 0.84
+        },
+        {
+          "epsilon": 0.2656659781932831,
+          "pair_accuracy": 0.85
+        },
+        {
+          "epsilon": 0.26997920870780945,
+          "pair_accuracy": 0.86
+        },
+        {
+          "epsilon": 0.27003300189971924,
+          "pair_accuracy": 0.87
+        },
+        {
+          "epsilon": 0.271806925535202,
+          "pair_accuracy": 0.88
+        },
+        {
+          "epsilon": 0.27381837368011475,
+          "pair_accuracy": 0.87
+        },
+        {
+          "epsilon": 0.27749159932136536,
+          "pair_accuracy": 0.88
+        },
+        {
+          "epsilon": 0.29040399193763733,
+          "pair_accuracy": 0.87
+        },
+        {
+          "epsilon": 0.29347822070121765,
+          "pair_accuracy": 0.88
+        },
+        {
+          "epsilon": 0.31902727484703064,
+          "pair_accuracy": 0.89
+        },
+        {
+          "epsilon": 0.33896562457084656,
+          "pair_accuracy": 0.9
+        },
+        {
+          "epsilon": 0.34194421768188477,
+          "pair_accuracy": 0.91
+        },
+        {
+          "epsilon": 0.3470027446746826,
+          "pair_accuracy": 0.92
+        },
+        {
+          "epsilon": 0.38957083225250244,
+          "pair_accuracy": 0.93
+        },
+        {
+          "epsilon": 0.40203341841697693,
+          "pair_accuracy": 0.92
+        },
+        {
+          "epsilon": 0.5620066523551941,
+          "pair_accuracy": 0.93
+        },
+        {
+          "epsilon": 0.5904780626296997,
+          "pair_accuracy": 0.92
+        },
+        {
+          "epsilon": 0.7756050825119019,
+          "pair_accuracy": 0.93
+        },
+        {
+          "epsilon": 0.9560799598693848,
+          "pair_accuracy": 0.92
+        },
+        {
+          "epsilon": 1.591660499572754,
+          "pair_accuracy": 0.91
+        },
+        {
+          "epsilon": 1.8413233757019043,
+          "pair_accuracy": 0.9
+        }
+      ],
+      "locked_epsilon": 1.6419658660888672,
+      "locked_epsilon_accuracy": 0.91,
+      "manifest_sha256": "dcdce1f5e90c29246b70670d6a61171bd8ba17814bc88726ac65994714c14afa",
+      "protocol": "moderate",
+      "result_path": "/public/home/xsy0001/workspace/data/stable-worldmodel/experiments/observation_goal_threshold/self-eval-d0c466b-20260821-available-thresholds/pusht-moderate/pusht_results.txt.json",
+      "result_sha256": "4401ae1f554e6d35931081e0ed12bcf1ee2c78b8a268bbcc507efd69ae6ab15f",
+      "source_kind": "locked-epsilon self-eval",
+      "task": "pusht"
+    },
+    {
+      "actual_success_rate_percent": 67.0,
+      "checkpoint_sha256": "e4f14a2276918bcb34876fb8d86d16dbd8683ae6077a13a2275dee008a68c775",
+      "curve_points": [
+        {
+          "epsilon": 0.0,
+          "pair_accuracy": 0.33
+        },
+        {
+          "epsilon": 0.006254839710891247,
+          "pair_accuracy": 0.34
+        },
+        {
+          "epsilon": 0.00850455928593874,
+          "pair_accuracy": 0.35
+        },
+        {
+          "epsilon": 0.019261375069618225,
+          "pair_accuracy": 0.36
+        },
+        {
+          "epsilon": 0.021600723266601562,
+          "pair_accuracy": 0.37
+        },
+        {
+          "epsilon": 0.022482406347990036,
+          "pair_accuracy": 0.38
+        },
+        {
+          "epsilon": 0.02436020039021969,
+          "pair_accuracy": 0.39
+        },
+        {
+          "epsilon": 0.025662891566753387,
+          "pair_accuracy": 0.38
+        },
+        {
+          "epsilon": 0.03249374404549599,
+          "pair_accuracy": 0.39
+        },
+        {
+          "epsilon": 0.03804309293627739,
+          "pair_accuracy": 0.38
+        },
+        {
+          "epsilon": 0.041747719049453735,
+          "pair_accuracy": 0.39
+        },
+        {
+          "epsilon": 0.04370769113302231,
+          "pair_accuracy": 0.38
+        },
+        {
+          "epsilon": 0.04661346599459648,
+          "pair_accuracy": 0.39
+        },
+        {
+          "epsilon": 0.048274584114551544,
+          "pair_accuracy": 0.4
+        },
+        {
+          "epsilon": 0.04832063242793083,
+          "pair_accuracy": 0.41
+        },
+        {
+          "epsilon": 0.05185505002737045,
+          "pair_accuracy": 0.42
+        },
+        {
+          "epsilon": 0.055217474699020386,
+          "pair_accuracy": 0.43
+        },
+        {
+          "epsilon": 0.05554630979895592,
+          "pair_accuracy": 0.44
+        },
+        {
+          "epsilon": 0.05570381134748459,
+          "pair_accuracy": 0.45
+        },
+        {
+          "epsilon": 0.05735296010971069,
+          "pair_accuracy": 0.44
+        },
+        {
+          "epsilon": 0.05911105126142502,
+          "pair_accuracy": 0.45
+        },
+        {
+          "epsilon": 0.06487485021352768,
+          "pair_accuracy": 0.46
+        },
+        {
+          "epsilon": 0.07386495918035507,
+          "pair_accuracy": 0.45
+        },
+        {
+          "epsilon": 0.07524801790714264,
+          "pair_accuracy": 0.46
+        },
+        {
+          "epsilon": 0.07687174528837204,
+          "pair_accuracy": 0.47
+        },
+        {
+          "epsilon": 0.07855245471000671,
+          "pair_accuracy": 0.46
+        },
+        {
+          "epsilon": 0.07894270867109299,
+          "pair_accuracy": 0.47
+        },
+        {
+          "epsilon": 0.08206067979335785,
+          "pair_accuracy": 0.48
+        },
+        {
+          "epsilon": 0.09070353209972382,
+          "pair_accuracy": 0.49
+        },
+        {
+          "epsilon": 0.09474014490842819,
+          "pair_accuracy": 0.48
+        },
+        {
+          "epsilon": 0.09526476263999939,
+          "pair_accuracy": 0.49
+        },
+        {
+          "epsilon": 0.0986756682395935,
+          "pair_accuracy": 0.5
+        },
+        {
+          "epsilon": 0.10207449644804001,
+          "pair_accuracy": 0.49
+        },
+        {
+          "epsilon": 0.12096922099590302,
+          "pair_accuracy": 0.5
+        },
+        {
+          "epsilon": 0.12356434762477875,
+          "pair_accuracy": 0.51
+        },
+        {
+          "epsilon": 0.12845385074615479,
+          "pair_accuracy": 0.5
+        },
+        {
+          "epsilon": 0.13311517238616943,
+          "pair_accuracy": 0.51
+        },
+        {
+          "epsilon": 0.134273499250412,
+          "pair_accuracy": 0.52
+        },
+        {
+          "epsilon": 0.13980278372764587,
+          "pair_accuracy": 0.51
+        },
+        {
+          "epsilon": 0.14251399040222168,
+          "pair_accuracy": 0.52
+        },
+        {
+          "epsilon": 0.1469441056251526,
+          "pair_accuracy": 0.53
+        },
+        {
+          "epsilon": 0.15112870931625366,
+          "pair_accuracy": 0.54
+        },
+        {
+          "epsilon": 0.17731033265590668,
+          "pair_accuracy": 0.55
+        },
+        {
+          "epsilon": 0.17755156755447388,
+          "pair_accuracy": 0.54
+        },
+        {
+          "epsilon": 0.1791612207889557,
+          "pair_accuracy": 0.53
+        },
+        {
+          "epsilon": 0.18489448726177216,
+          "pair_accuracy": 0.52
+        },
+        {
+          "epsilon": 0.18878547847270966,
+          "pair_accuracy": 0.53
+        },
+        {
+          "epsilon": 0.19799380004405975,
+          "pair_accuracy": 0.52
+        },
+        {
+          "epsilon": 0.19809743762016296,
+          "pair_accuracy": 0.51
+        },
+        {
+          "epsilon": 0.23959390819072723,
+          "pair_accuracy": 0.5
+        },
+        {
+          "epsilon": 0.24341647326946259,
+          "pair_accuracy": 0.49
+        },
+        {
+          "epsilon": 0.2446989268064499,
+          "pair_accuracy": 0.5
+        },
+        {
+          "epsilon": 0.2517006993293762,
+          "pair_accuracy": 0.51
+        },
+        {
+          "epsilon": 0.2561239004135132,
+          "pair_accuracy": 0.52
+        },
+        {
+          "epsilon": 0.25904592871665955,
+          "pair_accuracy": 0.53
+        },
+        {
+          "epsilon": 0.2590904235839844,
+          "pair_accuracy": 0.54
+        },
+        {
+          "epsilon": 0.2716904282569885,
+          "pair_accuracy": 0.53
+        },
+        {
+          "epsilon": 0.32044875621795654,
+          "pair_accuracy": 0.52
+        },
+        {
+          "epsilon": 0.32630032300949097,
+          "pair_accuracy": 0.51
+        },
+        {
+          "epsilon": 0.3345586955547333,
+          "pair_accuracy": 0.5
+        },
+        {
+          "epsilon": 0.34910592436790466,
+          "pair_accuracy": 0.51
+        },
+        {
+          "epsilon": 0.3789026141166687,
+          "pair_accuracy": 0.52
+        },
+        {
+          "epsilon": 0.38926026225090027,
+          "pair_accuracy": 0.53
+        },
+        {
+          "epsilon": 0.3958575129508972,
+          "pair_accuracy": 0.54
+        },
+        {
+          "epsilon": 0.45668554306030273,
+          "pair_accuracy": 0.55
+        },
+        {
+          "epsilon": 0.46689748764038086,
+          "pair_accuracy": 0.56
+        },
+        {
+          "epsilon": 0.47942861914634705,
+          "pair_accuracy": 0.55
+        },
+        {
+          "epsilon": 0.5654805898666382,
+          "pair_accuracy": 0.56
+        },
+        {
+          "epsilon": 0.5661941766738892,
+          "pair_accuracy": 0.57
+        },
+        {
+          "epsilon": 0.5997900366783142,
+          "pair_accuracy": 0.56
+        },
+        {
+          "epsilon": 0.6100700497627258,
+          "pair_accuracy": 0.57
+        },
+        {
+          "epsilon": 0.6107950210571289,
+          "pair_accuracy": 0.58
+        },
+        {
+          "epsilon": 0.6200058460235596,
+          "pair_accuracy": 0.59
+        },
+        {
+          "epsilon": 0.6297385096549988,
+          "pair_accuracy": 0.6
+        },
+        {
+          "epsilon": 0.6577327251434326,
+          "pair_accuracy": 0.61
+        },
+        {
+          "epsilon": 0.6787583231925964,
+          "pair_accuracy": 0.62
+        },
+        {
+          "epsilon": 0.7269681692123413,
+          "pair_accuracy": 0.61
+        },
+        {
+          "epsilon": 0.7434155344963074,
+          "pair_accuracy": 0.62
+        },
+        {
+          "epsilon": 0.784392237663269,
+          "pair_accuracy": 0.63
+        },
+        {
+          "epsilon": 0.8639723062515259,
+          "pair_accuracy": 0.62
+        },
+        {
+          "epsilon": 0.8878217935562134,
+          "pair_accuracy": 0.63
+        },
+        {
+          "epsilon": 0.9246678352355957,
+          "pair_accuracy": 0.62
+        },
+        {
+          "epsilon": 0.9332858324050903,
+          "pair_accuracy": 0.61
+        },
+        {
+          "epsilon": 1.0199168920516968,
+          "pair_accuracy": 0.62
+        },
+        {
+          "epsilon": 1.090825080871582,
+          "pair_accuracy": 0.63
+        },
+        {
+          "epsilon": 1.1139423847198486,
+          "pair_accuracy": 0.64
+        },
+        {
+          "epsilon": 1.1204442977905273,
+          "pair_accuracy": 0.65
+        },
+        {
+          "epsilon": 1.2006704807281494,
+          "pair_accuracy": 0.66
+        },
+        {
+          "epsilon": 1.2107288837432861,
+          "pair_accuracy": 0.67
+        },
+        {
+          "epsilon": 1.2293723821640015,
+          "pair_accuracy": 0.66
+        },
+        {
+          "epsilon": 1.3534806966781616,
+          "pair_accuracy": 0.67
+        },
+        {
+          "epsilon": 1.3553965091705322,
+          "pair_accuracy": 0.68
+        },
+        {
+          "epsilon": 1.373437762260437,
+          "pair_accuracy": 0.69
+        },
+        {
+          "epsilon": 1.3792780637741089,
+          "pair_accuracy": 0.68
+        },
+        {
+          "epsilon": 1.437952995300293,
+          "pair_accuracy": 0.67
+        },
+        {
+          "epsilon": 1.453195333480835,
+          "pair_accuracy": 0.66
+        },
+        {
+          "epsilon": 1.4723024368286133,
+          "pair_accuracy": 0.67
+        },
+        {
+          "epsilon": 1.5077011585235596,
+          "pair_accuracy": 0.68
+        },
+        {
+          "epsilon": 1.564992904663086,
+          "pair_accuracy": 0.69
+        },
+        {
+          "epsilon": 1.8121808767318726,
+          "pair_accuracy": 0.68
+        },
+        {
+          "epsilon": 1.9295988082885742,
+          "pair_accuracy": 0.67
+        }
+      ],
+      "locked_epsilon": 1.6419658660888672,
+      "locked_epsilon_accuracy": 0.69,
+      "manifest_sha256": "2042018fc346927af5da75cce2565db8476121d1db67a99d0fc50f218eddcbc9",
+      "protocol": "strict",
+      "result_path": "/public/home/xsy0001/workspace/data/stable-worldmodel/experiments/observation_goal_threshold/self-eval-d0c466b-20260821-available-thresholds/pusht-strict/pusht_results.txt.json",
+      "result_sha256": "d4782cca9a8337e48d2b322561af7a47586742f8c580ec5d067aef3e4c70f308",
+      "source_kind": "locked-epsilon self-eval",
+      "task": "pusht"
+    },
+    {
+      "actual_success_rate_percent": 52.0,
+      "checkpoint_sha256": "eece65ce87e451d8ee953d83da0c566f77ad2d8f8f6ee5e77f7ddbae5bedf883",
+      "curve_points": [
+        {
+          "epsilon": 0.0,
+          "pair_accuracy": 0.48
+        },
+        {
+          "epsilon": 0.009632404893636703,
+          "pair_accuracy": 0.49
+        },
+        {
+          "epsilon": 0.010654295794665813,
+          "pair_accuracy": 0.5
+        },
+        {
+          "epsilon": 0.015076006762683392,
+          "pair_accuracy": 0.51
+        },
+        {
+          "epsilon": 0.01690499857068062,
+          "pair_accuracy": 0.52
+        },
+        {
+          "epsilon": 0.02851526252925396,
+          "pair_accuracy": 0.53
+        },
+        {
+          "epsilon": 0.03134748339653015,
+          "pair_accuracy": 0.54
+        },
+        {
+          "epsilon": 0.03516619652509689,
+          "pair_accuracy": 0.55
+        },
+        {
+          "epsilon": 0.0472470223903656,
+          "pair_accuracy": 0.56
+        },
+        {
+          "epsilon": 0.04832526296377182,
+          "pair_accuracy": 0.57
+        },
+        {
+          "epsilon": 0.05070929229259491,
+          "pair_accuracy": 0.56
+        },
+        {
+          "epsilon": 0.05143597722053528,
+          "pair_accuracy": 0.57
+        },
+        {
+          "epsilon": 0.052409570664167404,
+          "pair_accuracy": 0.56
+        },
+        {
+          "epsilon": 0.05674842745065689,
+          "pair_accuracy": 0.55
+        },
+        {
+          "epsilon": 0.06517738103866577,
+          "pair_accuracy": 0.56
+        },
+        {
+          "epsilon": 0.0670335590839386,
+          "pair_accuracy": 0.57
+        },
+        {
+          "epsilon": 0.0739993155002594,
+          "pair_accuracy": 0.56
+        },
+        {
+          "epsilon": 0.0770440325140953,
+          "pair_accuracy": 0.57
+        },
+        {
+          "epsilon": 0.09615597128868103,
+          "pair_accuracy": 0.58
+        },
+        {
+          "epsilon": 0.09777839481830597,
+          "pair_accuracy": 0.59
+        },
+        {
+          "epsilon": 0.10160790383815765,
+          "pair_accuracy": 0.6
+        },
+        {
+          "epsilon": 0.1090308427810669,
+          "pair_accuracy": 0.59
+        },
+        {
+          "epsilon": 0.11852514743804932,
+          "pair_accuracy": 0.6
+        },
+        {
+          "epsilon": 0.12612897157669067,
+          "pair_accuracy": 0.61
+        },
+        {
+          "epsilon": 0.1280030608177185,
+          "pair_accuracy": 0.62
+        },
+        {
+          "epsilon": 0.1615498661994934,
+          "pair_accuracy": 0.63
+        },
+        {
+          "epsilon": 0.19490961730480194,
+          "pair_accuracy": 0.64
+        },
+        {
+          "epsilon": 0.20120692253112793,
+          "pair_accuracy": 0.65
+        },
+        {
+          "epsilon": 0.21013343334197998,
+          "pair_accuracy": 0.64
+        },
+        {
+          "epsilon": 0.211221382021904,
+          "pair_accuracy": 0.63
+        },
+        {
+          "epsilon": 0.2140081822872162,
+          "pair_accuracy": 0.64
+        },
+        {
+          "epsilon": 0.2287285327911377,
+          "pair_accuracy": 0.65
+        },
+        {
+          "epsilon": 0.23420068621635437,
+          "pair_accuracy": 0.64
+        },
+        {
+          "epsilon": 0.24893996119499207,
+          "pair_accuracy": 0.65
+        },
+        {
+          "epsilon": 0.3011047840118408,
+          "pair_accuracy": 0.64
+        },
+        {
+          "epsilon": 0.30877983570098877,
+          "pair_accuracy": 0.65
+        },
+        {
+          "epsilon": 0.3196173310279846,
+          "pair_accuracy": 0.66
+        },
+        {
+          "epsilon": 0.3218913674354553,
+          "pair_accuracy": 0.65
+        },
+        {
+          "epsilon": 0.35422807931900024,
+          "pair_accuracy": 0.66
+        },
+        {
+          "epsilon": 0.35896915197372437,
+          "pair_accuracy": 0.67
+        },
+        {
+          "epsilon": 0.35984787344932556,
+          "pair_accuracy": 0.66
+        },
+        {
+          "epsilon": 0.36181434988975525,
+          "pair_accuracy": 0.65
+        },
+        {
+          "epsilon": 0.3808651864528656,
+          "pair_accuracy": 0.64
+        },
+        {
+          "epsilon": 0.41177040338516235,
+          "pair_accuracy": 0.65
+        },
+        {
+          "epsilon": 0.42216813564300537,
+          "pair_accuracy": 0.66
+        },
+        {
+          "epsilon": 0.42375802993774414,
+          "pair_accuracy": 0.65
+        },
+        {
+          "epsilon": 0.4372439384460449,
+          "pair_accuracy": 0.64
+        },
+        {
+          "epsilon": 0.4417104423046112,
+          "pair_accuracy": 0.65
+        },
+        {
+          "epsilon": 0.4538296163082123,
+          "pair_accuracy": 0.64
+        },
+        {
+          "epsilon": 0.4586986005306244,
+          "pair_accuracy": 0.63
+        },
+        {
+          "epsilon": 0.4667629599571228,
+          "pair_accuracy": 0.62
+        },
+        {
+          "epsilon": 0.4812799394130707,
+          "pair_accuracy": 0.63
+        },
+        {
+          "epsilon": 0.5121587514877319,
+          "pair_accuracy": 0.64
+        },
+        {
+          "epsilon": 0.5174264907836914,
+          "pair_accuracy": 0.63
+        },
+        {
+          "epsilon": 0.5220909118652344,
+          "pair_accuracy": 0.62
+        },
+        {
+          "epsilon": 0.5282690525054932,
+          "pair_accuracy": 0.61
+        },
+        {
+          "epsilon": 0.536903977394104,
+          "pair_accuracy": 0.62
+        },
+        {
+          "epsilon": 0.5402702689170837,
+          "pair_accuracy": 0.63
+        },
+        {
+          "epsilon": 0.5405463576316833,
+          "pair_accuracy": 0.62
+        },
+        {
+          "epsilon": 0.6093560457229614,
+          "pair_accuracy": 0.61
+        },
+        {
+          "epsilon": 0.6281948089599609,
+          "pair_accuracy": 0.6
+        },
+        {
+          "epsilon": 0.6392991542816162,
+          "pair_accuracy": 0.59
+        },
+        {
+          "epsilon": 0.6940021514892578,
+          "pair_accuracy": 0.6
+        },
+        {
+          "epsilon": 0.7203680872917175,
+          "pair_accuracy": 0.59
+        },
+        {
+          "epsilon": 0.7281678915023804,
+          "pair_accuracy": 0.58
+        },
+        {
+          "epsilon": 0.748659074306488,
+          "pair_accuracy": 0.59
+        },
+        {
+          "epsilon": 0.7542979121208191,
+          "pair_accuracy": 0.6
+        },
+        {
+          "epsilon": 0.7906152009963989,
+          "pair_accuracy": 0.59
+        },
+        {
+          "epsilon": 0.8028069734573364,
+          "pair_accuracy": 0.58
+        },
+        {
+          "epsilon": 0.8281334638595581,
+          "pair_accuracy": 0.59
+        },
+        {
+          "epsilon": 0.8389369249343872,
+          "pair_accuracy": 0.6
+        },
+        {
+          "epsilon": 0.8636372089385986,
+          "pair_accuracy": 0.59
+        },
+        {
+          "epsilon": 0.8932870626449585,
+          "pair_accuracy": 0.58
+        },
+        {
+          "epsilon": 0.9021849632263184,
+          "pair_accuracy": 0.57
+        },
+        {
+          "epsilon": 0.9176737070083618,
+          "pair_accuracy": 0.56
+        },
+        {
+          "epsilon": 0.9935992956161499,
+          "pair_accuracy": 0.55
+        },
+        {
+          "epsilon": 1.0321285724639893,
+          "pair_accuracy": 0.54
+        },
+        {
+          "epsilon": 1.17287278175354,
+          "pair_accuracy": 0.53
+        },
+        {
+          "epsilon": 1.214632511138916,
+          "pair_accuracy": 0.52
+        },
+        {
+          "epsilon": 1.2156107425689697,
+          "pair_accuracy": 0.53
+        },
+        {
+          "epsilon": 1.2430871725082397,
+          "pair_accuracy": 0.54
+        },
+        {
+          "epsilon": 1.357057809829712,
+          "pair_accuracy": 0.55
+        },
+        {
+          "epsilon": 1.3576884269714355,
+          "pair_accuracy": 0.54
+        },
+        {
+          "epsilon": 1.366361379623413,
+          "pair_accuracy": 0.55
+        },
+        {
+          "epsilon": 1.3716421127319336,
+          "pair_accuracy": 0.54
+        },
+        {
+          "epsilon": 1.442766547203064,
+          "pair_accuracy": 0.53
+        },
+        {
+          "epsilon": 1.4468541145324707,
+          "pair_accuracy": 0.52
+        },
+        {
+          "epsilon": 1.4835675954818726,
+          "pair_accuracy": 0.53
+        },
+        {
+          "epsilon": 1.542894721031189,
+          "pair_accuracy": 0.52
+        },
+        {
+          "epsilon": 1.6044034957885742,
+          "pair_accuracy": 0.51
+        },
+        {
+          "epsilon": 1.6241710186004639,
+          "pair_accuracy": 0.5
+        },
+        {
+          "epsilon": 1.6960420608520508,
+          "pair_accuracy": 0.51
+        },
+        {
+          "epsilon": 1.7045836448669434,
+          "pair_accuracy": 0.52
+        },
+        {
+          "epsilon": 1.7585468292236328,
+          "pair_accuracy": 0.51
+        },
+        {
+          "epsilon": 1.8452056646347046,
+          "pair_accuracy": 0.52
+        },
+        {
+          "epsilon": 1.8762574195861816,
+          "pair_accuracy": 0.51
+        },
+        {
+          "epsilon": 1.913582682609558,
+          "pair_accuracy": 0.52
+        },
+        {
+          "epsilon": 1.995723009109497,
+          "pair_accuracy": 0.53
+        },
+        {
+          "epsilon": 2.031562328338623,
+          "pair_accuracy": 0.52
+        },
+        {
+          "epsilon": 2.115078926086426,
+          "pair_accuracy": 0.53
+        },
+        {
+          "epsilon": 2.3575873374938965,
+          "pair_accuracy": 0.52
+        }
+      ],
+      "locked_epsilon": null,
+      "locked_epsilon_accuracy": null,
+      "manifest_sha256": "03f9c3a375707bdcd40d32aa1be26ef15ab2529fe513e67eea59789b36c70d63",
+      "protocol": "moderate",
+      "result_path": "/public/home/xsy0001/workspace/data/stable-worldmodel/experiments/observation_goal_threshold/epsilon-accuracy-fb37755-20260821-cube-score-only/cube-moderate/ogb_cube_results.txt.json",
+      "result_sha256": "fdd01d3c175886006508a2a18d9600cd3f90ea43c31b8b29d4e63721199d86f4",
+      "source_kind": "score-only",
+      "task": "cube"
+    },
+    {
+      "actual_success_rate_percent": 25.0,
+      "checkpoint_sha256": "eece65ce87e451d8ee953d83da0c566f77ad2d8f8f6ee5e77f7ddbae5bedf883",
+      "curve_points": [
+        {
+          "epsilon": 0.0,
+          "pair_accuracy": 0.75
+        },
+        {
+          "epsilon": 0.01308742817491293,
+          "pair_accuracy": 0.74
+        },
+        {
+          "epsilon": 0.015817081555724144,
+          "pair_accuracy": 0.75
+        },
+        {
+          "epsilon": 0.017515098676085472,
+          "pair_accuracy": 0.74
+        },
+        {
+          "epsilon": 0.01779504492878914,
+          "pair_accuracy": 0.75
+        },
+        {
+          "epsilon": 0.018308190628886223,
+          "pair_accuracy": 0.74
+        },
+        {
+          "epsilon": 0.024597052484750748,
+          "pair_accuracy": 0.73
+        },
+        {
+          "epsilon": 0.027806637808680534,
+          "pair_accuracy": 0.74
+        },
+        {
+          "epsilon": 0.027965551242232323,
+          "pair_accuracy": 0.73
+        },
+        {
+          "epsilon": 0.03276119381189346,
+          "pair_accuracy": 0.72
+        },
+        {
+          "epsilon": 0.03804410994052887,
+          "pair_accuracy": 0.71
+        },
+        {
+          "epsilon": 0.038731545209884644,
+          "pair_accuracy": 0.72
+        },
+        {
+          "epsilon": 0.039670445024967194,
+          "pair_accuracy": 0.71
+        },
+        {
+          "epsilon": 0.04187668859958649,
+          "pair_accuracy": 0.7
+        },
+        {
+          "epsilon": 0.043608687818050385,
+          "pair_accuracy": 0.71
+        },
+        {
+          "epsilon": 0.04452691227197647,
+          "pair_accuracy": 0.72
+        },
+        {
+          "epsilon": 0.046005360782146454,
+          "pair_accuracy": 0.71
+        },
+        {
+          "epsilon": 0.05133451148867607,
+          "pair_accuracy": 0.72
+        },
+        {
+          "epsilon": 0.0526997372508049,
+          "pair_accuracy": 0.71
+        },
+        {
+          "epsilon": 0.054509054869413376,
+          "pair_accuracy": 0.7
+        },
+        {
+          "epsilon": 0.06013883650302887,
+          "pair_accuracy": 0.69
+        },
+        {
+          "epsilon": 0.06126171350479126,
+          "pair_accuracy": 0.68
+        },
+        {
+          "epsilon": 0.0621725432574749,
+          "pair_accuracy": 0.67
+        },
+        {
+          "epsilon": 0.0628076046705246,
+          "pair_accuracy": 0.66
+        },
+        {
+          "epsilon": 0.0662512481212616,
+          "pair_accuracy": 0.67
+        },
+        {
+          "epsilon": 0.06633754074573517,
+          "pair_accuracy": 0.66
+        },
+        {
+          "epsilon": 0.06828942894935608,
+          "pair_accuracy": 0.65
+        },
+        {
+          "epsilon": 0.06903120875358582,
+          "pair_accuracy": 0.66
+        },
+        {
+          "epsilon": 0.06981595605611801,
+          "pair_accuracy": 0.65
+        },
+        {
+          "epsilon": 0.07012684643268585,
+          "pair_accuracy": 0.64
+        },
+        {
+          "epsilon": 0.07048144936561584,
+          "pair_accuracy": 0.63
+        },
+        {
+          "epsilon": 0.07209770381450653,
+          "pair_accuracy": 0.64
+        },
+        {
+          "epsilon": 0.08766873925924301,
+          "pair_accuracy": 0.63
+        },
+        {
+          "epsilon": 0.09577381610870361,
+          "pair_accuracy": 0.62
+        },
+        {
+          "epsilon": 0.09743842482566833,
+          "pair_accuracy": 0.63
+        },
+        {
+          "epsilon": 0.0993676707148552,
+          "pair_accuracy": 0.64
+        },
+        {
+          "epsilon": 0.1116296648979187,
+          "pair_accuracy": 0.65
+        },
+        {
+          "epsilon": 0.11286020278930664,
+          "pair_accuracy": 0.64
+        },
+        {
+          "epsilon": 0.11863259971141815,
+          "pair_accuracy": 0.65
+        },
+        {
+          "epsilon": 0.12017105519771576,
+          "pair_accuracy": 0.64
+        },
+        {
+          "epsilon": 0.12319343537092209,
+          "pair_accuracy": 0.63
+        },
+        {
+          "epsilon": 0.12613944709300995,
+          "pair_accuracy": 0.62
+        },
+        {
+          "epsilon": 0.1312478929758072,
+          "pair_accuracy": 0.63
+        },
+        {
+          "epsilon": 0.14297424256801605,
+          "pair_accuracy": 0.62
+        },
+        {
+          "epsilon": 0.1561032235622406,
+          "pair_accuracy": 0.61
+        },
+        {
+          "epsilon": 0.16134589910507202,
+          "pair_accuracy": 0.62
+        },
+        {
+          "epsilon": 0.2131752371788025,
+          "pair_accuracy": 0.61
+        },
+        {
+          "epsilon": 0.2186240255832672,
+          "pair_accuracy": 0.62
+        },
+        {
+          "epsilon": 0.22492030262947083,
+          "pair_accuracy": 0.61
+        },
+        {
+          "epsilon": 0.2334277480840683,
+          "pair_accuracy": 0.6
+        },
+        {
+          "epsilon": 0.32025617361068726,
+          "pair_accuracy": 0.59
+        },
+        {
+          "epsilon": 0.3324286639690399,
+          "pair_accuracy": 0.58
+        },
+        {
+          "epsilon": 0.3373628556728363,
+          "pair_accuracy": 0.57
+        },
+        {
+          "epsilon": 0.34470951557159424,
+          "pair_accuracy": 0.56
+        },
+        {
+          "epsilon": 0.3483353555202484,
+          "pair_accuracy": 0.55
+        },
+        {
+          "epsilon": 0.3603244721889496,
+          "pair_accuracy": 0.54
+        },
+        {
+          "epsilon": 0.3808651864528656,
+          "pair_accuracy": 0.53
+        },
+        {
+          "epsilon": 0.38408154249191284,
+          "pair_accuracy": 0.54
+        },
+        {
+          "epsilon": 0.4236801564693451,
+          "pair_accuracy": 0.55
+        },
+        {
+          "epsilon": 0.4292412996292114,
+          "pair_accuracy": 0.54
+        },
+        {
+          "epsilon": 0.4582328200340271,
+          "pair_accuracy": 0.53
+        },
+        {
+          "epsilon": 0.4598686099052429,
+          "pair_accuracy": 0.52
+        },
+        {
+          "epsilon": 0.4938337206840515,
+          "pair_accuracy": 0.51
+        },
+        {
+          "epsilon": 0.507542610168457,
+          "pair_accuracy": 0.5
+        },
+        {
+          "epsilon": 0.510113000869751,
+          "pair_accuracy": 0.49
+        },
+        {
+          "epsilon": 0.5395385026931763,
+          "pair_accuracy": 0.48
+        },
+        {
+          "epsilon": 0.561460018157959,
+          "pair_accuracy": 0.47
+        },
+        {
+          "epsilon": 0.5653681755065918,
+          "pair_accuracy": 0.46
+        },
+        {
+          "epsilon": 0.5848891139030457,
+          "pair_accuracy": 0.45
+        },
+        {
+          "epsilon": 0.7779830694198608,
+          "pair_accuracy": 0.44
+        },
+        {
+          "epsilon": 0.7857515215873718,
+          "pair_accuracy": 0.43
+        },
+        {
+          "epsilon": 0.789260745048523,
+          "pair_accuracy": 0.42
+        },
+        {
+          "epsilon": 0.7928515672683716,
+          "pair_accuracy": 0.41
+        },
+        {
+          "epsilon": 0.7972699999809265,
+          "pair_accuracy": 0.4
+        },
+        {
+          "epsilon": 0.8508005142211914,
+          "pair_accuracy": 0.41
+        },
+        {
+          "epsilon": 0.8754382133483887,
+          "pair_accuracy": 0.4
+        },
+        {
+          "epsilon": 0.9124789237976074,
+          "pair_accuracy": 0.41
+        },
+        {
+          "epsilon": 1.000501036643982,
+          "pair_accuracy": 0.4
+        },
+        {
+          "epsilon": 1.0440478324890137,
+          "pair_accuracy": 0.39
+        },
+        {
+          "epsilon": 1.0565159320831299,
+          "pair_accuracy": 0.38
+        },
+        {
+          "epsilon": 1.1841950416564941,
+          "pair_accuracy": 0.37
+        },
+        {
+          "epsilon": 1.2469422817230225,
+          "pair_accuracy": 0.36
+        },
+        {
+          "epsilon": 1.262030839920044,
+          "pair_accuracy": 0.35
+        },
+        {
+          "epsilon": 1.2847259044647217,
+          "pair_accuracy": 0.34
+        },
+        {
+          "epsilon": 1.3561458587646484,
+          "pair_accuracy": 0.33
+        },
+        {
+          "epsilon": 1.4177731275558472,
+          "pair_accuracy": 0.32
+        },
+        {
+          "epsilon": 1.487932562828064,
+          "pair_accuracy": 0.33
+        },
+        {
+          "epsilon": 1.504641056060791,
+          "pair_accuracy": 0.32
+        },
+        {
+          "epsilon": 1.5795843601226807,
+          "pair_accuracy": 0.31
+        },
+        {
+          "epsilon": 1.664576768875122,
+          "pair_accuracy": 0.3
+        },
+        {
+          "epsilon": 1.7974151372909546,
+          "pair_accuracy": 0.29
+        },
+        {
+          "epsilon": 1.799753189086914,
+          "pair_accuracy": 0.28
+        },
+        {
+          "epsilon": 1.8107435703277588,
+          "pair_accuracy": 0.29
+        },
+        {
+          "epsilon": 1.8203911781311035,
+          "pair_accuracy": 0.28
+        },
+        {
+          "epsilon": 1.846606969833374,
+          "pair_accuracy": 0.27
+        },
+        {
+          "epsilon": 1.8539127111434937,
+          "pair_accuracy": 0.26
+        },
+        {
+          "epsilon": 1.867685079574585,
+          "pair_accuracy": 0.27
+        },
+        {
+          "epsilon": 1.9382786750793457,
+          "pair_accuracy": 0.26
+        },
+        {
+          "epsilon": 1.9700946807861328,
+          "pair_accuracy": 0.25
+        },
+        {
+          "epsilon": 2.029987335205078,
+          "pair_accuracy": 0.26
+        },
+        {
+          "epsilon": 2.1022303104400635,
+          "pair_accuracy": 0.25
+        }
+      ],
+      "locked_epsilon": null,
+      "locked_epsilon_accuracy": null,
+      "manifest_sha256": "fccf9d6de3336431a09f146b4fadbf1a1150aff4b2d699e75ca32835b3242ecd",
+      "protocol": "strict",
+      "result_path": "/public/home/xsy0001/workspace/data/stable-worldmodel/experiments/observation_goal_threshold/epsilon-accuracy-fb37755-20260821-cube-score-only/cube-strict/ogb_cube_results.txt.json",
+      "result_sha256": "e0717c21e2250ac0c69fef9f1a9d9a0281f55eca53ae8277f14e2fd716016ad7",
+      "source_kind": "score-only",
+      "task": "cube"
+    },
+    {
+      "actual_success_rate_percent": 92.0,
+      "checkpoint_sha256": "68e6ca32ec5f7bdfb728ef89164ab62f566147e7724b74e5cf8e5858db746a65",
+      "curve_points": [
+        {
+          "epsilon": 0.0,
+          "pair_accuracy": 0.08
+        },
+        {
+          "epsilon": 0.3912426829338074,
+          "pair_accuracy": 0.09
+        },
+        {
+          "epsilon": 0.5525935888290405,
+          "pair_accuracy": 0.1
+        },
+        {
+          "epsilon": 0.6096681356430054,
+          "pair_accuracy": 0.11
+        },
+        {
+          "epsilon": 0.6501818299293518,
+          "pair_accuracy": 0.12
+        },
+        {
+          "epsilon": 0.6801241636276245,
+          "pair_accuracy": 0.13
+        },
+        {
+          "epsilon": 0.7618937492370605,
+          "pair_accuracy": 0.14
+        },
+        {
+          "epsilon": 0.8578025698661804,
+          "pair_accuracy": 0.15
+        },
+        {
+          "epsilon": 0.8988629579544067,
+          "pair_accuracy": 0.16
+        },
+        {
+          "epsilon": 0.9554959535598755,
+          "pair_accuracy": 0.17
+        },
+        {
+          "epsilon": 0.9606883525848389,
+          "pair_accuracy": 0.18
+        },
+        {
+          "epsilon": 1.0419327020645142,
+          "pair_accuracy": 0.19
+        },
+        {
+          "epsilon": 1.05204176902771,
+          "pair_accuracy": 0.2
+        },
+        {
+          "epsilon": 1.0589784383773804,
+          "pair_accuracy": 0.21
+        },
+        {
+          "epsilon": 1.0937254428863525,
+          "pair_accuracy": 0.22
+        },
+        {
+          "epsilon": 1.1018376350402832,
+          "pair_accuracy": 0.23
+        },
+        {
+          "epsilon": 1.121921420097351,
+          "pair_accuracy": 0.24
+        },
+        {
+          "epsilon": 1.1264069080352783,
+          "pair_accuracy": 0.25
+        },
+        {
+          "epsilon": 1.132250428199768,
+          "pair_accuracy": 0.26
+        },
+        {
+          "epsilon": 1.13249671459198,
+          "pair_accuracy": 0.27
+        },
+        {
+          "epsilon": 1.144495964050293,
+          "pair_accuracy": 0.28
+        },
+        {
+          "epsilon": 1.1719058752059937,
+          "pair_accuracy": 0.29
+        },
+        {
+          "epsilon": 1.1739548444747925,
+          "pair_accuracy": 0.3
+        },
+        {
+          "epsilon": 1.1780928373336792,
+          "pair_accuracy": 0.31
+        },
+        {
+          "epsilon": 1.2081040143966675,
+          "pair_accuracy": 0.32
+        },
+        {
+          "epsilon": 1.211409330368042,
+          "pair_accuracy": 0.33
+        },
+        {
+          "epsilon": 1.2173247337341309,
+          "pair_accuracy": 0.34
+        },
+        {
+          "epsilon": 1.2249810695648193,
+          "pair_accuracy": 0.35
+        },
+        {
+          "epsilon": 1.231935739517212,
+          "pair_accuracy": 0.36
+        },
+        {
+          "epsilon": 1.234773874282837,
+          "pair_accuracy": 0.37
+        },
+        {
+          "epsilon": 1.2824122905731201,
+          "pair_accuracy": 0.38
+        },
+        {
+          "epsilon": 1.3061401844024658,
+          "pair_accuracy": 0.39
+        },
+        {
+          "epsilon": 1.3085559606552124,
+          "pair_accuracy": 0.4
+        },
+        {
+          "epsilon": 1.3235268592834473,
+          "pair_accuracy": 0.41
+        },
+        {
+          "epsilon": 1.3330819606781006,
+          "pair_accuracy": 0.42
+        },
+        {
+          "epsilon": 1.3391735553741455,
+          "pair_accuracy": 0.43
+        },
+        {
+          "epsilon": 1.345026969909668,
+          "pair_accuracy": 0.44
+        },
+        {
+          "epsilon": 1.3594000339508057,
+          "pair_accuracy": 0.45
+        },
+        {
+          "epsilon": 1.3671014308929443,
+          "pair_accuracy": 0.46
+        },
+        {
+          "epsilon": 1.3709962368011475,
+          "pair_accuracy": 0.47
+        },
+        {
+          "epsilon": 1.372069239616394,
+          "pair_accuracy": 0.48
+        },
+        {
+          "epsilon": 1.3889367580413818,
+          "pair_accuracy": 0.49
+        },
+        {
+          "epsilon": 1.396409511566162,
+          "pair_accuracy": 0.5
+        },
+        {
+          "epsilon": 1.3968467712402344,
+          "pair_accuracy": 0.51
+        },
+        {
+          "epsilon": 1.3970521688461304,
+          "pair_accuracy": 0.52
+        },
+        {
+          "epsilon": 1.4001147747039795,
+          "pair_accuracy": 0.53
+        },
+        {
+          "epsilon": 1.4140018224716187,
+          "pair_accuracy": 0.54
+        },
+        {
+          "epsilon": 1.4254026412963867,
+          "pair_accuracy": 0.55
+        },
+        {
+          "epsilon": 1.4271291494369507,
+          "pair_accuracy": 0.56
+        },
+        {
+          "epsilon": 1.4296778440475464,
+          "pair_accuracy": 0.57
+        },
+        {
+          "epsilon": 1.4347469806671143,
+          "pair_accuracy": 0.58
+        },
+        {
+          "epsilon": 1.438555121421814,
+          "pair_accuracy": 0.59
+        },
+        {
+          "epsilon": 1.4419711828231812,
+          "pair_accuracy": 0.6
+        },
+        {
+          "epsilon": 1.4619624614715576,
+          "pair_accuracy": 0.61
+        },
+        {
+          "epsilon": 1.4684852361679077,
+          "pair_accuracy": 0.62
+        },
+        {
+          "epsilon": 1.4762413501739502,
+          "pair_accuracy": 0.63
+        },
+        {
+          "epsilon": 1.4794948101043701,
+          "pair_accuracy": 0.64
+        },
+        {
+          "epsilon": 1.489314317703247,
+          "pair_accuracy": 0.65
+        },
+        {
+          "epsilon": 1.4922237396240234,
+          "pair_accuracy": 0.66
+        },
+        {
+          "epsilon": 1.5100131034851074,
+          "pair_accuracy": 0.67
+        },
+        {
+          "epsilon": 1.511117696762085,
+          "pair_accuracy": 0.68
+        },
+        {
+          "epsilon": 1.5147747993469238,
+          "pair_accuracy": 0.69
+        },
+        {
+          "epsilon": 1.523606538772583,
+          "pair_accuracy": 0.7
+        },
+        {
+          "epsilon": 1.5274336338043213,
+          "pair_accuracy": 0.71
+        },
+        {
+          "epsilon": 1.5286431312561035,
+          "pair_accuracy": 0.72
+        },
+        {
+          "epsilon": 1.5352678298950195,
+          "pair_accuracy": 0.73
+        },
+        {
+          "epsilon": 1.5404155254364014,
+          "pair_accuracy": 0.74
+        },
+        {
+          "epsilon": 1.5513811111450195,
+          "pair_accuracy": 0.75
+        },
+        {
+          "epsilon": 1.5520408153533936,
+          "pair_accuracy": 0.76
+        },
+        {
+          "epsilon": 1.5592827796936035,
+          "pair_accuracy": 0.77
+        },
+        {
+          "epsilon": 1.5606489181518555,
+          "pair_accuracy": 0.76
+        },
+        {
+          "epsilon": 1.5698412656784058,
+          "pair_accuracy": 0.75
+        },
+        {
+          "epsilon": 1.5760736465454102,
+          "pair_accuracy": 0.76
+        },
+        {
+          "epsilon": 1.5879424810409546,
+          "pair_accuracy": 0.77
+        },
+        {
+          "epsilon": 1.6101059913635254,
+          "pair_accuracy": 0.76
+        },
+        {
+          "epsilon": 1.612987756729126,
+          "pair_accuracy": 0.77
+        },
+        {
+          "epsilon": 1.625052809715271,
+          "pair_accuracy": 0.78
+        },
+        {
+          "epsilon": 1.6567304134368896,
+          "pair_accuracy": 0.77
+        },
+        {
+          "epsilon": 1.6746797561645508,
+          "pair_accuracy": 0.76
+        },
+        {
+          "epsilon": 1.677747130393982,
+          "pair_accuracy": 0.77
+        },
+        {
+          "epsilon": 1.679146647453308,
+          "pair_accuracy": 0.78
+        },
+        {
+          "epsilon": 1.6825488805770874,
+          "pair_accuracy": 0.79
+        },
+        {
+          "epsilon": 1.6955347061157227,
+          "pair_accuracy": 0.8
+        },
+        {
+          "epsilon": 1.6966317892074585,
+          "pair_accuracy": 0.81
+        },
+        {
+          "epsilon": 1.6973985433578491,
+          "pair_accuracy": 0.82
+        },
+        {
+          "epsilon": 1.7173657417297363,
+          "pair_accuracy": 0.83
+        },
+        {
+          "epsilon": 1.7328805923461914,
+          "pair_accuracy": 0.84
+        },
+        {
+          "epsilon": 1.7430146932601929,
+          "pair_accuracy": 0.85
+        },
+        {
+          "epsilon": 1.7510017156600952,
+          "pair_accuracy": 0.84
+        },
+        {
+          "epsilon": 1.751226782798767,
+          "pair_accuracy": 0.85
+        },
+        {
+          "epsilon": 1.8014132976531982,
+          "pair_accuracy": 0.84
+        },
+        {
+          "epsilon": 1.8338817358016968,
+          "pair_accuracy": 0.83
+        },
+        {
+          "epsilon": 1.871673345565796,
+          "pair_accuracy": 0.84
+        },
+        {
+          "epsilon": 1.8922021389007568,
+          "pair_accuracy": 0.85
+        },
+        {
+          "epsilon": 1.9364551305770874,
+          "pair_accuracy": 0.86
+        },
+        {
+          "epsilon": 2.0028820037841797,
+          "pair_accuracy": 0.87
+        },
+        {
+          "epsilon": 2.012782096862793,
+          "pair_accuracy": 0.88
+        },
+        {
+          "epsilon": 2.0475168228149414,
+          "pair_accuracy": 0.89
+        },
+        {
+          "epsilon": 2.2470126152038574,
+          "pair_accuracy": 0.9
+        },
+        {
+          "epsilon": 2.2511134147644043,
+          "pair_accuracy": 0.91
+        },
+        {
+          "epsilon": 2.2519803047180176,
+          "pair_accuracy": 0.92
+        }
+      ],
+      "locked_epsilon": 1.392462968826294,
+      "locked_epsilon_accuracy": 0.49,
+      "manifest_sha256": "216250de76495a17a58bb16538b678408063798c3e4f55381943b79214ac83f6",
+      "protocol": "moderate",
+      "result_path": "/public/home/xsy0001/workspace/data/stable-worldmodel/experiments/observation_goal_threshold/self-eval-d0c466b-20260821-available-thresholds/tworoom-moderate/tworoom_results.txt.json",
+      "result_sha256": "5650e2450f6d9573328d12c8947613adca52e5aecd8dd0b1215035cff9ea4b17",
+      "source_kind": "locked-epsilon self-eval",
+      "task": "tworoom"
+    },
+    {
+      "actual_success_rate_percent": 82.0,
+      "checkpoint_sha256": "68e6ca32ec5f7bdfb728ef89164ab62f566147e7724b74e5cf8e5858db746a65",
+      "curve_points": [
+        {
+          "epsilon": 0.0,
+          "pair_accuracy": 0.18
+        },
+        {
+          "epsilon": 0.0009194327867589891,
+          "pair_accuracy": 0.19
+        },
+        {
+          "epsilon": 0.003357730573043227,
+          "pair_accuracy": 0.2
+        },
+        {
+          "epsilon": 0.009031692519783974,
+          "pair_accuracy": 0.21
+        },
+        {
+          "epsilon": 0.015604312531650066,
+          "pair_accuracy": 0.2
+        },
+        {
+          "epsilon": 0.01807008497416973,
+          "pair_accuracy": 0.19
+        },
+        {
+          "epsilon": 0.018667280673980713,
+          "pair_accuracy": 0.2
+        },
+        {
+          "epsilon": 0.03737063333392143,
+          "pair_accuracy": 0.21
+        },
+        {
+          "epsilon": 0.03903089463710785,
+          "pair_accuracy": 0.22
+        },
+        {
+          "epsilon": 0.06389176100492477,
+          "pair_accuracy": 0.23
+        },
+        {
+          "epsilon": 0.06659848988056183,
+          "pair_accuracy": 0.22
+        },
+        {
+          "epsilon": 0.07998287677764893,
+          "pair_accuracy": 0.21
+        },
+        {
+          "epsilon": 0.0862215980887413,
+          "pair_accuracy": 0.22
+        },
+        {
+          "epsilon": 0.089752696454525,
+          "pair_accuracy": 0.23
+        },
+        {
+          "epsilon": 0.10394488275051117,
+          "pair_accuracy": 0.24
+        },
+        {
+          "epsilon": 0.11359263956546783,
+          "pair_accuracy": 0.25
+        },
+        {
+          "epsilon": 0.11458667367696762,
+          "pair_accuracy": 0.26
+        },
+        {
+          "epsilon": 0.11609077453613281,
+          "pair_accuracy": 0.27
+        },
+        {
+          "epsilon": 0.13614460825920105,
+          "pair_accuracy": 0.26
+        },
+        {
+          "epsilon": 0.14333315193653107,
+          "pair_accuracy": 0.27
+        },
+        {
+          "epsilon": 0.14403501152992249,
+          "pair_accuracy": 0.28
+        },
+        {
+          "epsilon": 0.15230509638786316,
+          "pair_accuracy": 0.29
+        },
+        {
+          "epsilon": 0.15601566433906555,
+          "pair_accuracy": 0.3
+        },
+        {
+          "epsilon": 0.15730559825897217,
+          "pair_accuracy": 0.31
+        },
+        {
+          "epsilon": 0.16966065764427185,
+          "pair_accuracy": 0.32
+        },
+        {
+          "epsilon": 0.18066911399364471,
+          "pair_accuracy": 0.31
+        },
+        {
+          "epsilon": 0.21050629019737244,
+          "pair_accuracy": 0.32
+        },
+        {
+          "epsilon": 0.2429208755493164,
+          "pair_accuracy": 0.33
+        },
+        {
+          "epsilon": 0.24557790160179138,
+          "pair_accuracy": 0.34
+        },
+        {
+          "epsilon": 0.25480398535728455,
+          "pair_accuracy": 0.35
+        },
+        {
+          "epsilon": 0.2742770314216614,
+          "pair_accuracy": 0.34
+        },
+        {
+          "epsilon": 0.28497743606567383,
+          "pair_accuracy": 0.35
+        },
+        {
+          "epsilon": 0.29505717754364014,
+          "pair_accuracy": 0.36
+        },
+        {
+          "epsilon": 0.2955712676048279,
+          "pair_accuracy": 0.37
+        },
+        {
+          "epsilon": 0.29685330390930176,
+          "pair_accuracy": 0.38
+        },
+        {
+          "epsilon": 0.30418717861175537,
+          "pair_accuracy": 0.39
+        },
+        {
+          "epsilon": 0.3052757680416107,
+          "pair_accuracy": 0.4
+        },
+        {
+          "epsilon": 0.3054153621196747,
+          "pair_accuracy": 0.41
+        },
+        {
+          "epsilon": 0.307919979095459,
+          "pair_accuracy": 0.42
+        },
+        {
+          "epsilon": 0.31360554695129395,
+          "pair_accuracy": 0.43
+        },
+        {
+          "epsilon": 0.3161735236644745,
+          "pair_accuracy": 0.44
+        },
+        {
+          "epsilon": 0.3307484984397888,
+          "pair_accuracy": 0.45
+        },
+        {
+          "epsilon": 0.3427477777004242,
+          "pair_accuracy": 0.46
+        },
+        {
+          "epsilon": 0.35054469108581543,
+          "pair_accuracy": 0.45
+        },
+        {
+          "epsilon": 0.35298463702201843,
+          "pair_accuracy": 0.46
+        },
+        {
+          "epsilon": 0.3592579960823059,
+          "pair_accuracy": 0.47
+        },
+        {
+          "epsilon": 0.3597983717918396,
+          "pair_accuracy": 0.48
+        },
+        {
+          "epsilon": 0.36206698417663574,
+          "pair_accuracy": 0.47
+        },
+        {
+          "epsilon": 0.3918413519859314,
+          "pair_accuracy": 0.48
+        },
+        {
+          "epsilon": 0.4138774573802948,
+          "pair_accuracy": 0.49
+        },
+        {
+          "epsilon": 0.42263638973236084,
+          "pair_accuracy": 0.48
+        },
+        {
+          "epsilon": 0.4251408576965332,
+          "pair_accuracy": 0.49
+        },
+        {
+          "epsilon": 0.4324576258659363,
+          "pair_accuracy": 0.5
+        },
+        {
+          "epsilon": 0.4365057647228241,
+          "pair_accuracy": 0.51
+        },
+        {
+          "epsilon": 0.4409264028072357,
+          "pair_accuracy": 0.52
+        },
+        {
+          "epsilon": 0.4427463412284851,
+          "pair_accuracy": 0.53
+        },
+        {
+          "epsilon": 0.4777151942253113,
+          "pair_accuracy": 0.54
+        },
+        {
+          "epsilon": 0.47853952646255493,
+          "pair_accuracy": 0.55
+        },
+        {
+          "epsilon": 0.4824315905570984,
+          "pair_accuracy": 0.56
+        },
+        {
+          "epsilon": 0.4831967055797577,
+          "pair_accuracy": 0.57
+        },
+        {
+          "epsilon": 0.48606762290000916,
+          "pair_accuracy": 0.58
+        },
+        {
+          "epsilon": 0.49795350432395935,
+          "pair_accuracy": 0.59
+        },
+        {
+          "epsilon": 0.5022165179252625,
+          "pair_accuracy": 0.6
+        },
+        {
+          "epsilon": 0.5106810331344604,
+          "pair_accuracy": 0.61
+        },
+        {
+          "epsilon": 0.5111409425735474,
+          "pair_accuracy": 0.62
+        },
+        {
+          "epsilon": 0.538670003414154,
+          "pair_accuracy": 0.63
+        },
+        {
+          "epsilon": 0.5655360817909241,
+          "pair_accuracy": 0.64
+        },
+        {
+          "epsilon": 0.568618893623352,
+          "pair_accuracy": 0.65
+        },
+        {
+          "epsilon": 0.5813289880752563,
+          "pair_accuracy": 0.66
+        },
+        {
+          "epsilon": 0.5818707942962646,
+          "pair_accuracy": 0.67
+        },
+        {
+          "epsilon": 0.6038384437561035,
+          "pair_accuracy": 0.68
+        },
+        {
+          "epsilon": 0.6169253587722778,
+          "pair_accuracy": 0.69
+        },
+        {
+          "epsilon": 0.6371692419052124,
+          "pair_accuracy": 0.7
+        },
+        {
+          "epsilon": 0.6533442735671997,
+          "pair_accuracy": 0.71
+        },
+        {
+          "epsilon": 0.657802939414978,
+          "pair_accuracy": 0.72
+        },
+        {
+          "epsilon": 0.6648048758506775,
+          "pair_accuracy": 0.73
+        },
+        {
+          "epsilon": 0.6695389747619629,
+          "pair_accuracy": 0.72
+        },
+        {
+          "epsilon": 0.6800473928451538,
+          "pair_accuracy": 0.73
+        },
+        {
+          "epsilon": 0.6999543905258179,
+          "pair_accuracy": 0.74
+        },
+        {
+          "epsilon": 0.7133779525756836,
+          "pair_accuracy": 0.75
+        },
+        {
+          "epsilon": 0.7405192852020264,
+          "pair_accuracy": 0.76
+        },
+        {
+          "epsilon": 0.7483195066452026,
+          "pair_accuracy": 0.75
+        },
+        {
+          "epsilon": 0.7732605338096619,
+          "pair_accuracy": 0.76
+        },
+        {
+          "epsilon": 0.7755905985832214,
+          "pair_accuracy": 0.77
+        },
+        {
+          "epsilon": 0.7919614315032959,
+          "pair_accuracy": 0.78
+        },
+        {
+          "epsilon": 0.8121036291122437,
+          "pair_accuracy": 0.79
+        },
+        {
+          "epsilon": 0.8244377970695496,
+          "pair_accuracy": 0.8
+        },
+        {
+          "epsilon": 0.8426650762557983,
+          "pair_accuracy": 0.81
+        },
+        {
+          "epsilon": 0.903739869594574,
+          "pair_accuracy": 0.82
+        },
+        {
+          "epsilon": 0.9279885292053223,
+          "pair_accuracy": 0.83
+        },
+        {
+          "epsilon": 0.9521768093109131,
+          "pair_accuracy": 0.84
+        },
+        {
+          "epsilon": 0.981414794921875,
+          "pair_accuracy": 0.83
+        },
+        {
+          "epsilon": 0.9833571314811707,
+          "pair_accuracy": 0.84
+        },
+        {
+          "epsilon": 1.0470242500305176,
+          "pair_accuracy": 0.85
+        },
+        {
+          "epsilon": 1.1034810543060303,
+          "pair_accuracy": 0.86
+        },
+        {
+          "epsilon": 1.1598037481307983,
+          "pair_accuracy": 0.85
+        },
+        {
+          "epsilon": 1.170325517654419,
+          "pair_accuracy": 0.86
+        },
+        {
+          "epsilon": 1.6130850315093994,
+          "pair_accuracy": 0.85
+        },
+        {
+          "epsilon": 1.6455148458480835,
+          "pair_accuracy": 0.84
+        },
+        {
+          "epsilon": 1.7110555171966553,
+          "pair_accuracy": 0.83
+        },
+        {
+          "epsilon": 1.8479983806610107,
+          "pair_accuracy": 0.82
+        }
+      ],
+      "locked_epsilon": 1.392462968826294,
+      "locked_epsilon_accuracy": 0.86,
+      "manifest_sha256": "b1833f5e500db94157b5f091bef8c77380a8d49a4862701eba7c2cad8b87fc35",
+      "protocol": "strict",
+      "result_path": "/public/home/xsy0001/workspace/data/stable-worldmodel/experiments/observation_goal_threshold/self-eval-d0c466b-20260821-available-thresholds/tworoom-strict/tworoom_results.txt.json",
+      "result_sha256": "a8d330b1f26796ffb4c3ff498bb18ba9773699eb3e8aae62518d0bb6800cd672",
+      "source_kind": "locked-epsilon self-eval",
+      "task": "tworoom"
+    }
+  ],
+  "curve_semantics": "empirical paired accuracy on fixed CLEAR endpoints; diagnostic only and not a threshold-selection or calibration artifact",
+  "matrix_contract": {
+    "pairs_per_cell": 100,
+    "pooling": "none; each task/protocol panel is separate",
+    "protocols": [
+      "moderate",
+      "strict"
+    ],
+    "tasks": [
+      "pusht",
+      "cube",
+      "tworoom"
+    ],
+    "total_paired_endpoints": 600
+  },
+  "plot": "epsilon_pair_accuracy_3x2.png",
+  "plot_sha256": "bdfda4be33b956f923accd005016023222c0452de4432d1463c614036d46407d",
+  "predicate_sweep": "endpoint_latent_distance <= epsilon",
+  "status": "COMPLETE_3X2"
+}
