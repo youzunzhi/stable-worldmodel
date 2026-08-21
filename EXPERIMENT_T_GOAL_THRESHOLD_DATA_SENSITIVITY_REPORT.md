@@ -64,7 +64,7 @@ does not attribute the variation to one of those two sources separately.
 - Each task has five distinct split hashes and five distinct pair-manifest hashes, but exactly one checkpoint hash and one frozen-embedding hash across seeds.
 - Every new current-method replicate materialized exactly 100M Uniform + 20M task-stratified pairs. Under the unchanged 60/20/20 boundary, threshold selection opened 60M Uniform + 12M task-stratified fit pairs; validation and audit stayed closed.
 - Live full-file dataset hashes and checkpoint hashes matched the existing formal baseline before launch. Frozen embedding files and row-ID maps were also re-hashed before reuse.
-- Remote targeted tests: `38 passed`. Remote full suite: `1104 passed, 11 skipped, 1 xfailed`. Targeted Ruff passed; repo-wide Ruff remains blocked by 400 pre-existing violations outside this change.
+- Execution-commit tests: targeted `38 passed`; full suite `1104 passed, 11 skipped, 1 xfailed`. After merging with the concurrent CLEAR/self-eval work at `c5eed448a7f98e404ea08295d6ef3d7602059e19`, the combined remote full suite passed with `1109 passed, 11 skipped, 1 xfailed`. Targeted Ruff passed; repo-wide Ruff remains blocked by 400 pre-existing violations outside this change.
 
 The first background wrapper attempt exited before creating any run directory
 because of launcher shell quoting (`bash: -m: command not found`). Its log is
