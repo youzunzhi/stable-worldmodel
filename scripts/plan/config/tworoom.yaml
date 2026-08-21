@@ -35,6 +35,9 @@ eval:
   # Locked selected_threshold.json for endpoint self-evaluation. Requires a
   # CLEAR manifest and the exact checkpoint recorded by the threshold.
   find_goal_threshold: null
+  # Formal calibration task directory or pre_registered_config.json for
+  # recording endpoint distances without applying or selecting epsilon.
+  find_goal_threshold_score_contract: null
   # Permit a non-CEM solver on fixed CLEAR pairs. Such a run is an ablation,
   # not a protocol-conformant CLEAR result, and is marked as such in JSON.
   solver_ablation: false

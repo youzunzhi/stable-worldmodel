@@ -1,4 +1,4 @@
-"""Endpoint self-evaluation with a locked find-goal-threshold epsilon."""
+"""Endpoint scoring and self-evaluation for find-goal-threshold."""
 
 from __future__ import annotations
 
@@ -12,6 +12,7 @@ from .encode import encode_projected, preprocess_pixels
 from .io_utils import read_json, sha256_file
 
 SELF_EVAL_SCHEMA = 'find-goal-threshold-self-eval-v1'
+ENDPOINT_SCORE_SCHEMA = 'find-goal-threshold-endpoint-scores-v1'
 RESIDUAL = 'mean_D((z_i-z_j)^2)'
 
 
@@ -112,6 +113,97 @@ def load_and_validate_threshold(
         ),
     }
     return artifact, provenance
+
+
+def load_and_validate_score_contract(
+    path: str | Path,
+    *,
+    task: str,
+    checkpoint_sha256: str,
+    checkpoint_config_sha256: str,
+) -> dict:
+    """Validate a formal calibration identity without requiring epsilon.
+
+    This is the score-only path for diagnostic epsilon sweeps. It records
+    endpoint distances and evaluator labels but cannot promote or apply a
+    threshold.
+    """
+    source = Path(path).expanduser().resolve()
+    config_path = (
+        source / 'pre_registered_config.json' if source.is_dir() else source
+    )
+    if not config_path.is_file():
+        raise FileNotFoundError(
+            f'No find-goal-threshold scoring contract: {config_path}'
+        )
+    status_path = config_path.parent / 'status.json'
+    if not status_path.is_file():
+        raise FileNotFoundError(
+            f'No formal find-goal-threshold status artifact: {status_path}'
+        )
+    config = read_json(config_path)
+    status = read_json(status_path)
+    preprocessing = config.get('preprocessing', {})
+    mismatches = {}
+    expected = {
+        'task': (config.get('task'), task),
+        'checkpoint.sha256': (
+            config.get('checkpoint', {}).get('sha256'),
+            checkpoint_sha256,
+        ),
+        'checkpoint.config_sha256': (
+            config.get('checkpoint', {}).get('config_sha256'),
+            checkpoint_config_sha256,
+        ),
+        'preprocessing.residual': (
+            preprocessing.get('residual'),
+            RESIDUAL,
+        ),
+        'preprocessing.dtype': (preprocessing.get('dtype'), 'float32'),
+        'preprocessing.latent_dim': (preprocessing.get('latent_dim'), 192),
+        'preprocessing.resize': (preprocessing.get('resize'), [224, 224]),
+        'preprocessing.normalization': (
+            preprocessing.get('normalization'),
+            'ImageNet mean/std from stable_pretraining',
+        ),
+        'status.formal_evidence': (
+            status.get('formal_evidence'),
+            True,
+        ),
+    }
+    for key, (actual, wanted) in expected.items():
+        if actual != wanted:
+            mismatches[key] = {'actual': actual, 'expected': wanted}
+    if mismatches:
+        raise ValueError(
+            f'find-goal-threshold score-contract identity mismatch: '
+            f'{mismatches}'
+        )
+    threshold_path = config_path.parent / 'selected_threshold.json'
+    return {
+        'mode': 'score-only diagnostic epsilon sweep',
+        'threshold_applied': False,
+        'threshold_selection_permitted': False,
+        'calibration_run_dir': str(config_path.parent),
+        'pre_registered_config_path': str(config_path),
+        'pre_registered_config_sha256': sha256_file(config_path),
+        'status_path': str(status_path),
+        'status_sha256': sha256_file(status_path),
+        'calibration_status': status.get('status'),
+        'calibration_stage': status.get('stage'),
+        'selected_threshold_exists': threshold_path.is_file(),
+        'task': task,
+        'pointwise_label_variant': config.get('task_label', {}).get('variant'),
+        'encoder_checkpoint_sha256': checkpoint_sha256,
+        'encoder_checkpoint_config_sha256': checkpoint_config_sha256,
+        'encoder_checkpoint_provenance': config.get('checkpoint', {}).get(
+            'provenance'
+        ),
+        'residual_definition': RESIDUAL,
+        'latent_dim': 192,
+        'dtype': 'float32',
+        'preprocessing': preprocessing,
+    }
 
 
 def _nhwc_uint8(value: Any, name: str) -> np.ndarray:
@@ -319,6 +411,46 @@ def compare_predictions(
     }
 
 
+def build_endpoint_score_records(
+    distances: np.ndarray,
+    actual_successes: np.ndarray,
+    *,
+    pair_ids: list[str],
+) -> dict:
+    """Record endpoint distances and CLEAR labels without choosing epsilon."""
+    distance = np.asarray(distances, dtype=np.float32)
+    actual = np.asarray(actual_successes, dtype=bool)
+    if distance.shape != actual.shape or distance.ndim != 1:
+        raise ValueError(
+            'distance and actual success vectors must have the same 1-D shape'
+        )
+    if len(pair_ids) != len(actual):
+        raise ValueError('pair_ids length does not match evaluation vectors')
+    if not np.isfinite(distance).all():
+        raise ValueError('endpoint scores contain non-finite distances')
+    total = len(actual)
+    return {
+        'artifact_schema_version': ENDPOINT_SCORE_SCHEMA,
+        'summary': {
+            'pairs': total,
+            'actual_successes': int(actual.sum()),
+            'actual_failures': int((~actual).sum()),
+            'actual_success_rate_percent': (
+                float(actual.mean()) * 100 if total else float('nan')
+            ),
+            'epsilon_applied': False,
+        },
+        'pairs': [
+            {
+                'pair_id': pair_id,
+                'endpoint_latent_distance': float(value),
+                'evaluator_success': bool(success),
+            }
+            for pair_id, value, success in zip(pair_ids, distance, actual)
+        ],
+    }
+
+
 def evaluate_endpoints(
     model,
     endpoint_pixels: Any,
@@ -344,4 +476,27 @@ def evaluate_endpoints(
         pair_ids=pair_ids,
         bootstrap_replicates=bootstrap_replicates,
         bootstrap_seed=bootstrap_seed,
+    )
+
+
+def evaluate_endpoint_scores(
+    model,
+    endpoint_pixels: Any,
+    goal_pixels: Any,
+    actual_successes: np.ndarray,
+    *,
+    pair_ids: list[str],
+    batch_size: int = 256,
+) -> dict:
+    """Encode endpoints for a diagnostic sweep without selecting epsilon."""
+    distances = endpoint_distances(
+        model,
+        endpoint_pixels,
+        goal_pixels,
+        batch_size=batch_size,
+    )
+    return build_endpoint_score_records(
+        distances,
+        actual_successes,
+        pair_ids=pair_ids,
     )

@@ -71,6 +71,42 @@ The current Cube calibration has no promoted epsilon. Cube self-eval must
 therefore remain unavailable unless a new threshold-selection contract is
 pre-registered and calibrated; do not substitute its best failed fit point.
 
+### Epsilon versus pair-accuracy matrix
+
+To include Cube in the descriptive 3x2 accuracy figure without inventing a
+threshold, run its two CLEAR cells in score-only mode. The value is the formal
+Cube calibration task directory (or its `pre_registered_config.json`):
+
+```bash
+PYTHONPATH=. python scripts/plan/eval_wm.py --config-name=cube \
+  policy=/absolute/path/to/weights_epoch_10.pt \
+  eval.dataset_name=/absolute/path/to/cube_single_expert.h5 \
+  eval.manifest=/absolute/path/to/cube/moderate-seed42-n100.json \
+  eval.find_goal_threshold_score_contract=/absolute/path/to/formal-run/cube \
+  eval.video=false output.dir=/new/immutable/output
+```
+
+This validates the task/checkpoint/config/preprocessing/status identity and
+records distances plus evaluator labels. It applies no epsilon and cannot
+promote one. Combine those two Cube results with the four locked-epsilon
+PushT/TwoRoom results:
+
+```bash
+PYTHONPATH=. python -m \
+  scripts.experiments.observation_goal_threshold.self_eval_accuracy_curve \
+  --result /path/to/pusht-moderate/results.txt.json \
+  --result /path/to/pusht-strict/results.txt.json \
+  --result /path/to/cube-moderate/results.txt.json \
+  --result /path/to/cube-strict/results.txt.json \
+  --result /path/to/tworoom-moderate/results.txt.json \
+  --result /path/to/tworoom-strict/results.txt.json \
+  --output-dir /new/epsilon-pair-accuracy-3x2
+```
+
+The renderer requires the exact complete 3x2 matrix and preserves every exact
+distance breakpoint in `curve_manifest.json`. The PNG is post-lock diagnostic
+evidence only; never select epsilon from its apparent maximum.
+
 ## Threshold data sensitivity
 
 The paired data-sensitivity study is preregistered in

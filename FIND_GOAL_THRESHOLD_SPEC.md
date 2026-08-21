@@ -1161,3 +1161,22 @@ No CLEAR result may alter epsilon, labels, splits, or the operating contract.
 - Missing-threshold rule: a task without a promoted epsilon is
   `THRESHOLD_UNAVAILABLE`. It is forbidden to substitute a fit diagnostic,
   tune on CLEAR outcomes, or call the three-task matrix complete.
+
+### 20.1 Post-lock epsilon-pair-accuracy curve
+
+The diagnostic curve uses the same fixed 3-task x Moderate/Strict x 100-pair
+CLEAR endpoints. Within each cell, sweep every non-negative epsilon at the
+exact observed distance breakpoints and report the empirical paired accuracy
+of `endpoint_distance <= epsilon` against the evaluator S/F vector. Keep all
+six task/protocol curves separate in one 3x2 figure; do not pool pairs.
+
+PushT and TwoRoom mark their already locked epsilon and its paired accuracy.
+Because Cube has no promoted epsilon, its two cells may run in score-only mode:
+the exact formal calibration config/status and checkpoint identity are locked,
+but the run records only endpoint distances and evaluator labels. Cube draws
+no epsilon marker, produces no fixed-threshold S/F prediction, and remains
+`THRESHOLD_UNAVAILABLE` for self-eval.
+
+This sweep is post-lock descriptive analysis. It must not select, promote, or
+retune epsilon, and a high point on any curve is not validation evidence
+because the same 100 CLEAR labels define the displayed accuracy.

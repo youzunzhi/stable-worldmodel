@@ -42,9 +42,17 @@ from scripts.experiments.observation_goal_threshold.sample_pairs import (
     uniform_ordered_pairs,
 )
 from scripts.experiments.observation_goal_threshold.self_eval import (
+    build_endpoint_score_records,
     compare_predictions,
     endpoint_distances,
+    load_and_validate_score_contract,
     load_and_validate_threshold,
+)
+from scripts.experiments.observation_goal_threshold.self_eval_accuracy_curve import (
+    epsilon_accuracy_curve,
+)
+from scripts.experiments.observation_goal_threshold.self_eval_accuracy_curve import (
+    plot_matrix as plot_self_eval_accuracy_matrix,
 )
 from scripts.experiments.observation_goal_threshold.split import (
     PARTITIONS,
@@ -593,6 +601,52 @@ def test_locked_threshold_validation_checks_checkpoint_and_contract(tmp_path):
         )
 
 
+def test_score_contract_validation_does_not_require_epsilon(tmp_path):
+    write_json(
+        tmp_path / 'pre_registered_config.json',
+        {
+            'task': 'cube',
+            'checkpoint': {
+                'sha256': 'checkpoint',
+                'config_sha256': 'config',
+                'provenance': 'fixture',
+            },
+            'task_label': {'variant': 'cube_fixture'},
+            'preprocessing': {
+                'residual': 'mean_D((z_i-z_j)^2)',
+                'dtype': 'float32',
+                'latent_dim': 192,
+                'resize': [224, 224],
+                'normalization': ('ImageNet mean/std from stable_pretraining'),
+            },
+        },
+    )
+    write_json(
+        tmp_path / 'status.json',
+        {
+            'formal_evidence': True,
+            'stage': 'fit',
+            'status': 'THRESHOLD_CALIBRATION_NO_FEASIBLE_OPERATING_POINT',
+        },
+    )
+    provenance = load_and_validate_score_contract(
+        tmp_path,
+        task='cube',
+        checkpoint_sha256='checkpoint',
+        checkpoint_config_sha256='config',
+    )
+    assert provenance['threshold_applied'] is False
+    assert provenance['threshold_selection_permitted'] is False
+    assert provenance['selected_threshold_exists'] is False
+    with pytest.raises(ValueError, match='identity mismatch'):
+        load_and_validate_score_contract(
+            tmp_path,
+            task='cube',
+            checkpoint_sha256='different',
+            checkpoint_config_sha256='config',
+        )
+
+
 def test_self_eval_confusion_and_sr_error_are_pair_aligned():
     result = compare_predictions(
         np.array([0.1, 0.7, 0.2, 0.8], dtype=np.float32),
@@ -618,6 +672,96 @@ def test_self_eval_confusion_and_sr_error_are_pair_aligned():
         'c',
         'd',
     ]
+
+
+def test_endpoint_score_records_apply_no_epsilon():
+    result = build_endpoint_score_records(
+        np.array([0.1, 0.7], dtype=np.float32),
+        np.array([True, False]),
+        pair_ids=['a', 'b'],
+    )
+    assert result['summary']['epsilon_applied'] is False
+    assert result['summary']['actual_success_rate_percent'] == 50.0
+    assert 'predicted_success' not in result['pairs'][0]
+
+
+def test_epsilon_accuracy_curve_uses_inclusive_predicate():
+    epsilon, accuracy = epsilon_accuracy_curve(
+        np.array([0.1, 0.2, 0.3, 0.4], dtype=np.float32),
+        np.array([False, True, False, True]),
+    )
+    assert epsilon == pytest.approx([0.0, 0.1, 0.2, 0.3, 0.4])
+    assert accuracy == pytest.approx([0.5, 0.25, 0.5, 0.25, 0.5])
+
+
+def test_epsilon_accuracy_plot_requires_and_records_complete_3x2(tmp_path):
+    pytest.importorskip('matplotlib')
+    paths = []
+    actual = [index % 2 == 0 for index in range(100)]
+    for task in ('pusht', 'cube', 'tworoom'):
+        for protocol in ('moderate', 'strict'):
+            path = tmp_path / f'{task}-{protocol}.json'
+            pairs = [
+                {
+                    'pair_id': index,
+                    'endpoint_latent_distance': index / 100,
+                    'evaluator_success': success,
+                }
+                for index, success in enumerate(actual)
+            ]
+            provenance = {
+                'encoder_checkpoint_sha256': f'{task}-checkpoint',
+                'encoder_projector_parameter_hash_before_evaluation': 'same',
+                'encoder_projector_parameter_hash_after_evaluation': 'same',
+            }
+            if task == 'cube':
+                self_eval = None
+                endpoint_scores = {
+                    'task': task,
+                    'clear_protocol': protocol,
+                    'score_contract': provenance,
+                    'pairs': pairs,
+                }
+            else:
+                self_eval = {
+                    'task': task,
+                    'clear_protocol': protocol,
+                    'threshold': {**provenance, 'epsilon': 0.5},
+                    'pairs': pairs,
+                }
+                endpoint_scores = None
+            write_json(
+                path,
+                {
+                    'requested_trajectories': 100,
+                    'completed_trajectories': 100,
+                    'checkpoint_sha256': f'{task}-checkpoint',
+                    'resolved_config': {
+                        'solver': {
+                            'batch_size': 1,
+                            'num_samples': 300,
+                            'n_steps': 30,
+                            'topk': 30,
+                        }
+                    },
+                    'metrics': {'episode_successes': actual},
+                    'clear_lewm': {
+                        'task': task,
+                        'protocol': {'name': protocol},
+                        'manifest_sha256': f'{task}-{protocol}-manifest',
+                        'cpu_threads': 1,
+                        'solver_contract_matched': True,
+                    },
+                    'find_goal_threshold_self_eval': self_eval,
+                    'find_goal_threshold_endpoint_scores': endpoint_scores,
+                },
+            )
+            paths.append(path)
+    manifest = plot_self_eval_accuracy_matrix(paths, tmp_path / 'curve')
+    assert manifest['status'] == 'COMPLETE_3X2'
+    assert len(manifest['cells']) == 6
+    assert (tmp_path / 'curve/epsilon_pair_accuracy_3x2.png').is_file()
+    assert (tmp_path / 'curve/curve_manifest.json').is_file()
 
 
 def test_endpoint_self_eval_uses_encoder_projector_only():

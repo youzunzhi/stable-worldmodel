@@ -34,7 +34,9 @@ from scripts.experiments.observation_goal_threshold.encode import (
     parameter_hash,
 )
 from scripts.experiments.observation_goal_threshold.self_eval import (
+    evaluate_endpoint_scores,
     evaluate_endpoints,
+    load_and_validate_score_contract,
     load_and_validate_threshold,
 )
 
@@ -162,6 +164,18 @@ def run(cfg: DictConfig):
     """Run evaluation of dinowm vs random policy."""
     clear_manifest_path = cfg.eval.get('manifest')
     find_goal_threshold_path = cfg.eval.get('find_goal_threshold')
+    score_contract_path = cfg.eval.get('find_goal_threshold_score_contract')
+    if (
+        find_goal_threshold_path is not None
+        and score_contract_path is not None
+    ):
+        raise ValueError(
+            'set either eval.find_goal_threshold or '
+            'eval.find_goal_threshold_score_contract, not both'
+        )
+    endpoint_scoring_requested = (
+        find_goal_threshold_path is not None or score_contract_path is not None
+    )
     solver_ablation = bool(cfg.eval.get('solver_ablation', False))
     clear_solver_contract_matched = None
     clear_manifest = (
@@ -192,19 +206,18 @@ def run(cfg: DictConfig):
         else:
             clear_solver_contract_matched = True
         seed_runtime(int(cfg.seed))
-    if find_goal_threshold_path is not None and clear_manifest is None:
+    if endpoint_scoring_requested and clear_manifest is None:
         raise ValueError(
-            'find-goal-threshold self-eval requires a CLEAR manifest'
+            'find-goal-threshold endpoint scoring requires a CLEAR manifest'
         )
-    if find_goal_threshold_path is not None and bool(cfg.get('bf16', False)):
+    if endpoint_scoring_requested and bool(cfg.get('bf16', False)):
         raise ValueError(
-            'find-goal-threshold self-eval requires float32 evaluation'
+            'find-goal-threshold endpoint scoring requires float32 evaluation'
         )
-    if find_goal_threshold_path is not None and bool(
-        cfg.get('compile', False)
-    ):
+    if endpoint_scoring_requested and bool(cfg.get('compile', False)):
         raise ValueError(
-            'find-goal-threshold self-eval requires an uncompiled encoder '
+            'find-goal-threshold endpoint scoring requires an uncompiled '
+            'encoder '
             'for exact parameter-hash verification'
         )
 
@@ -234,6 +247,7 @@ def run(cfg: DictConfig):
     )
     threshold_artifact = None
     threshold_provenance = None
+    score_contract_provenance = None
     if find_goal_threshold_path is not None:
         if checkpoint_sha256 is None:
             raise ValueError(
@@ -242,6 +256,18 @@ def run(cfg: DictConfig):
             )
         threshold_artifact, threshold_provenance = load_and_validate_threshold(
             find_goal_threshold_path,
+            task=clear_manifest['task'],
+            checkpoint_sha256=checkpoint_sha256,
+            checkpoint_config_sha256=checkpoint_config_sha256,
+        )
+    elif score_contract_path is not None:
+        if checkpoint_sha256 is None:
+            raise ValueError(
+                'find-goal-threshold endpoint scoring requires its trained '
+                'checkpoint, not a random policy'
+            )
+        score_contract_provenance = load_and_validate_score_contract(
+            score_contract_path,
             task=clear_manifest['task'],
             checkpoint_sha256=checkpoint_sha256,
             checkpoint_config_sha256=checkpoint_config_sha256,
@@ -300,19 +326,25 @@ def run(cfg: DictConfig):
         model = model.eval()
         model.requires_grad_(False)
         model.interpolate_pos_encoding = True
-        if threshold_artifact is not None:
+        if endpoint_scoring_requested:
             model_parameter_hash = parameter_hash(model)
-            expected_parameter_hashes = set(
-                threshold_artifact[
-                    'encoder_projector_parameter_hashes'
-                ].values()
-            )
-            if model_parameter_hash not in expected_parameter_hashes:
-                raise ValueError(
-                    'find-goal-threshold encoder/projector parameter hash '
-                    'does not match the locked artifact'
+            if threshold_artifact is not None:
+                expected_parameter_hashes = set(
+                    threshold_artifact[
+                        'encoder_projector_parameter_hashes'
+                    ].values()
                 )
-            threshold_provenance[
+                if model_parameter_hash not in expected_parameter_hashes:
+                    raise ValueError(
+                        'find-goal-threshold encoder/projector parameter hash '
+                        'does not match the locked artifact'
+                    )
+            scoring_provenance = (
+                threshold_provenance
+                if threshold_provenance is not None
+                else score_contract_provenance
+            )
+            scoring_provenance[
                 'encoder_projector_parameter_hash_before_evaluation'
             ] = model_parameter_hash
         if cfg.get('compile', False):
@@ -411,7 +443,7 @@ def run(cfg: DictConfig):
                 ),
                 video=video_path,
                 render_pixels=(
-                    'always' if threshold_artifact is not None else None
+                    'always' if endpoint_scoring_requested else None
                 ),
             )
         print('Warmup done.')
@@ -428,13 +460,12 @@ def run(cfg: DictConfig):
                 cfg.eval.get('callables'), resolve=True
             ),
             video=video_path,
-            render_pixels=(
-                'always' if threshold_artifact is not None else None
-            ),
+            render_pixels=('always' if endpoint_scoring_requested else None),
         )
     end_time = time.time()
 
     find_goal_threshold_self_eval = None
+    find_goal_threshold_endpoint_scores = None
     if threshold_artifact is not None:
         self_eval_started = time.time()
         find_goal_threshold_self_eval = evaluate_endpoints(
@@ -471,17 +502,56 @@ def run(cfg: DictConfig):
         metrics['find_goal_threshold_self_eval'] = (
             find_goal_threshold_self_eval['summary']
         )
+    elif score_contract_provenance is not None:
+        score_started = time.time()
+        find_goal_threshold_endpoint_scores = evaluate_endpoint_scores(
+            model,
+            world.infos['pixels'],
+            world.infos['goal'],
+            metrics['episode_successes'],
+            pair_ids=[pair['pair_id'] for pair in clear_manifest['pairs']],
+        )
+        find_goal_threshold_endpoint_scores.update(
+            {
+                'task': clear_manifest['task'],
+                'clear_protocol': clear_manifest['protocol']['name'],
+                'score_contract': score_contract_provenance,
+                'endpoint_contract': {
+                    'observation': (
+                        'final executed observation at evaluator termination '
+                        'or the 50-step budget'
+                    ),
+                    'goal': 'fixed CLEAR manifest goal observation',
+                    'rendering': (
+                        'fresh pixels rendered after every environment step'
+                    ),
+                    'evaluator_label': (
+                        'CLEAR task predicate termination observed at any '
+                        'executed step'
+                    ),
+                    'epsilon_use': (
+                        'none; distances are recorded for a diagnostic sweep'
+                    ),
+                },
+                'score_time_seconds': time.time() - score_started,
+            }
+        )
+        metrics['find_goal_threshold_endpoint_scores'] = (
+            find_goal_threshold_endpoint_scores['summary']
+        )
+    if endpoint_scoring_requested:
         after_parameter_hash = parameter_hash(model)
         if (
             after_parameter_hash
-            != threshold_provenance[
+            != scoring_provenance[
                 'encoder_projector_parameter_hash_before_evaluation'
             ]
         ):
             raise ValueError(
-                'encoder/projector parameters changed during CLEAR self-eval'
+                'encoder/projector parameters changed during CLEAR endpoint '
+                'scoring'
             )
-        threshold_provenance[
+        scoring_provenance[
             'encoder_projector_parameter_hash_after_evaluation'
         ] = after_parameter_hash
 
@@ -541,6 +611,9 @@ def run(cfg: DictConfig):
         'metrics': jsonable(metrics),
         'find_goal_threshold_self_eval': jsonable(
             find_goal_threshold_self_eval
+        ),
+        'find_goal_threshold_endpoint_scores': jsonable(
+            find_goal_threshold_endpoint_scores
         ),
         'evaluation_time_seconds': end_time - start_time,
         'evaluation_time_per_trajectory_seconds': (
