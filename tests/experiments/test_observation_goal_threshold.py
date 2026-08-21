@@ -570,6 +570,13 @@ def test_self_eval_confusion_and_sr_error_are_pair_aligned():
     assert summary['accuracy'] == pytest.approx(0.5)
     assert summary['actual_success_rate_percent'] == pytest.approx(50.0)
     assert summary['predicted_success_rate_percent'] == pytest.approx(50.0)
+    assert summary['success_rate_error_paired_bootstrap_95ci'] == {
+        'low': -75.0,
+        'high': 75.0,
+        'replicates': 10_000,
+        'seed': 20260821,
+        'unit': 'percentage_points',
+    }
     assert [row['pair_id'] for row in result['pairs']] == [
         'a',
         'b',
@@ -640,6 +647,18 @@ def test_self_eval_summary_keeps_missing_matrix_cells_explicit(tmp_path):
                     'actual_success_rate_percent': 50.0,
                     'predicted_success_rate_percent': 45.0,
                     'accuracy': 0.8,
+                    'accuracy_wilson_95ci': {
+                        'low': 0.711,
+                        'high': 0.866,
+                    },
+                    'success_rate_error_percentage_points': -5.0,
+                    'success_rate_error_paired_bootstrap_95ci': {
+                        'low': -10.0,
+                        'high': 0.0,
+                        'replicates': 10_000,
+                        'seed': 20260821,
+                        'unit': 'percentage_points',
+                    },
                     'confusion': {
                         'tp': 40,
                         'tn': 40,

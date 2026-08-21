@@ -1153,7 +1153,8 @@ No CLEAR result may alter epsilon, labels, splits, or the operating contract.
   success iff that distance is `<= epsilon`.
 - Artifacts: preserve every pair ID, endpoint distance, prediction, evaluator
   label, correctness bit, confusion counts, accuracy with Wilson 95% interval,
-  actual SR, predicted SR, and signed/absolute SR error.
+  actual SR, predicted SR, signed/absolute SR error, and a paired bootstrap
+  95% interval for predicted-minus-actual SR error.
 - Reporting: never pool tasks or Moderate/Strict into the primary result;
   pointwise geometry omits angle, pose, sustained hold, collision, route, and
   reachability semantics present in some CLEAR cells.

@@ -63,7 +63,9 @@ PYTHONPATH=. python scripts/plan/eval_wm.py --config-name=pusht \
 Repeat with each task config and both protocols, then aggregate the six
 `results.txt.json` files with `summarize_self_eval`. The aggregator rejects
 non-100-pair cells, solver/CPU-contract mismatches, duplicate pair IDs, and
-checkpoint/threshold hash mismatches.
+checkpoint/threshold hash mismatches. It reports Wilson uncertainty for pair
+accuracy and a deterministic paired bootstrap interval for predicted-minus-
+actual success-rate error.
 
 The current Cube calibration has no promoted epsilon. Cube self-eval must
 therefore remain unavailable unless a new threshold-selection contract is

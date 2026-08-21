@@ -91,18 +91,23 @@ def summarize(paths: list[Path], output_dir: Path) -> dict:
         '- Contract: 3 tasks x Moderate/Strict x 100 fixed CLEAR pairs.',
         '- Prediction: final endpoint latent distance `<= epsilon`.',
         '',
-        '| Task | CLEAR rule | Epsilon | Actual SR | Predicted SR | Accuracy | TP/TN/FP/FN |',
-        '|---|---|---:|---:|---:|---:|---:|',
+        '| Task | CLEAR rule | Epsilon | Actual SR | Predicted SR | SR error [paired 95% CI] | Accuracy [Wilson 95% CI] | TP/TN/FP/FN |',
+        '|---|---|---:|---:|---:|---:|---:|---:|',
     ]
     for cell in payload['cells']:
         summary = cell['summary']
         confusion = summary['confusion']
+        error_ci = summary['success_rate_error_paired_bootstrap_95ci']
+        accuracy_ci = summary['accuracy_wilson_95ci']
         lines.append(
             f'| {cell["task"]} | {cell["protocol"]} | '
             f'{cell["epsilon"]:.10g} | '
             f'{summary["actual_success_rate_percent"]:.1f}% | '
             f'{summary["predicted_success_rate_percent"]:.1f}% | '
-            f'{summary["accuracy"]:.3f} | '
+            f'{summary["success_rate_error_percentage_points"]:+.1f} '
+            f'[{error_ci["low"]:+.1f}, {error_ci["high"]:+.1f}] pp | '
+            f'{summary["accuracy"]:.3f} '
+            f'[{accuracy_ci["low"]:.3f}, {accuracy_ci["high"]:.3f}] | '
             f'{confusion["tp"]}/{confusion["tn"]}/'
             f'{confusion["fp"]}/{confusion["fn"]} |'
         )

@@ -202,12 +202,44 @@ def _wilson_interval(successes: int, total: int) -> dict[str, float] | None:
     return {'low': center - radius, 'high': center + radius}
 
 
+def _paired_bootstrap_mean_interval(
+    values: np.ndarray,
+    *,
+    replicates: int,
+    seed: int,
+) -> dict[str, float | int]:
+    values = np.asarray(values, dtype=np.float64)
+    if not len(values):
+        return {
+            'low': float('nan'),
+            'high': float('nan'),
+            'replicates': replicates,
+            'seed': seed,
+        }
+    rng = np.random.default_rng(seed)
+    distribution = np.empty(replicates, dtype=np.float64)
+    chunk = 512
+    for start in range(0, replicates, chunk):
+        count = min(chunk, replicates - start)
+        sampled = rng.integers(0, len(values), size=(count, len(values)))
+        distribution[start : start + count] = values[sampled].mean(axis=1)
+    low, high = np.quantile(distribution, [0.025, 0.975])
+    return {
+        'low': float(low),
+        'high': float(high),
+        'replicates': replicates,
+        'seed': seed,
+    }
+
+
 def compare_predictions(
     distances: np.ndarray,
     actual_successes: np.ndarray,
     *,
     epsilon: float,
     pair_ids: list[str],
+    bootstrap_replicates: int = 10_000,
+    bootstrap_seed: int = 20260821,
 ) -> dict:
     """Build paired records and a binary confusion summary."""
     distance = np.asarray(distances, dtype=np.float32)
@@ -227,6 +259,15 @@ def compare_predictions(
     total = len(actual)
     actual_sr = float(actual.mean()) if total else float('nan')
     predicted_sr = float(predicted.mean()) if total else float('nan')
+    paired_sr_difference = predicted.astype(np.int8) - actual.astype(np.int8)
+    paired_sr_interval = _paired_bootstrap_mean_interval(
+        paired_sr_difference,
+        replicates=bootstrap_replicates,
+        seed=bootstrap_seed,
+    )
+    paired_sr_interval['low'] *= 100
+    paired_sr_interval['high'] *= 100
+    paired_sr_interval['unit'] = 'percentage_points'
     tpr = _safe_ratio(tp, tp + fn)
     tnr = _safe_ratio(tn, tn + fp)
     balanced_accuracy = (
@@ -252,6 +293,7 @@ def compare_predictions(
         'predicted_success_rate_percent': predicted_sr * 100,
         'success_rate_error_percentage_points': (predicted_sr - actual_sr)
         * 100,
+        'success_rate_error_paired_bootstrap_95ci': paired_sr_interval,
         'absolute_success_rate_error_percentage_points': abs(
             predicted_sr - actual_sr
         )
@@ -286,6 +328,8 @@ def evaluate_endpoints(
     epsilon: float,
     pair_ids: list[str],
     batch_size: int = 256,
+    bootstrap_replicates: int = 10_000,
+    bootstrap_seed: int = 20260821,
 ) -> dict:
     distances = endpoint_distances(
         model,
@@ -298,4 +342,6 @@ def evaluate_endpoints(
         actual_successes,
         epsilon=epsilon,
         pair_ids=pair_ids,
+        bootstrap_replicates=bootstrap_replicates,
+        bootstrap_seed=bootstrap_seed,
     )
