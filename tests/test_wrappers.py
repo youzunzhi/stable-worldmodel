@@ -1276,9 +1276,7 @@ def test_add_pixels_wrapper_can_reuse_cached_pixels(minimal_env):
     minimal_env.render = MagicMock(side_effect=[first, second])
     minimal_env.unwrapped = minimal_env
 
-    wrapped_env = wrapper.AddPixelsWrapper(
-        minimal_env, pixels_shape=(16, 16)
-    )
+    wrapped_env = wrapper.AddPixelsWrapper(minimal_env, pixels_shape=(16, 16))
     _, reset_info = wrapped_env.reset()
     wrapped_env.set_render_on_step(False)
     *_, cached_info = wrapped_env.step(0.0)

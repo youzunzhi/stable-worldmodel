@@ -147,18 +147,18 @@ def load_manifest(path: str | Path) -> dict:
     if manifest.get('schema_version') != CLEAR_MANIFEST_SCHEMA:
         raise ValueError(
             'Unsupported CLEAR manifest schema: '
-            f"{manifest.get('schema_version')!r}"
+            f'{manifest.get("schema_version")!r}'
         )
     if manifest.get('task') not in CLEAR_TASKS:
         raise ValueError(
-            f"CLEAR task must be one of {sorted(CLEAR_TASKS)}, "
-            f"got {manifest.get('task')!r}"
+            f'CLEAR task must be one of {sorted(CLEAR_TASKS)}, '
+            f'got {manifest.get("task")!r}'
         )
     protocol = manifest.get('protocol', {})
     if protocol.get('name') not in CLEAR_PROTOCOLS:
         raise ValueError(
-            f"CLEAR protocol must be one of {sorted(CLEAR_PROTOCOLS)}, "
-            f"got {protocol.get('name')!r}"
+            f'CLEAR protocol must be one of {sorted(CLEAR_PROTOCOLS)}, '
+            f'got {protocol.get("name")!r}'
         )
     _validate_v05_protocol(manifest)
     pairs = manifest.get('pairs')
@@ -167,12 +167,16 @@ def load_manifest(path: str | Path) -> dict:
     if len({pair['pair_id'] for pair in pairs}) != len(pairs):
         raise ValueError('CLEAR manifest pair_id values must be unique')
     if any(pair.get('initial_success') for pair in pairs):
-        raise ValueError('CLEAR robust manifests cannot contain pre-solved pairs')
+        raise ValueError(
+            'CLEAR robust manifests cannot contain pre-solved pairs'
+        )
     return manifest
 
 
 def manifest_sha256(path: str | Path) -> str:
-    return hashlib.sha256(Path(path).expanduser().resolve().read_bytes()).hexdigest()
+    return hashlib.sha256(
+        Path(path).expanduser().resolve().read_bytes()
+    ).hexdigest()
 
 
 def metadata_fingerprint(path: str | Path) -> str:
@@ -205,13 +209,13 @@ def validate_dataset(dataset, manifest: dict) -> Path:
     expected = manifest['dataset']['fingerprint']
     if expected['kind'] != 'metadata-sha256':
         raise ValueError(
-            f"Unsupported CLEAR dataset fingerprint kind: {expected['kind']}"
+            f'Unsupported CLEAR dataset fingerprint kind: {expected["kind"]}'
         )
     actual = metadata_fingerprint(dataset_path)
     if actual != expected['value']:
         raise ValueError(
             'Evaluation dataset does not match the CLEAR manifest: '
-            f"{actual} != {expected['value']}"
+            f'{actual} != {expected["value"]}'
         )
     return dataset_path
 
@@ -233,9 +237,13 @@ def resolve_manifest_pairs(
         [pair['start_step'] for pair in manifest['pairs']]
     )
     if not np.array_equal(episodes, expected_episodes):
-        raise ValueError('CLEAR manifest episode IDs do not match dataset rows')
+        raise ValueError(
+            'CLEAR manifest episode IDs do not match dataset rows'
+        )
     if not np.array_equal(steps, expected_steps):
-        raise ValueError('CLEAR manifest start steps do not match dataset rows')
+        raise ValueError(
+            'CLEAR manifest start steps do not match dataset rows'
+        )
     return rows, episodes, steps
 
 
@@ -348,9 +356,7 @@ def _install_pusht_success(world, protocol: dict) -> None:
             state = np.asarray(observation['state'])
             goal = np.asarray(self.goal_state)
             position_slice = (
-                slice(2, 4)
-                if protocol['pusht_block_only']
-                else slice(0, 4)
+                slice(2, 4) if protocol['pusht_block_only'] else slice(0, 4)
             )
             position_error = float(
                 np.linalg.norm(goal[position_slice] - state[position_slice])
@@ -365,9 +371,8 @@ def _install_pusht_success(world, protocol: dict) -> None:
             self._clear_lewm_hold_count = (
                 self._clear_lewm_hold_count + 1 if success else 0
             )
-            terminated = (
-                self._clear_lewm_hold_count
-                >= _hold_steps(protocol, 'pusht')
+            terminated = self._clear_lewm_hold_count >= _hold_steps(
+                protocol, 'pusht'
             )
             info['clear_lewm_hold_count'] = self._clear_lewm_hold_count
             return observation, reward, terminated, truncated, info
@@ -401,9 +406,7 @@ def _install_cube_success(world, protocol: dict) -> None:
                 <= protocol['cube_position_threshold_m']
             )
             pose_ok = bool(position_ok)
-            orientation_threshold = protocol[
-                'cube_orientation_threshold_deg'
-            ]
+            orientation_threshold = protocol['cube_orientation_threshold_deg']
             if orientation_threshold is not None:
                 if not protocol['cube_symmetry_aware']:
                     raise ValueError(
@@ -416,14 +419,12 @@ def _install_cube_success(world, protocol: dict) -> None:
                         qpos[None, 3:7], target_quat[None]
                     )[0]
                 )
-                pose_ok = bool(
-                    pose_ok and angle_deg <= orientation_threshold
-                )
+                pose_ok = bool(pose_ok and angle_deg <= orientation_threshold)
             self._clear_lewm_hold_count = (
                 self._clear_lewm_hold_count + 1 if pose_ok else 0
             )
-            self._success = (
-                self._clear_lewm_hold_count >= _hold_steps(protocol, 'cube')
+            self._success = self._clear_lewm_hold_count >= _hold_steps(
+                protocol, 'cube'
             )
 
         env.set_target_pos = MethodType(set_target_pos, env)
@@ -443,4 +444,4 @@ def install_success_criterion(world, manifest: dict) -> None:
     elif manifest['task'] == 'tworoom':
         install_tworoom_success(world, protocol)
     else:
-        raise ValueError(f"Unsupported CLEAR task: {manifest['task']}")
+        raise ValueError(f'Unsupported CLEAR task: {manifest["task"]}')

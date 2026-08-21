@@ -114,8 +114,7 @@ def test_strict_adapter_requires_a_legal_crossing_and_goal_side():
     env._set_goal_state(np.array([130.0, 49.0], dtype=np.float32))
 
     outcomes = [
-        env.step(np.array([1.0, 0.0], dtype=np.float32))[2]
-        for _ in range(7)
+        env.step(np.array([1.0, 0.0], dtype=np.float32))[2] for _ in range(7)
     ]
     assert outcomes == [False] * 6 + [True]
     audit = topology_audit_records()[0]

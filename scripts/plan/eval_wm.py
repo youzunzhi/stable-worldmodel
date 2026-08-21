@@ -167,7 +167,7 @@ def run(cfg: DictConfig):
         }[clear_manifest['task']]
         if cfg.world.env_name != expected_env:
             raise ValueError(
-                f"CLEAR manifest task {clear_manifest['task']!r} requires "
+                f'CLEAR manifest task {clear_manifest["task"]!r} requires '
                 f'{expected_env}, got {cfg.world.env_name}'
             )
         protocol = clear_manifest['protocol']
@@ -209,9 +209,7 @@ def run(cfg: DictConfig):
     }
 
     keys_to_load = (
-        None
-        if use_pixels
-        else non_pixel_hdf5_keys(cfg.eval.dataset_name)
+        None if use_pixels else non_pixel_hdf5_keys(cfg.eval.dataset_name)
     )
     dataset = get_dataset(
         cfg, cfg.eval.dataset_name, keys_to_load=keys_to_load
@@ -277,9 +275,7 @@ def run(cfg: DictConfig):
             num_samples=cfg.eval.num_eval,
             seed=cfg.seed,
         )
-        eval_episodes = dataset.get_col_data(col_name)[
-            random_episode_indices
-        ]
+        eval_episodes = dataset.get_col_data(col_name)[random_episode_indices]
         eval_start_idx = dataset.get_col_data('step_idx')[
             random_episode_indices
         ]
@@ -412,9 +408,7 @@ def run(cfg: DictConfig):
     )
     structured = {
         'checkpoint': (
-            'random'
-            if checkpoint_path is None
-            else str(checkpoint_path)
+            'random' if checkpoint_path is None else str(checkpoint_path)
         ),
         'checkpoint_sha256': (
             None
