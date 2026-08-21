@@ -107,6 +107,13 @@ The renderer requires the exact complete 3x2 matrix and preserves every exact
 distance breakpoint in `curve_manifest.json`. The PNG is post-lock diagnostic
 evidence only; never select epsilon from its apparent maximum.
 
+To render evaluator-relative endpoint TPR/FPR instead of pair accuracy, add
+`--metric tpr-fpr` to the same command. This fixes Cube's x-axis to `[0,4]`
+and TwoRoom's to `[0,3]`, draws separate TPR/FPR step curves, and records the
+display limits plus exact breakpoint rates in the new manifest. The evaluator
+S/F vector defines the positive/negative classes; this is not the calibration
+fit-split macro TPR/FPR curve.
+
 ## Threshold data sensitivity
 
 The paired data-sensitivity study is preregistered in

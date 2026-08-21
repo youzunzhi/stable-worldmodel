@@ -50,9 +50,13 @@ from scripts.experiments.observation_goal_threshold.self_eval import (
 )
 from scripts.experiments.observation_goal_threshold.self_eval_accuracy_curve import (
     epsilon_accuracy_curve,
+    epsilon_tpr_fpr_curve,
 )
 from scripts.experiments.observation_goal_threshold.self_eval_accuracy_curve import (
     plot_matrix as plot_self_eval_accuracy_matrix,
+)
+from scripts.experiments.observation_goal_threshold.self_eval_accuracy_curve import (
+    plot_tpr_fpr_matrix as plot_self_eval_tpr_fpr_matrix,
 )
 from scripts.experiments.observation_goal_threshold.split import (
     PARTITIONS,
@@ -694,6 +698,16 @@ def test_epsilon_accuracy_curve_uses_inclusive_predicate():
     assert accuracy == pytest.approx([0.5, 0.25, 0.5, 0.25, 0.5])
 
 
+def test_epsilon_tpr_fpr_curve_uses_evaluator_classes():
+    epsilon, tpr, fpr = epsilon_tpr_fpr_curve(
+        np.array([0.1, 0.2, 0.3, 0.4], dtype=np.float32),
+        np.array([False, True, False, True]),
+    )
+    assert epsilon == pytest.approx([0.0, 0.1, 0.2, 0.3, 0.4])
+    assert tpr == pytest.approx([0.0, 0.0, 0.5, 0.5, 1.0])
+    assert fpr == pytest.approx([0.0, 0.5, 0.5, 1.0, 1.0])
+
+
 def test_epsilon_accuracy_plot_requires_and_records_complete_3x2(tmp_path):
     pytest.importorskip('matplotlib')
     paths = []
@@ -762,6 +776,15 @@ def test_epsilon_accuracy_plot_requires_and_records_complete_3x2(tmp_path):
     assert len(manifest['cells']) == 6
     assert (tmp_path / 'curve/epsilon_pair_accuracy_3x2.png').is_file()
     assert (tmp_path / 'curve/curve_manifest.json').is_file()
+    tpr_fpr = plot_self_eval_tpr_fpr_matrix(paths, tmp_path / 'tpr-fpr-curve')
+    assert tpr_fpr['status'] == 'COMPLETE_3X2'
+    assert tpr_fpr['plot_x_limits']['cube/moderate'] == [0.0, 4.0]
+    assert tpr_fpr['plot_x_limits']['cube/strict'] == [0.0, 4.0]
+    assert tpr_fpr['plot_x_limits']['tworoom/moderate'] == [0.0, 3.0]
+    assert tpr_fpr['plot_x_limits']['tworoom/strict'] == [0.0, 3.0]
+    assert (
+        tmp_path / 'tpr-fpr-curve/epsilon_endpoint_tpr_fpr_3x2.png'
+    ).is_file()
 
 
 def test_endpoint_self_eval_uses_encoder_projector_only():

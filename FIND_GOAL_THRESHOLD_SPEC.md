@@ -1180,3 +1180,18 @@ no epsilon marker, produces no fixed-threshold S/F prediction, and remains
 This sweep is post-lock descriptive analysis. It must not select, promote, or
 retune epsilon, and a high point on any curve is not validation evidence
 because the same 100 CLEAR labels define the displayed accuracy.
+
+### 20.2 Evaluator-relative endpoint TPR/FPR curve
+
+Using the identical six endpoint result artifacts, also report TPR and FPR as
+functions of epsilon, with the CLEAR evaluator S/F vector defining the positive
+and negative classes. The predicate remains `endpoint_distance <= epsilon`;
+TPR is the fraction of evaluator successes predicted successful, and FPR is
+the fraction of evaluator failures predicted successful.
+
+The six-panel display fixes Cube's epsilon axis to `[0, 4]` and TwoRoom's to
+`[0, 3]`, extending each curve horizontally at its terminal all-positive rate
+when the observed maximum distance is smaller. PushT retains a data-driven
+range containing all breakpoints and its locked epsilon. Locked epsilon markers
+remain available only for PushT and TwoRoom; Cube remains score-only. This is
+still post-lock descriptive analysis and must not be used to select epsilon.
