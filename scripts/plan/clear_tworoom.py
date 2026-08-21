@@ -499,18 +499,15 @@ def install_tworoom_success(world, protocol: dict) -> None:
             self._clear_lewm_hold_count = 0
             return result
 
-        def step(
-            self, action, *, _audit=audit, _original=original_step
-        ):
+        def step(self, action, *, _audit=audit, _original=original_step):
             before = np.asarray(self.agent_position, dtype=np.float64).copy()
             observation, reward, _, truncated, info = _original(action)
             after = np.asarray(self.agent_position, dtype=np.float64).copy()
             geometry = TwoRoomGeometry.from_env(self)
             route_check = check_route_segment(geometry, before, after)
             coordinate = geometry.crossing_coordinate(before, after)
-            if (
-                coordinate is not None
-                and geometry.crossing_has_full_clearance(coordinate)
+            if coordinate is not None and geometry.crossing_has_full_clearance(
+                coordinate
             ):
                 _audit.valid_room_crossings += 1
             _audit.route_valid &= route_check.valid
@@ -524,17 +521,14 @@ def install_tworoom_success(world, protocol: dict) -> None:
                 )
             )
             crossing_ok = (
-                not _audit.cross_room_goal
-                or _audit.valid_room_crossings > 0
+                not _audit.cross_room_goal or _audit.valid_room_crossings > 0
             )
             _audit.goal_side_reached = geometry.room_side(
                 self.agent_position
             ) == geometry.room_side(self.target_position)
             success = distance < protocol['tworoom_distance_threshold']
             if protocol['tworoom_route_required']:
-                success = bool(
-                    success and _audit.route_valid and crossing_ok
-                )
+                success = bool(success and _audit.route_valid and crossing_ok)
             if protocol.get('tworoom_goal_side_required', False):
                 success = bool(success and _audit.goal_side_reached)
             _audit.hold_count = _audit.hold_count + 1 if success else 0

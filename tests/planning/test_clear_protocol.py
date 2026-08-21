@@ -114,9 +114,7 @@ class _FakeJoint:
 
 class _FakeData:
     def __init__(self):
-        self.object_qpos = np.array(
-            [0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0]
-        )
+        self.object_qpos = np.array([0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0])
         self.mocap_pos = np.zeros((1, 3))
         self.mocap_quat = np.array([[1.0, 0.0, 0.0, 0.0]])
 
@@ -196,9 +194,7 @@ def test_cube_strict_scores_symmetry_aware_orientation_and_holds_three_steps():
 
 def test_cube_symmetry_accepts_equivalent_quarter_turn():
     identity = np.array([[1.0, 0.0, 0.0, 0.0]])
-    quarter_turn_z = np.array(
-        [[np.sqrt(0.5), 0.0, 0.0, np.sqrt(0.5)]]
-    )
+    quarter_turn_z = np.array([[np.sqrt(0.5), 0.0, 0.0, np.sqrt(0.5)]])
     assert cube_symmetry_angle_deg(identity, quarter_turn_z)[0] < 1e-6
 
 
@@ -254,9 +250,10 @@ def test_bundled_tworoom_manifest_matches_registry(protocol):
     manifest = load_manifest(path)
     assert manifest['task'] == 'tworoom'
     assert len(manifest['pairs']) == 100
-    assert manifest_sha256(path) == registry['manifests'][
-        f'tworoom/{protocol}/seed42'
-    ]
+    assert (
+        manifest_sha256(path)
+        == registry['manifests'][f'tworoom/{protocol}/seed42']
+    )
 
 
 def test_policy_seed_must_match_manifest():

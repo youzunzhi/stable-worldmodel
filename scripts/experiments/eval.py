@@ -37,9 +37,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         default='cem',
         help='Planning solver config. GD uses AdamW with multiple restarts.',
     )
-    parser.add_argument(
-        'overrides', nargs='*', help='Extra Hydra overrides.'
-    )
+    parser.add_argument('overrides', nargs='*', help='Extra Hydra overrides.')
     args = parser.parse_args(argv)
     experiment, data_root = validate_experiment_arguments(parser, args)
 
@@ -91,9 +89,7 @@ def build_eval_command(args: argparse.Namespace) -> list[str]:
     if not eval_script.is_file():
         raise FileNotFoundError(f'Evaluation script not found: {eval_script}')
 
-    output_dir = (
-        Path(run_root_value).resolve() / 'evaluations' / args.run_name
-    )
+    output_dir = Path(run_root_value).resolve() / 'evaluations' / args.run_name
     command = [
         sys.executable,
         str(eval_script),

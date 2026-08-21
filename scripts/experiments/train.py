@@ -14,9 +14,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         '--max-steps', type=int, help='Maximum optimizer steps.'
     )
-    parser.add_argument(
-        'overrides', nargs='*', help='Extra Hydra overrides.'
-    )
+    parser.add_argument('overrides', nargs='*', help='Extra Hydra overrides.')
     args = parser.parse_args(argv)
     experiment, data_root = validate_experiment_arguments(parser, args)
 
@@ -73,9 +71,7 @@ def run_training(args: argparse.Namespace) -> None:
     run_root = Path(run_root_value).resolve()
     environment = os.environ.copy()
     environment['STABLEWM_HOME'] = str(run_root)
-    environment['SPT_CACHE_DIR'] = str(
-        run_root / 'spt_cache' / args.run_name
-    )
+    environment['SPT_CACHE_DIR'] = str(run_root / 'spt_cache' / args.run_name)
 
     subprocess.run(
         build_train_command(args),

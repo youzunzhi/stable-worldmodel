@@ -423,9 +423,7 @@ class WorldModelPolicy(BasePolicy):
 
         terminated = info_dict.get('terminated')
         dead = (
-            np.asarray(terminated, dtype=bool)
-            .reshape(n_envs, -1)
-            .any(axis=1)
+            np.asarray(terminated, dtype=bool).reshape(n_envs, -1).any(axis=1)
             if terminated is not None
             else np.zeros(n_envs, dtype=bool)
         )

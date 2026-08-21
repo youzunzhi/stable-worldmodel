@@ -302,9 +302,7 @@ class GradientSolver(torch.nn.Module):
                 self.init[start_idx:end_idx] = batch_init
 
             top_idx = torch.argmin(final_costs, dim=1)
-            batch_indices = torch.arange(
-                current_bs, device=batch_init.device
-            )
+            batch_indices = torch.arange(current_bs, device=batch_init.device)
 
             top_actions_batch = batch_init[batch_indices, top_idx]
             batch_top_actions_list.append(top_actions_batch.detach().cpu())

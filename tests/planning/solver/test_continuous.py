@@ -340,17 +340,16 @@ def test_gradient_solver_call():
 
     assert 'actions' in outputs
     assert outputs['actions'].shape == (2, 3, 2)
-    assert outputs['costs'] == torch.sum(
-        outputs['actions'].pow(2), dim=(-1, -2)
-    ).tolist()
+    assert (
+        outputs['costs']
+        == torch.sum(outputs['actions'].pow(2), dim=(-1, -2)).tolist()
+    )
 
 
 def test_gradient_solver_zero_steps_returns_scored_initialization():
     """Zero optimization steps still selects and reports a valid restart."""
     model = DummyCostModel()
-    solver = GradientSolver(
-        cost=model, n_steps=0, num_samples=2, batch_size=2
-    )
+    solver = GradientSolver(cost=model, n_steps=0, num_samples=2, batch_size=2)
     action_space = gym_spaces.Box(
         low=-1, high=1, shape=(2, 2), dtype=np.float32
     )
@@ -361,6 +360,7 @@ def test_gradient_solver_zero_steps_returns_scored_initialization():
     outputs = solver(info_dict)
 
     assert outputs['actions'].shape == (2, 3, 2)
-    assert outputs['costs'] == torch.sum(
-        outputs['actions'].pow(2), dim=(-1, -2)
-    ).tolist()
+    assert (
+        outputs['costs']
+        == torch.sum(outputs['actions'].pow(2), dim=(-1, -2)).tolist()
+    )

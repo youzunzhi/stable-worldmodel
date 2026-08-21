@@ -232,9 +232,7 @@ def test_prepare_info_non_numpy_passthrough():
 def test_prepare_info_batched_images_match_per_image_pipeline_bitwise():
     """Batched v2 transforms preserve the former per-image tensor values."""
     rng = np.random.default_rng(42)
-    pixels = rng.integers(
-        0, 256, size=(3, 2, 20, 24, 3), dtype=np.uint8
-    )
+    pixels = rng.integers(0, 256, size=(3, 2, 20, 24, 3), dtype=np.uint8)
     transform = transforms.Compose(
         [
             transforms.ToImage(),
@@ -246,9 +244,7 @@ def test_prepare_info_batched_images_match_per_image_pipeline_bitwise():
             transforms.Resize(size=16),
         ]
     )
-    nchw = np.transpose(
-        pixels.reshape(-1, *pixels.shape[2:]), (0, 3, 1, 2)
-    )
+    nchw = np.transpose(pixels.reshape(-1, *pixels.shape[2:]), (0, 3, 1, 2))
     reference = torch.stack(
         [transform(tv_tensors.Image(image)) for image in nchw]
     ).reshape(3, 2, 3, 16, 19)

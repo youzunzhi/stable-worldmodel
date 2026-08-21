@@ -28,7 +28,9 @@ def save_pretrained(
     else:
         if run_name is None:
             raise ValueError('output_dir or run_name is required')
-        ckpt_dir = get_cache_dir(cache_dir, sub_folder='checkpoints') / run_name
+        ckpt_dir = (
+            get_cache_dir(cache_dir, sub_folder='checkpoints') / run_name
+        )
     ensure_dir_exists(ckpt_dir)
 
     checkpoint_path = ckpt_dir / filename
