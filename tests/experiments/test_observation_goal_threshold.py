@@ -23,6 +23,7 @@ from scripts.experiments.observation_goal_threshold.io_utils import read_json
 from scripts.experiments.observation_goal_threshold.metrics import (
     CalibrationOutcome,
     attach_bootstrap_cis,
+    best_stratified_operating_point,
     enforce_validation,
     metrics_at_threshold,
     select_threshold,
@@ -317,6 +318,40 @@ def test_selector_reports_registered_no_feasible_outcome():
     assert (
         error.value.code == 'THRESHOLD_CALIBRATION_NO_FEASIBLE_OPERATING_POINT'
     )
+
+
+def test_best_operating_point_preserves_infeasible_descriptive_epsilon():
+    stratified, _ = synthetic_samples()
+    stratified['latent_distance'] = np.array([0.3, 0.8, 0.4, 0.5])
+    result = best_stratified_operating_point(stratified, max_negative_fpr=0.1)
+    assert result.epsilon == pytest.approx(0.3)
+    assert result.macro_tpr == pytest.approx(0.5)
+    assert result.macro_fpr == pytest.approx(0.0)
+
+
+def test_uniform_pairs_do_not_change_selector_without_precision_gate():
+    stratified, uniform = synthetic_samples()
+    first = select_threshold(
+        stratified,
+        uniform,
+        min_positive_recall=0.9,
+        max_negative_fpr=0.1,
+        min_population_precision=None,
+    )
+    uniform['latent_distance'] = np.array(
+        [0.001, 0.002, 100.0, 200.0, 0.003], dtype=np.float32
+    )
+    second = select_threshold(
+        stratified,
+        uniform,
+        min_positive_recall=0.9,
+        max_negative_fpr=0.1,
+        min_population_precision=None,
+    )
+    stratified_only = best_stratified_operating_point(
+        stratified, max_negative_fpr=0.1
+    )
+    assert first.epsilon == second.epsilon == stratified_only.epsilon
 
 
 def test_uniform_population_precision_excludes_u_and_is_not_balanced_precision():
