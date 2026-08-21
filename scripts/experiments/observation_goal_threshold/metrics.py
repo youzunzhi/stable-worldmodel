@@ -130,6 +130,50 @@ class SelectionResult:
     candidates: dict[str, np.ndarray]
 
 
+def best_stratified_operating_point(
+    stratified: dict[str, np.ndarray],
+    *,
+    max_negative_fpr: float,
+) -> SelectionResult:
+    """Return the registered best macro operating point without a recall gate.
+
+    This is the complete threshold selector when population precision is not a
+    constraint.  Keeping the recall gate outside this helper lets sensitivity
+    reports retain Cube's best descriptive epsilon without promoting it.
+    """
+    macro = macro_curve(
+        stratified['latent_distance'],
+        stratified['label'],
+        stratified['analysis_weight'],
+        stratified['anchor_group'],
+    )
+    feasible = np.isfinite(macro['epsilon'])
+    feasible &= macro['macro_fpr'] <= max_negative_fpr
+    if not np.any(feasible):
+        raise CalibrationOutcome(
+            'THRESHOLD_CALIBRATION_NO_FEASIBLE_OPERATING_POINT',
+            {'reason': 'no finite candidate satisfies the FPR constraint'},
+        )
+    maximum_tpr = float(macro['macro_tpr'][feasible].max())
+    winner = np.flatnonzero(feasible & (macro['macro_tpr'] == maximum_tpr))[0]
+    candidates = {
+        'epsilon': macro['epsilon'],
+        'macro_tpr': macro['macro_tpr'],
+        'macro_fpr': macro['macro_fpr'],
+        'population_precision': np.full(
+            len(macro['epsilon']), np.nan, dtype=np.float64
+        ),
+        'feasible': feasible,
+    }
+    return SelectionResult(
+        epsilon=float(macro['epsilon'][winner]),
+        macro_tpr=float(macro['macro_tpr'][winner]),
+        macro_fpr=float(macro['macro_fpr'][winner]),
+        population_precision=float('nan'),
+        candidates=candidates,
+    )
+
+
 def select_threshold(
     stratified: dict[str, np.ndarray],
     uniform: dict[str, np.ndarray],

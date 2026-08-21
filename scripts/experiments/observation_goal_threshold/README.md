@@ -70,3 +70,13 @@ actual success-rate error.
 The current Cube calibration has no promoted epsilon. Cube self-eval must
 therefore remain unavailable unless a new threshold-selection contract is
 pre-registered and calibrated; do not substitute its best failed fit point.
+
+## Threshold data sensitivity
+
+The paired data-sensitivity study is preregistered in
+`data_sensitivity_config.json` and run with the separate `data_sensitivity`
+module. It reuses verified frozen embeddings, materializes the unchanged full
+pair design for four new seeds, opens fit scores only, and derives a paired
+stratified-only estimate from the same task-stratified shards. See
+`EXPERIMENT_T_GOAL_THRESHOLD_DATA_SENSITIVITY_SPEC.md` for the access and
+interpretation boundaries.
