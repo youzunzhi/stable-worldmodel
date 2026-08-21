@@ -1,0 +1,47 @@
+{
+  "artifact_schema_version": "find-goal-threshold-endpoint-tpr-fpr-derivation-v1",
+  "status": "COMPLETE_3X2",
+  "source_revision": "c507b0598d0e7ae92502a1088fdad263b537a1a5",
+  "remote_source": "/public/home/xsy0001/workspace/code/stable-worldmodel-find-goal-threshold-c507b05",
+  "remote_output": "/public/home/xsy0001/workspace/data/stable-worldmodel/experiments/observation_goal_threshold/epsilon-accuracy-fb37755-20260821-cube-score-only/curve-tpr-fpr-v1",
+  "derivation": {
+    "new_evaluation_run": false,
+    "source_endpoint_results": 6,
+    "paired_endpoints": 600,
+    "predicate": "endpoint_latent_distance <= epsilon",
+    "positive_class": "CLEAR evaluator success",
+    "negative_class": "CLEAR evaluator failure",
+    "metrics": ["TPR", "FPR"],
+    "pooling": "none",
+    "threshold_selection_permitted": false
+  },
+  "plot_contract": {
+    "cube_x_range": [0.0, 4.0],
+    "tworoom_x_range": [0.0, 3.0],
+    "pusht_x_range": "data-driven; contains all exact breakpoints and locked epsilon",
+    "locked_epsilon_markers": ["pusht", "tworoom"],
+    "cube_marker": null,
+    "right_extension": "hold terminal TPR/FPR constant after the maximum observed endpoint distance"
+  },
+  "source_artifacts": {
+    "pusht_moderate_sha256": "4401ae1f554e6d35931081e0ed12bcf1ee2c78b8a268bbcc507efd69ae6ab15f",
+    "pusht_strict_sha256": "d4782cca9a8337e48d2b322561af7a47586742f8c580ec5d067aef3e4c70f308",
+    "cube_moderate_sha256": "fdd01d3c175886006508a2a18d9600cd3f90ea43c31b8b29d4e63721199d86f4",
+    "cube_strict_sha256": "e0717c21e2250ac0c69fef9f1a9d9a0281f55eca53ae8277f14e2fd716016ad7",
+    "tworoom_moderate_sha256": "5650e2450f6d9573328d12c8947613adca52e5aecd8dd0b1215035cff9ea4b17",
+    "tworoom_strict_sha256": "a8d330b1f26796ffb4c3ff498bb18ba9773699eb3e8aae62518d0bb6800cd672"
+  },
+  "outputs": {
+    "plot": "epsilon_endpoint_tpr_fpr_3x2.png",
+    "plot_sha256": "d8c11cb16380a5cd3f6ef1d312c616764b78a611e7d1e0249234a1637e80ea22",
+    "manifest": "curve_manifest.json",
+    "manifest_sha256": "0c2f5d49bebc9cf63c49ecf214d53602778e50af111370ab70b5e876ae4368e7"
+  },
+  "validation": {
+    "local_targeted": "59 passed, 3 skipped",
+    "remote_targeted": "62 passed",
+    "ruff_check": "passed",
+    "ruff_format_check": "passed",
+    "original_resolution_visual_qa": "passed"
+  }
+}
