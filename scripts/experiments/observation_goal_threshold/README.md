@@ -1,7 +1,7 @@
-# Experiment T implementation
+# find-goal-threshold implementation
 
 This package implements
-`EXPERIMENT_T_DEMO_CALIBRATED_GOAL_THRESHOLD_SPEC.md` for the three primary
+`FIND_GOAL_THRESHOLD_SPEC.md` for the three primary
 pointwise variants: PushT joint XY, Cube block position, and TwoRoom agent XY.
 
 The full driver constructs and hashes group-first splits and pair manifests,
@@ -28,3 +28,43 @@ PYTHONPATH=. python -m \
   scripts.experiments.observation_goal_threshold.summarize_three \
   --root /path/containing/pusht-cube-tworoom
 ```
+
+The run writes `epsilon_tpr_fpr_curve.png`, with epsilon on the x-axis and
+fit-split anchor-group macro TPR/FPR on the y-axis. To derive the same plot
+from an immutable existing run without modifying it:
+
+```bash
+PYTHONPATH=. python -m \
+  scripts.experiments.observation_goal_threshold.curve_plot \
+  --run-dir /path/to/immutable/task-run \
+  --output-dir /path/to/new/derived-curve-directory
+```
+
+## CLEAR endpoint self-eval
+
+Self-eval is a downstream test performed only after epsilon is locked. The
+full matrix is three tasks by CLEAR Moderate/Strict by 100 fixed pairs (600
+trajectories). Each cell uses the same checkpoint as that task's threshold.
+The normal CLEAR planner and evaluator produce the actual S/F label; after the
+pair ends, the frozen encoder/projector computes endpoint-to-goal mean-D MSE
+and predicts success exactly when the distance is at most epsilon.
+
+Pass the locked artifact to the normal evaluator:
+
+```bash
+PYTHONPATH=. python scripts/plan/eval_wm.py --config-name=pusht \
+  policy=/absolute/path/to/weights_epoch_10.pt \
+  eval.dataset_name=/absolute/path/to/pusht_expert_train.h5 \
+  eval.manifest=/absolute/path/to/pusht/moderate-seed42-n100.json \
+  eval.find_goal_threshold=/absolute/path/to/pusht/selected_threshold.json \
+  eval.video=false output.dir=/new/immutable/output
+```
+
+Repeat with each task config and both protocols, then aggregate the six
+`results.txt.json` files with `summarize_self_eval`. The aggregator rejects
+non-100-pair cells, solver/CPU-contract mismatches, duplicate pair IDs, and
+checkpoint/threshold hash mismatches.
+
+The current Cube calibration has no promoted epsilon. Cube self-eval must
+therefore remain unavailable unless a new threshold-selection contract is
+pre-registered and calibrated; do not substitute its best failed fit point.

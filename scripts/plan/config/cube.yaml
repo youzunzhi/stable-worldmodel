@@ -38,6 +38,9 @@ eval:
   # Optional fixed CLEAR-LeWM v0.5 manifest. When set, its pair list and
   # selected success criterion replace random row sampling.
   manifest: null
+  # Locked selected_threshold.json for endpoint self-evaluation. Cube has no
+  # promotable threshold under the current find-goal-threshold contract.
+  find_goal_threshold: null
   # Permit a non-CEM solver on fixed CLEAR pairs. Such a run is an ablation,
   # not a protocol-conformant CLEAR result, and is marked as such in JSON.
   solver_ablation: false

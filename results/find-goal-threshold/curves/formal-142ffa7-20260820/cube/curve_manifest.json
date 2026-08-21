@@ -1,0 +1,70 @@
+{
+  "artifact_schema_version": "find-goal-threshold-curve-v1",
+  "curve_estimator": "anchor-group macro",
+  "curve_partition": "threshold_fit",
+  "curve_points_exact": 8658167,
+  "curve_points_plotted": 20000,
+  "epsilon_max": 3.5573840141296387,
+  "epsilon_min": 4.413782153278589e-05,
+  "max_negative_fpr": 0.1,
+  "min_positive_recall": 0.9,
+  "plot": "epsilon_tpr_fpr_curve.png",
+  "plot_sha256": "ebbdc6e579ac1558f28db9dad18be2fb6cd68dbf3d56c700e16691a4412e0a16",
+  "selected_epsilon": null,
+  "source_config_sha256": "10b081958fecf34313cef340d783bea97bd38e8e4d34f920dc2390bb095d2422",
+  "source_fit_score_shards": [
+    {
+      "file": "task_stratified-00000.parquet",
+      "sha256": "10c56aa67bf104ffee0681bb066e144476659686037944a61a75a142bf2cb906"
+    },
+    {
+      "file": "task_stratified-00001.parquet",
+      "sha256": "3a5bbe4594298524f6fa138da3733d25f343a9c69ad5551194699b85aa1923ee"
+    },
+    {
+      "file": "task_stratified-00002.parquet",
+      "sha256": "1aaea221af08f3cf977416da1769dfde298d56399b042a3b39709e798be47179"
+    },
+    {
+      "file": "task_stratified-00003.parquet",
+      "sha256": "432398050d5c8e20ab1d8de96b09358f1b1f706787e4baa67cedaa3e958ff0fb"
+    },
+    {
+      "file": "task_stratified-00004.parquet",
+      "sha256": "da03f8e698d28958f132713ef5ea46864c5855100f50a8dfe1c4f1de854b09b7"
+    },
+    {
+      "file": "task_stratified-00005.parquet",
+      "sha256": "3c53da66387654055504979a1380ec55b6116f5c51b34f59e21a5deaa0b7cc72"
+    },
+    {
+      "file": "task_stratified-00006.parquet",
+      "sha256": "b3c2b25ff265577b101b29299dfaee250ffc51fe347897a3c1e79ea2b4cb00b6"
+    },
+    {
+      "file": "task_stratified-00007.parquet",
+      "sha256": "6da959efdc571b8e508fb82517b74896a7d6b203ea53dfbc62828f9a2765d14a"
+    },
+    {
+      "file": "task_stratified-00008.parquet",
+      "sha256": "36f26a2cd55b91957562aa7d8cd0bab0dabea19cc921acf406c9309533bdb292"
+    },
+    {
+      "file": "task_stratified-00009.parquet",
+      "sha256": "53b45825f0b8b578fab8c564dd1874f0bc548fc6855c0588845dfb64bba7cc9f"
+    },
+    {
+      "file": "task_stratified-00010.parquet",
+      "sha256": "75b2413c61ac0eb666488f140717be40e83d5661e546f71b506ddc9cf1a01c5a"
+    },
+    {
+      "file": "task_stratified-00011.parquet",
+      "sha256": "385ed39766b7b6b1bcf605bf3b704afc4fee993822889ad6adba6301eeafec61"
+    }
+  ],
+  "source_run_dir": "/public/home/xsy0001/workspace/data/stable-worldmodel/experiments/observation_goal_threshold/formal-142ffa7-20260820/cube",
+  "source_status_sha256": "77e999f03f35c77d3baf120fba7d85c74b385af33301e8c3edb72a770d933272",
+  "source_threshold_sha256": null,
+  "status": "THRESHOLD_CALIBRATION_NO_FEASIBLE_OPERATING_POINT",
+  "task": "cube"
+}

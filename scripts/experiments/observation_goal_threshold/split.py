@@ -1,4 +1,4 @@
-"""Group-first split construction for Experiment T."""
+"""Group-first split construction for find-goal-threshold."""
 
 from __future__ import annotations
 

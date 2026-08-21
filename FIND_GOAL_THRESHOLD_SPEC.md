@@ -1,4 +1,4 @@
-# Experiment T Spec: Demo-Calibrated Observation-Observation Latent Goal Threshold
+# find-goal-threshold spec: demo-calibrated observation-observation latent goal threshold
 
 ## 0. Scope and decision
 
@@ -120,7 +120,7 @@ Using
 \|\hat z_H-E_0(o_j)\|^2
 \]
 
-would combine encoder geometry with multi-step predictor error. Experiment T
+would combine encoder geometry with multi-step predictor error. find-goal-threshold
 intentionally isolates encoder geometry. Every latent in this experiment is a
 direct encoding of a recorded observation. Predictor error requires a separate
 experiment and must not influence \(\epsilon^*\).
@@ -564,7 +564,7 @@ subsampling is not the runtime-control mechanism.
 Eligibility depends on the declared observation and simulator-state fields, not
 on the existence of an outgoing action. Initial rows and terminal rows with a
 NaN or missing outgoing-action sentinel remain eligible when their observation
-and required state are finite, because Experiment T never consumes actions.
+and required state are finite, because find-goal-threshold never consumes actions.
 
 For every row:
 
@@ -1132,3 +1132,31 @@ The central review question is:
 > from a pre-registered single-time-step simulator-state gap predicate, with
 > population precision estimated from uniform pairs and the threshold locked
 > before any downstream predictor or planner result was observed?
+
+---
+
+## 20. Downstream CLEAR endpoint self-eval
+
+This is a post-lock validation experiment, not part of threshold selection.
+No CLEAR result may alter epsilon, labels, splits, or the operating contract.
+
+- Matrix: PushT, Cube, and TwoRoom x CLEAR v0.5 Moderate and Strict x 100
+  fixed seed-42 manifest pairs, reported as six separate cells.
+- Planner contract: CEM `batch_size=1`, `num_samples=300`, `n_steps=30`,
+  `topk=30`, `cpu_threads=1`, goal offset 25, execution budget 50.
+- Model: each task uses the exact checkpoint SHA-256 recorded in its locked
+  `selected_threshold.json`; no official or cross-task checkpoint fallback.
+- Actual label: the installed CLEAR evaluator's per-pair S/F result.
+- Self label: after the pair terminates or exhausts its budget, freshly render
+  the final observation, encode it and the fixed goal using only the frozen
+  encoder/projector, compute float32 `mean_D((z_final-z_goal)^2)`, and predict
+  success iff that distance is `<= epsilon`.
+- Artifacts: preserve every pair ID, endpoint distance, prediction, evaluator
+  label, correctness bit, confusion counts, accuracy with Wilson 95% interval,
+  actual SR, predicted SR, and signed/absolute SR error.
+- Reporting: never pool tasks or Moderate/Strict into the primary result;
+  pointwise geometry omits angle, pose, sustained hold, collision, route, and
+  reachability semantics present in some CLEAR cells.
+- Missing-threshold rule: a task without a promoted epsilon is
+  `THRESHOLD_UNAVAILABLE`. It is forbidden to substitute a fit diagnostic,
+  tune on CLEAR outcomes, or call the three-task matrix complete.

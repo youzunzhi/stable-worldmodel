@@ -1,4 +1,4 @@
-"""Pure task-space label contracts for Experiment T.
+"""Pure task-space label contracts for find-goal-threshold.
 
 This module intentionally imports neither torch nor any world-model code.  Pair
 IDs, compatibility, task errors, and T/F/U labels must be materialized before

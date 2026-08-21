@@ -12,6 +12,9 @@ from scripts.experiments.observation_goal_threshold.contracts import (
     cube_symmetry_angle_deg,
     cube_symmetry_quaternions,
 )
+from scripts.experiments.observation_goal_threshold.curve_plot import (
+    plot_epsilon_tpr_fpr,
+)
 from scripts.experiments.observation_goal_threshold.encode import (
     encode_projected,
     pair_partition_matches,
@@ -19,7 +22,10 @@ from scripts.experiments.observation_goal_threshold.encode import (
     preprocess_pixels,
     score_pair_shards,
 )
-from scripts.experiments.observation_goal_threshold.io_utils import read_json
+from scripts.experiments.observation_goal_threshold.io_utils import (
+    read_json,
+    write_json,
+)
 from scripts.experiments.observation_goal_threshold.metrics import (
     CalibrationOutcome,
     attach_bootstrap_cis,
@@ -34,10 +40,18 @@ from scripts.experiments.observation_goal_threshold.sample_pairs import (
     sample_task_stratum,
     uniform_ordered_pairs,
 )
+from scripts.experiments.observation_goal_threshold.self_eval import (
+    compare_predictions,
+    endpoint_distances,
+    load_and_validate_threshold,
+)
 from scripts.experiments.observation_goal_threshold.split import (
     PARTITIONS,
     row_partitions,
     split_groups,
+)
+from scripts.experiments.observation_goal_threshold.summarize_self_eval import (
+    summarize as summarize_self_eval,
 )
 
 
@@ -484,3 +498,162 @@ def test_sampler_source_imports_no_model_or_latent_code():
     assert 'import torch' not in source
     assert 'stable_worldmodel' not in source
     assert 'latent_distance' not in source
+
+
+def test_epsilon_tpr_fpr_curve_is_written_for_failed_selection(tmp_path):
+    pytest.importorskip('matplotlib')
+    stratified, _ = synthetic_samples()
+    manifest = plot_epsilon_tpr_fpr(
+        stratified,
+        tmp_path / 'curve.png',
+        task='fixture',
+        selected_epsilon=None,
+        min_positive_recall=0.9,
+        max_negative_fpr=0.1,
+        status='THRESHOLD_CALIBRATION_NO_FEASIBLE_OPERATING_POINT',
+    )
+    assert (tmp_path / 'curve.png').is_file()
+    assert manifest['selected_epsilon'] is None
+    assert manifest['curve_points_exact'] > 0
+
+
+def test_locked_threshold_validation_checks_checkpoint_and_contract(tmp_path):
+    path = tmp_path / 'selected_threshold.json'
+    path.write_text(
+        """{
+          "epsilon": 0.25,
+          "task": "pusht",
+          "pointwise_label_variant": "fixture",
+          "residual_definition": "mean_D((z_i-z_j)^2)",
+          "D": 192,
+          "dtype": "float32",
+          "encoder_checkpoint_sha256": "abc",
+          "encoder_checkpoint_config_sha256": "cfg",
+          "encoder_projector_parameter_hashes": {
+            "before": "params",
+            "after": "params"
+          },
+          "observation_preprocessing": {
+            "residual": "mean_D((z_i-z_j)^2)",
+            "dtype": "float32",
+            "latent_dim": 192,
+            "resize": [224, 224],
+            "normalization": "ImageNet mean/std from stable_pretraining"
+          }
+        }"""
+    )
+    _, provenance = load_and_validate_threshold(
+        path,
+        task='pusht',
+        checkpoint_sha256='abc',
+        checkpoint_config_sha256='cfg',
+    )
+    assert provenance['epsilon'] == 0.25
+    with pytest.raises(ValueError, match='identity mismatch'):
+        load_and_validate_threshold(
+            path,
+            task='pusht',
+            checkpoint_sha256='different',
+            checkpoint_config_sha256='cfg',
+        )
+
+
+def test_self_eval_confusion_and_sr_error_are_pair_aligned():
+    result = compare_predictions(
+        np.array([0.1, 0.7, 0.2, 0.8], dtype=np.float32),
+        np.array([True, True, False, False]),
+        epsilon=0.5,
+        pair_ids=['a', 'b', 'c', 'd'],
+    )
+    summary = result['summary']
+    assert summary['confusion'] == {'tp': 1, 'tn': 1, 'fp': 1, 'fn': 1}
+    assert summary['accuracy'] == pytest.approx(0.5)
+    assert summary['actual_success_rate_percent'] == pytest.approx(50.0)
+    assert summary['predicted_success_rate_percent'] == pytest.approx(50.0)
+    assert [row['pair_id'] for row in result['pairs']] == [
+        'a',
+        'b',
+        'c',
+        'd',
+    ]
+
+
+def test_endpoint_self_eval_uses_encoder_projector_only():
+    torch = pytest.importorskip('torch')
+
+    class Output:
+        def __init__(self, value):
+            self.last_hidden_state = value
+
+    class Encoder(torch.nn.Module):
+        def forward(self, pixels, interpolate_pos_encoding=False):
+            assert interpolate_pos_encoding
+            pooled = pixels.mean(dim=(-2, -1))[:, None, :]
+            return Output(pooled)
+
+    class Forbidden(torch.nn.Module):
+        def forward(self, *args, **kwargs):
+            raise AssertionError('forbidden path called')
+
+    class Model(torch.nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.anchor = torch.nn.Parameter(torch.zeros(()))
+            self.encoder = Encoder()
+            self.projector = torch.nn.Identity()
+            self.predictor = Forbidden()
+            self.action_encoder = Forbidden()
+
+    endpoint = np.zeros((2, 8, 8, 3), dtype=np.uint8)
+    goal = endpoint.copy()
+    goal[1] = 255
+    distance = endpoint_distances(Model(), endpoint, goal, batch_size=1)
+    assert distance[0] == pytest.approx(0.0)
+    assert distance[1] > 0
+
+
+def test_self_eval_summary_keeps_missing_matrix_cells_explicit(tmp_path):
+    result_path = tmp_path / 'results.txt.json'
+    write_json(
+        result_path,
+        {
+            'requested_trajectories': 100,
+            'completed_trajectories': 100,
+            'checkpoint_sha256': 'checkpoint',
+            'clear_lewm': {
+                'task': 'pusht',
+                'protocol': {'name': 'moderate'},
+                'manifest_sha256': 'manifest',
+                'cpu_threads': 1,
+                'solver_contract_matched': True,
+            },
+            'find_goal_threshold_self_eval': {
+                'task': 'pusht',
+                'clear_protocol': 'moderate',
+                'threshold': {
+                    'encoder_checkpoint_sha256': 'checkpoint',
+                    'selected_threshold_sha256': 'threshold',
+                    'epsilon': 0.5,
+                },
+                'summary': {
+                    'pairs': 100,
+                    'actual_success_rate_percent': 50.0,
+                    'predicted_success_rate_percent': 45.0,
+                    'accuracy': 0.8,
+                    'confusion': {
+                        'tp': 40,
+                        'tn': 40,
+                        'fp': 10,
+                        'fn': 10,
+                    },
+                },
+                'pairs': [
+                    {'pair_id': f'pair-{index}'} for index in range(100)
+                ],
+            },
+        },
+    )
+    summary = summarize_self_eval([result_path], tmp_path / 'summary')
+    assert summary['status'] == 'INCOMPLETE'
+    assert len(summary['missing_cells']) == 5
+    assert summary['cells'][0]['task'] == 'pusht'

@@ -1,5 +1,5 @@
 {
-  "artifact_schema_version": "experiment-t-v1",
+  "artifact_schema_version": "find-goal-threshold-v1",
   "task": "pusht",
   "dataset": {
     "path": "/public/home/xsy0001/workspace/data/stable-worldmodel/hf/datasets/quentinll--lewm-pusht/655cd446b9929369d7d406001da85c15d1457850/pusht_expert_train.h5",

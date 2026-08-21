@@ -1,4 +1,4 @@
-"""Build the final three-task Experiment T summary from immutable runs."""
+"""Build the final three-task find-goal-threshold summary."""
 
 from __future__ import annotations
 
@@ -48,7 +48,7 @@ def summarize(root: Path) -> dict:
     summary = {'tasks': rows}
     write_json(root / 'three_task_summary.json', summary)
     lines = [
-        '# Experiment T: three-task calibrated goal-threshold report',
+        '# find-goal-threshold: three-task calibrated goal-threshold report',
         '',
         '| Task | Pointwise variant | Status | Epsilon | Audit TPR | Audit FPR | Audit precision |',
         '|---|---|---|---:|---:|---:|---:|',

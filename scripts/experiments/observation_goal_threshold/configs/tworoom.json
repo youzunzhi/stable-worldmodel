@@ -1,5 +1,5 @@
 {
-  "artifact_schema_version": "experiment-t-v1",
+  "artifact_schema_version": "find-goal-threshold-v1",
   "task": "tworoom",
   "dataset": {
     "path": "/public/home/xsy0001/workspace/data/stable-worldmodel/tworoom/tworoom.h5",

@@ -48,10 +48,9 @@ import torch
 
 from stable_worldmodel.policy import Policy
 
-from .env_pool import EnvPool
 from ..plot import save_panel_videos, save_video
 from ..wrapper import MegaWrapper
-
+from .env_pool import EnvPool
 
 RESET_MODES = ('auto', 'wait')
 
@@ -202,6 +201,7 @@ class World:
         goal_offset: int | None = None,
         eval_budget: int | None = None,
         callables: list[dict] | None = None,
+        render_pixels: str | None = None,
     ) -> dict:
         """Run the attached policy and return aggregated metrics.
 
@@ -238,6 +238,9 @@ class World:
                 'in_dataset': bool}}}``; if ``in_dataset`` is True, the
                 ``value`` names a key in the sliced dataset state and the
                 per-env value is deep-copied in.
+            render_pixels: ``'always'`` renders every executed endpoint;
+                ``'policy'`` permits cached pixels between replans. Defaults
+                to ``'always'`` with video and ``'policy'`` otherwise.
 
         Returns:
             A dict with ``'success_rate'`` (percent), ``'episode_successes'``
@@ -254,9 +257,12 @@ class World:
                 callables,
                 video,
                 mode,
+                render_pixels,
             )
         mode = reset_mode or 'auto'
-        return self._evaluate(episodes, seed, options, video, mode)
+        return self._evaluate(
+            episodes, seed, options, video, mode, render_pixels
+        )
 
     def collect(
         self,
@@ -465,7 +471,9 @@ class World:
     def _get_actions(self) -> np.ndarray:
         return self.policy.get_action(self.infos)
 
-    def _evaluate(self, episodes, seed, options, video, mode) -> dict:
+    def _evaluate(
+        self, episodes, seed, options, video, mode, render_pixels
+    ) -> dict:
         results = {
             'success_rate': 0.0,
             'episode_successes': np.zeros(episodes),
@@ -496,7 +504,7 @@ class World:
             mode=mode,
             on_step=on_step,
             on_done=on_done,
-            render_pixels='always' if video else 'policy',
+            render_pixels=render_pixels or ('always' if video else 'policy'),
         )
 
         results['success_rate'] = (
@@ -517,6 +525,7 @@ class World:
         callables,
         video,
         mode,
+        render_pixels,
     ) -> dict:
         n = len(episodes_idx)
         assert n == self.num_envs
@@ -569,7 +578,7 @@ class World:
             max_steps=eval_budget,
             mode=mode,
             on_step=on_step,
-            render_pixels='always' if video else 'policy',
+            render_pixels=render_pixels or ('always' if video else 'policy'),
         )
 
         results['success_rate'] = (

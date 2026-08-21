@@ -1,4 +1,4 @@
-# Experiment T：demo-calibrated goal threshold 正式報告
+# find-goal-threshold：demo-calibrated goal threshold 正式報告
 
 ## 結論
 
@@ -10,6 +10,20 @@
 | PushT | `pusht_joint_xy_pointwise_gap20_30` | `1.6419658660888672` | threshold 已鎖定；fit/validation 合約通過 | `0.952936 / 0.100224` | `0.950860 / 0.143495` | `0.008638` |
 | Cube | `cube_block_xyz_pointwise_gap03_04` | **沒有可行 threshold** | `THRESHOLD_CALIBRATION_NO_FEASIBLE_OPERATING_POINT` | audit 未開啟 | audit 未開啟 | audit 未開啟 |
 | TwoRoom | `tworoom_agent_xy_pointwise_gap8_16` | `1.392462968826294` | threshold 已鎖定；fit/validation 合約通過 | `1.000000 / 0.028177` | `1.000000 / 0.065225` | `0.228997` |
+
+## Epsilon–TPR/FPR curves
+
+以下三張圖以 ε 為 x 軸、fit split 的 anchor-group macro TPR/FPR 為 y
+軸。虛線是預註冊的 `TPR >= 0.90`、`FPR <= 0.10` 約束；PushT 與
+TwoRoom 的黑色垂直線是鎖定 ε。Cube 沒有畫垂直線，因為它沒有通過合約
+的 ε。每張圖旁的 `curve_manifest.json` 都 hash-lock 來源 config、status、
+fit score shards、threshold（若有）與 PNG。
+
+![PushT epsilon–TPR/FPR curve](results/find-goal-threshold/curves/formal-142ffa7-20260820/pusht/epsilon_tpr_fpr_curve.png)
+
+![Cube epsilon–TPR/FPR curve](results/find-goal-threshold/curves/formal-142ffa7-20260820/cube/epsilon_tpr_fpr_curve.png)
+
+![TwoRoom epsilon–TPR/FPR curve](results/find-goal-threshold/curves/formal-142ffa7-20260820/tworoom/epsilon_tpr_fpr_curve.png)
 
 Cube 的正式結論不是缺少實驗，而是在要求
 `macro-TPR >= 0.90` 且 `macro-FPR <= 0.10` 的預註冊 operating

@@ -1,5 +1,5 @@
 {
-  "artifact_schema_version": "experiment-t-v1",
+  "artifact_schema_version": "find-goal-threshold-v1",
   "task": "cube",
   "dataset": {
     "path": "/public/home/xsy0001/workspace/data/stable-worldmodel/hf/datasets/quentinll--lewm-cube/02a19a67a0dc8c9d6215f89c19e0a597691e152a/cube_single_expert.h5",

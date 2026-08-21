@@ -12,11 +12,6 @@ import hydra
 import numpy as np
 import stable_pretraining as spt
 import torch
-from omegaconf import DictConfig, OmegaConf
-from sklearn import preprocessing
-from torchvision.transforms import v2 as transforms
-import stable_worldmodel as swm
-
 from clear_protocol import (
     CLEAR_LEWM_REVISION,
     CLEAR_LEWM_VERSION,
@@ -29,6 +24,18 @@ from clear_protocol import (
     validate_dataset,
     validate_policy_seed,
     validate_solver_config,
+)
+from omegaconf import DictConfig, OmegaConf
+from sklearn import preprocessing
+from torchvision.transforms import v2 as transforms
+
+import stable_worldmodel as swm
+from scripts.experiments.observation_goal_threshold.encode import (
+    parameter_hash,
+)
+from scripts.experiments.observation_goal_threshold.self_eval import (
+    evaluate_endpoints,
+    load_and_validate_threshold,
 )
 
 
@@ -92,7 +99,7 @@ def non_pixel_hdf5_keys(dataset_name):
     with h5py.File(path, 'r') as dataset:
         return [
             key
-            for key in dataset.keys()
+            for key in dataset
             if key not in ('ep_len', 'ep_offset')
             and not key.startswith('pixels')
         ]
@@ -154,6 +161,7 @@ def sample_evaluation_starts(
 def run(cfg: DictConfig):
     """Run evaluation of dinowm vs random policy."""
     clear_manifest_path = cfg.eval.get('manifest')
+    find_goal_threshold_path = cfg.eval.get('find_goal_threshold')
     solver_ablation = bool(cfg.eval.get('solver_ablation', False))
     clear_solver_contract_matched = None
     clear_manifest = (
@@ -167,7 +175,7 @@ def run(cfg: DictConfig):
         }[clear_manifest['task']]
         if cfg.world.env_name != expected_env:
             raise ValueError(
-                f"CLEAR manifest task {clear_manifest['task']!r} requires "
+                f'CLEAR manifest task {clear_manifest["task"]!r} requires '
                 f'{expected_env}, got {cfg.world.env_name}'
             )
         protocol = clear_manifest['protocol']
@@ -184,15 +192,61 @@ def run(cfg: DictConfig):
         else:
             clear_solver_contract_matched = True
         seed_runtime(int(cfg.seed))
+    if find_goal_threshold_path is not None and clear_manifest is None:
+        raise ValueError(
+            'find-goal-threshold self-eval requires a CLEAR manifest'
+        )
+    if find_goal_threshold_path is not None and bool(cfg.get('bf16', False)):
+        raise ValueError(
+            'find-goal-threshold self-eval requires float32 evaluation'
+        )
+    if find_goal_threshold_path is not None and bool(
+        cfg.get('compile', False)
+    ):
+        raise ValueError(
+            'find-goal-threshold self-eval requires an uncompiled encoder '
+            'for exact parameter-hash verification'
+        )
 
     assert (
         cfg.plan_config.horizon * cfg.plan_config.action_block
         <= cfg.eval.eval_budget
     ), 'Planning horizon must be smaller than or equal to eval_budget'
-    results_path = prepare_results_path(cfg)
-
     # create world environment
     policy_name = cfg.get('policy', 'random')
+    checkpoint_path = (
+        None
+        if policy_name == 'random'
+        else Path(policy_name).expanduser().resolve()
+    )
+    checkpoint_config_path = (
+        checkpoint_path.parent / 'config.json'
+        if checkpoint_path is not None
+        else None
+    )
+    checkpoint_sha256 = (
+        None if checkpoint_path is None else manifest_sha256(checkpoint_path)
+    )
+    checkpoint_config_sha256 = (
+        None
+        if checkpoint_config_path is None
+        else manifest_sha256(checkpoint_config_path)
+    )
+    threshold_artifact = None
+    threshold_provenance = None
+    if find_goal_threshold_path is not None:
+        if checkpoint_sha256 is None:
+            raise ValueError(
+                'find-goal-threshold self-eval requires its trained '
+                'checkpoint, not a random policy'
+            )
+        threshold_artifact, threshold_provenance = load_and_validate_threshold(
+            find_goal_threshold_path,
+            task=clear_manifest['task'],
+            checkpoint_sha256=checkpoint_sha256,
+            checkpoint_config_sha256=checkpoint_config_sha256,
+        )
+    results_path = prepare_results_path(cfg)
     use_pixels = policy_name != 'random' or bool(cfg.eval.video)
     cfg.world.max_episode_steps = 2 * cfg.eval.eval_budget
     world = swm.World(
@@ -209,9 +263,7 @@ def run(cfg: DictConfig):
     }
 
     keys_to_load = (
-        None
-        if use_pixels
-        else non_pixel_hdf5_keys(cfg.eval.dataset_name)
+        None if use_pixels else non_pixel_hdf5_keys(cfg.eval.dataset_name)
     )
     dataset = get_dataset(
         cfg, cfg.eval.dataset_name, keys_to_load=keys_to_load
@@ -248,6 +300,21 @@ def run(cfg: DictConfig):
         model = model.eval()
         model.requires_grad_(False)
         model.interpolate_pos_encoding = True
+        if threshold_artifact is not None:
+            model_parameter_hash = parameter_hash(model)
+            expected_parameter_hashes = set(
+                threshold_artifact[
+                    'encoder_projector_parameter_hashes'
+                ].values()
+            )
+            if model_parameter_hash not in expected_parameter_hashes:
+                raise ValueError(
+                    'find-goal-threshold encoder/projector parameter hash '
+                    'does not match the locked artifact'
+                )
+            threshold_provenance[
+                'encoder_projector_parameter_hash_before_evaluation'
+            ] = model_parameter_hash
         if cfg.get('compile', False):
             encoder_attr = (
                 'backbone' if hasattr(model, 'backbone') else 'encoder'
@@ -277,9 +344,7 @@ def run(cfg: DictConfig):
             num_samples=cfg.eval.num_eval,
             seed=cfg.seed,
         )
-        eval_episodes = dataset.get_col_data(col_name)[
-            random_episode_indices
-        ]
+        eval_episodes = dataset.get_col_data(col_name)[random_episode_indices]
         eval_start_idx = dataset.get_col_data('step_idx')[
             random_episode_indices
         ]
@@ -345,6 +410,9 @@ def run(cfg: DictConfig):
                     cfg.eval.get('callables'), resolve=True
                 ),
                 video=video_path,
+                render_pixels=(
+                    'always' if threshold_artifact is not None else None
+                ),
             )
         print('Warmup done.')
 
@@ -360,8 +428,62 @@ def run(cfg: DictConfig):
                 cfg.eval.get('callables'), resolve=True
             ),
             video=video_path,
+            render_pixels=(
+                'always' if threshold_artifact is not None else None
+            ),
         )
     end_time = time.time()
+
+    find_goal_threshold_self_eval = None
+    if threshold_artifact is not None:
+        self_eval_started = time.time()
+        find_goal_threshold_self_eval = evaluate_endpoints(
+            model,
+            world.infos['pixels'],
+            world.infos['goal'],
+            metrics['episode_successes'],
+            epsilon=float(threshold_artifact['epsilon']),
+            pair_ids=[pair['pair_id'] for pair in clear_manifest['pairs']],
+        )
+        find_goal_threshold_self_eval.update(
+            {
+                'task': clear_manifest['task'],
+                'clear_protocol': clear_manifest['protocol']['name'],
+                'threshold': threshold_provenance,
+                'endpoint_contract': {
+                    'observation': (
+                        'final executed observation at evaluator termination '
+                        'or the 50-step budget'
+                    ),
+                    'goal': 'fixed CLEAR manifest goal observation',
+                    'predicate': 'endpoint_latent_distance <= epsilon',
+                    'rendering': (
+                        'fresh pixels rendered after every environment step'
+                    ),
+                    'evaluator_label': (
+                        'CLEAR task predicate termination observed at any '
+                        'executed step'
+                    ),
+                },
+                'self_eval_time_seconds': time.time() - self_eval_started,
+            }
+        )
+        metrics['find_goal_threshold_self_eval'] = (
+            find_goal_threshold_self_eval['summary']
+        )
+        after_parameter_hash = parameter_hash(model)
+        if (
+            after_parameter_hash
+            != threshold_provenance[
+                'encoder_projector_parameter_hash_before_evaluation'
+            ]
+        ):
+            raise ValueError(
+                'encoder/projector parameters changed during CLEAR self-eval'
+            )
+        threshold_provenance[
+            'encoder_projector_parameter_hash_after_evaluation'
+        ] = after_parameter_hash
 
     print(metrics)
     if video_path is not None:
@@ -391,14 +513,6 @@ def run(cfg: DictConfig):
         return value
 
     completed = len(metrics['episode_successes'])
-    checkpoint_path = (
-        None if cfg.policy == 'random' else Path(cfg.policy).resolve()
-    )
-    checkpoint_config_path = (
-        checkpoint_path.parent / 'config.json'
-        if checkpoint_path is not None
-        else None
-    )
     checkpoint_source_path = (
         checkpoint_path.parent / 'source.json'
         if checkpoint_path is not None
@@ -412,20 +526,10 @@ def run(cfg: DictConfig):
     )
     structured = {
         'checkpoint': (
-            'random'
-            if checkpoint_path is None
-            else str(checkpoint_path)
+            'random' if checkpoint_path is None else str(checkpoint_path)
         ),
-        'checkpoint_sha256': (
-            None
-            if checkpoint_path is None
-            else manifest_sha256(checkpoint_path)
-        ),
-        'checkpoint_config_sha256': (
-            None
-            if checkpoint_config_path is None
-            else manifest_sha256(checkpoint_config_path)
-        ),
+        'checkpoint_sha256': checkpoint_sha256,
+        'checkpoint_config_sha256': checkpoint_config_sha256,
         'checkpoint_provenance': checkpoint_provenance,
         'dataset': str(Path(cfg.eval.dataset_name).resolve()),
         'seed': int(cfg.seed),
@@ -435,6 +539,9 @@ def run(cfg: DictConfig):
         'sampled_episode_indices': eval_episodes.tolist(),
         'sampled_start_steps': eval_start_idx.tolist(),
         'metrics': jsonable(metrics),
+        'find_goal_threshold_self_eval': jsonable(
+            find_goal_threshold_self_eval
+        ),
         'evaluation_time_seconds': end_time - start_time,
         'evaluation_time_per_trajectory_seconds': (
             (end_time - start_time) / completed

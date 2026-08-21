@@ -1,10 +1,10 @@
-"""Run Experiment T with fit/validation/lock/audit access boundaries.
+"""Run find-goal-threshold with fit/validation/lock/audit boundaries.
 
 Example smoke:
 
     python -m scripts.experiments.observation_goal_threshold.run \
       --config scripts/experiments/observation_goal_threshold/configs/pusht.json \
-      --run-dir /tmp/experiment-t-pusht-smoke --smoke
+      --run-dir /tmp/find-goal-threshold-pusht-smoke --smoke
 """
 
 from __future__ import annotations
@@ -21,6 +21,7 @@ from typing import Any
 import numpy as np
 
 from .contracts import LABEL_NAMES, TaskContract
+from .curve_plot import plot_epsilon_tpr_fpr
 from .encode import encode_observations, score_pair_shards
 from .io_utils import (
     git_provenance,
@@ -647,6 +648,9 @@ def _lock_threshold(
         'dtype': config['preprocessing']['dtype'],
         'encoder_checkpoint_path': config['checkpoint']['path'],
         'encoder_checkpoint_sha256': config['checkpoint']['sha256'],
+        'encoder_checkpoint_config_sha256': config['checkpoint'][
+            'config_sha256'
+        ],
         'encoder_checkpoint_provenance': config['checkpoint']['provenance'],
         'encoder_projector_parameter_hashes': {
             'before': embeddings['encoder_projector_parameter_hash_before'],
@@ -764,7 +768,7 @@ def _report_success(
 ) -> str:
     task = config['task']
     lines = [
-        f'# Experiment T report: {task}',
+        f'# find-goal-threshold report: {task}',
         '',
         f'- Status: **PROMOTABLE for `{config["task_label"]["variant"]}` only**',
         f'- Locked threshold epsilon: `{artifact["epsilon"]:.10g}` mean-D latent MSE',
@@ -834,7 +838,7 @@ def _report_failure(
 ) -> None:
     report = '\n'.join(
         [
-            f'# Experiment T report: {config["task"]}',
+            f'# find-goal-threshold report: {config["task"]}',
             '',
             f'- Status: **{outcome.code}**',
             f'- Stage: `{stage}`',
@@ -914,6 +918,18 @@ def run_experiment(config_path: Path, run_dir: Path, smoke: bool) -> None:
             fit['task_stratified'], fit['uniform'], **_selection_kwargs(config)
         )
     except CalibrationOutcome as outcome:
+        write_json(
+            run_dir / 'epsilon_tpr_fpr_curve.json',
+            plot_epsilon_tpr_fpr(
+                fit['task_stratified'],
+                run_dir / 'epsilon_tpr_fpr_curve.png',
+                task=config['task'],
+                selected_epsilon=None,
+                min_positive_recall=config['selection']['min_positive_recall'],
+                max_negative_fpr=config['selection']['max_negative_fpr'],
+                status=outcome.code,
+            ),
+        )
         timings['fit_score_and_select'] = time.monotonic() - start
         timings['total'] = time.monotonic() - total_started
         write_json(run_dir / 'timing.json', timings)
@@ -921,6 +937,18 @@ def run_experiment(config_path: Path, run_dir: Path, smoke: bool) -> None:
         return
     _write_candidates(
         run_dir / 'threshold_candidates.parquet', selection.candidates
+    )
+    write_json(
+        run_dir / 'epsilon_tpr_fpr_curve.json',
+        plot_epsilon_tpr_fpr(
+            fit['task_stratified'],
+            run_dir / 'epsilon_tpr_fpr_curve.png',
+            task=config['task'],
+            selected_epsilon=selection.epsilon,
+            min_positive_recall=config['selection']['min_positive_recall'],
+            max_negative_fpr=config['selection']['max_negative_fpr'],
+            status='FIT_SELECTED_PENDING_VALIDATION',
+        ),
     )
     fit_metrics = _analyze_partition(
         fit, selection.epsilon, config, seed_offset=0
@@ -961,6 +989,18 @@ def run_experiment(config_path: Path, run_dir: Path, smoke: bool) -> None:
     try:
         enforce_validation(validation_metrics, **_selection_kwargs(config))
     except CalibrationOutcome as outcome:
+        write_json(
+            run_dir / 'epsilon_tpr_fpr_curve.json',
+            plot_epsilon_tpr_fpr(
+                fit['task_stratified'],
+                run_dir / 'epsilon_tpr_fpr_curve.png',
+                task=config['task'],
+                selected_epsilon=selection.epsilon,
+                min_positive_recall=config['selection']['min_positive_recall'],
+                max_negative_fpr=config['selection']['max_negative_fpr'],
+                status=outcome.code,
+            ),
+        )
         timings['validation'] = time.monotonic() - start
         timings['total'] = time.monotonic() - total_started
         write_json(run_dir / 'timing.json', timings)
@@ -998,6 +1038,18 @@ def run_experiment(config_path: Path, run_dir: Path, smoke: bool) -> None:
 
     start = time.monotonic()
     _plot_outputs(run_dir, selection, fit, audit, epsilon_distribution)
+    write_json(
+        run_dir / 'epsilon_tpr_fpr_curve.json',
+        plot_epsilon_tpr_fpr(
+            fit['task_stratified'],
+            run_dir / 'epsilon_tpr_fpr_curve.png',
+            task=config['task'],
+            selected_epsilon=selection.epsilon,
+            min_positive_recall=config['selection']['min_positive_recall'],
+            max_negative_fpr=config['selection']['max_negative_fpr'],
+            status='PROMOTABLE',
+        ),
+    )
     timings['plots_and_report'] = time.monotonic() - start
     timings['total'] = time.monotonic() - total_started
     write_json(run_dir / 'timing.json', timings)
