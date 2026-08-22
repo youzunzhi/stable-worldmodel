@@ -15,3 +15,8 @@ The formal gate order is:
 
 Every command refuses incompatible inputs or existing formal targets.  Smoke
 artifacts explicitly record `formal_evidence=false` and cannot be promoted.
+
+The completed formal results are documented in the
+[experiment report](../../../SELF_SUPERVISED_PLANNABILITY_REPORT.md), with exact
+machine-readable values in
+[the results summary](../../../SELF_SUPERVISED_PLANNABILITY_RESULTS.json).
