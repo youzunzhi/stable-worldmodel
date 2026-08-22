@@ -1,0 +1,58 @@
+{
+  "protocol_id": "self-supervised-plannability-v1",
+  "task": "cube",
+  "base_revision": "83f229b267f1c6be229546cb2bec93cbb253d5cf",
+  "epsilon_task": 1.0,
+  "basis_seed": 26082202,
+  "replicate_seeds": [260822, 260823, 260824],
+  "dataset": {
+    "path": "/public/home/xsy0001/workspace/data/stable-worldmodel/hf/datasets/quentinll--lewm-cube/02a19a67a0dc8c9d6215f89c19e0a597691e152a/cube_single_expert.h5",
+    "expected_bytes": 101942558720,
+    "repository": "quentinll/lewm-cube",
+    "revision": "02a19a67a0dc8c9d6215f89c19e0a597691e152a",
+    "pixels_column": "pixels",
+    "episode_column": "ep_idx",
+    "step_column": "step_idx",
+    "group_rule": "episode"
+  },
+  "checkpoint": {
+    "path": "/public/home/xsy0001/workspace/code/stable-worldmodel/outputs/worktrees/lewm-dagger/outputs/experiments/lewm-dagger-r1-cube-tworoom-v2-73e9902d/cube/seed-3072/runtime/checkpoints/lewm-dagger-cube-m0-seed3072/weights_epoch_10.pt",
+    "sha256": "eece65ce87e451d8ee953d83da0c566f77ad2d8f8f6ee5e77f7ddbae5bedf883",
+    "config_sha256": "86f2ed24c61b48354416c23af51aa51279ae28a33cb36b7ebc3d057eec2b8c0d"
+  },
+  "clear_manifests": [
+    "results/clear_eval/v0.5/manifests/cube/moderate-seed42-n100.json",
+    "results/clear_eval/v0.5/manifests/cube/strict-seed42-n100.json"
+  ],
+  "runtime": {"encode_batch_size": 128},
+  "locked": {
+    "latent_dim": 192,
+    "parameter_dim": 16,
+    "goal_offset": 25,
+    "split_seed": 260822,
+    "split_fractions": [0.7, 0.15, 0.15],
+    "train_pairs": 800,
+    "validation_pairs": 256,
+    "test_pairs": 512,
+    "batch_size": 1,
+    "num_samples": 300,
+    "n_steps": 30,
+    "topk": 30,
+    "var_scale": 1.0,
+    "horizon": 5,
+    "receding_horizon": 5,
+    "action_block": 5,
+    "outer_pair_batch": 16,
+    "directions": 8,
+    "sigma": 0.25,
+    "learning_rate": 0.05,
+    "adam_betas": [0.9, 0.999],
+    "adam_epsilon": 1e-8,
+    "outer_steps": 50,
+    "checkpoint_interval": 5,
+    "validation_interval": 5,
+    "validation_seed": 26082290,
+    "bootstrap_replicates": 10000,
+    "analysis_seed": 20260822
+  }
+}

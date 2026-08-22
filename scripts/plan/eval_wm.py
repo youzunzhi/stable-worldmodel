@@ -12,11 +12,6 @@ import hydra
 import numpy as np
 import stable_pretraining as spt
 import torch
-from omegaconf import DictConfig, OmegaConf
-from sklearn import preprocessing
-from torchvision.transforms import v2 as transforms
-import stable_worldmodel as swm
-
 from clear_protocol import (
     CLEAR_LEWM_REVISION,
     CLEAR_LEWM_VERSION,
@@ -30,6 +25,11 @@ from clear_protocol import (
     validate_policy_seed,
     validate_solver_config,
 )
+from omegaconf import DictConfig, OmegaConf
+from sklearn import preprocessing
+from torchvision.transforms import v2 as transforms
+
+import stable_worldmodel as swm
 
 
 def img_transform(cfg, dtype=torch.float32):
@@ -92,7 +92,7 @@ def non_pixel_hdf5_keys(dataset_name):
     with h5py.File(path, 'r') as dataset:
         return [
             key
-            for key in dataset.keys()
+            for key in dataset
             if key not in ('ep_len', 'ep_offset')
             and not key.startswith('pixels')
         ]
@@ -153,6 +153,7 @@ def sample_evaluation_starts(
 @hydra.main(version_base=None, config_path='./config', config_name='pusht')
 def run(cfg: DictConfig):
     """Run evaluation of dinowm vs random policy."""
+    ssp_provenance = None
     clear_manifest_path = cfg.eval.get('manifest')
     solver_ablation = bool(cfg.eval.get('solver_ablation', False))
     clear_solver_contract_matched = None
@@ -257,7 +258,42 @@ def run(cfg: DictConfig):
             )
             model.predictor = torch.compile(model.predictor)
         config = swm.PlanConfig(**cfg.plan_config)
-        objective = hydra.utils.instantiate(cfg.objective)
+        ssp_geometry_path = cfg.get('ssp', {}).get('geometry')
+        if ssp_geometry_path:
+            from scripts.experiments.self_supervised_plannability.contracts import (
+                PROTOCOL_ID as SSP_PROTOCOL_ID,
+            )
+            from scripts.experiments.self_supervised_plannability.geometry import (
+                DiagonalSearchCost,
+            )
+
+            geometry_path = Path(ssp_geometry_path).expanduser().resolve()
+            basis_path = Path(cfg.ssp.basis).expanduser().resolve()
+            geometry = torch.load(
+                geometry_path, map_location='cpu', weights_only=True
+            )
+            if geometry.get('protocol_id') != SSP_PROTOCOL_ID:
+                raise ValueError('SSP geometry protocol mismatch')
+            if clear_manifest is not None and (
+                geometry.get('task') != clear_manifest['task']
+            ):
+                raise ValueError('SSP geometry task does not match CLEAR task')
+            basis = torch.from_numpy(np.load(basis_path)).float()
+            objective = DiagonalSearchCost(basis, geometry['center'].float())
+            ssp_provenance = {
+                'protocol_id': SSP_PROTOCOL_ID,
+                'geometry_path': str(geometry_path),
+                'geometry_sha256': manifest_sha256(geometry_path),
+                'basis_path': str(basis_path),
+                'basis_sha256': manifest_sha256(basis_path),
+                'task': geometry['task'],
+                'replicate_seed': int(geometry['replicate_seed']),
+                'selected_step': int(geometry['step']),
+                'center': geometry['center'].tolist(),
+                'replaces_terminal_ranking_cost_only': True,
+            }
+        else:
+            objective = hydra.utils.instantiate(cfg.objective)
         cost = swm.planning.ShootingCostEvaluator(model, objective)
         solver = hydra.utils.instantiate(cfg.solver, cost=cost)
         policy = swm.policy.WorldModelPolicy(
@@ -456,6 +492,7 @@ def run(cfg: DictConfig):
             and clear_manifest['task'] == 'tworoom'
             else None
         ),
+        'self_supervised_plannability': ssp_provenance,
         'resolved_config': OmegaConf.to_container(cfg, resolve=True),
     }
     structured_path = results_path.with_suffix(results_path.suffix + '.json')

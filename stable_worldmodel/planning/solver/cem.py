@@ -1,6 +1,7 @@
 """Cross Entropy Method solver for model-based planning."""
 
 import time
+from collections.abc import Callable
 from typing import Any
 
 import gymnasium as gym
@@ -9,9 +10,9 @@ import torch
 from gymnasium.spaces import Box
 from loguru import logger as logging
 
-from .utils import prepare_init_action
 from .callbacks import Callback
 from .solver import Costable
+from .utils import prepare_init_action
 
 
 class CEMSolver:
@@ -39,6 +40,9 @@ class CEMSolver:
         device: str | torch.device = 'cpu',
         seed: int = 1234,
         callbacks: list[Callback] | None = None,
+        candidate_noise: Callable[..., torch.Tensor] | None = None,
+        iteration_observer: Callable[..., None] | None = None,
+        log_timing: bool = True,
     ) -> None:
         self.cost = cost
         self.batch_size = batch_size
@@ -49,6 +53,9 @@ class CEMSolver:
         self.device = device
         self.torch_gen = torch.Generator(device=device).manual_seed(seed)
         self.callbacks = list(callbacks) if callbacks else []
+        self.candidate_noise = candidate_noise
+        self.iteration_observer = iteration_observer
+        self.log_timing = bool(log_timing)
         try:
             self._dtype = next(cost.parameters()).dtype
         except (AttributeError, StopIteration):
@@ -147,6 +154,10 @@ class CEMSolver:
 
         for cb in self.callbacks:
             cb.reset()
+        if self.iteration_observer is not None:
+            reset = getattr(self.iteration_observer, 'reset', None)
+            if callable(reset):
+                reset()
 
         # --- Iterate over batches ---
         for start_idx in range(0, total_envs, self.batch_size):
@@ -185,18 +196,64 @@ class CEMSolver:
 
             for cb in self.callbacks:
                 cb.start_batch()
+            if self.iteration_observer is not None:
+                start_batch = getattr(
+                    self.iteration_observer, 'start_batch', None
+                )
+                if callable(start_batch):
+                    start_batch(start_idx=start_idx, end_idx=end_idx)
 
             for step in range(self.n_steps):
                 # Sample action sequences: (Batch, Num_Samples, Horizon, Dim)
-                candidates = torch.randn(
+                noise_shape = (
                     current_bs,
                     self.num_samples,
                     self.horizon,
                     self.action_dim,
-                    generator=self.torch_gen,
-                    device=self.device,
-                    dtype=self.dtype,
                 )
+                if self.candidate_noise is None:
+                    candidates = torch.randn(
+                        *noise_shape,
+                        generator=self.torch_gen,
+                        device=self.device,
+                        dtype=self.dtype,
+                    )
+                else:
+                    candidates = self.candidate_noise(
+                        step=step,
+                        batch_start=start_idx,
+                        shape=noise_shape,
+                        device=torch.device(self.device),
+                        dtype=self.dtype,
+                    )
+                    if not torch.is_tensor(candidates):
+                        raise TypeError(
+                            'candidate_noise must return a torch.Tensor'
+                        )
+                    if tuple(candidates.shape) != noise_shape:
+                        raise ValueError(
+                            'candidate_noise returned shape '
+                            f'{tuple(candidates.shape)}, expected {noise_shape}'
+                        )
+                    expected_device = torch.device(self.device)
+                    device_mismatch = (
+                        candidates.device.type != expected_device.type
+                        or (
+                            expected_device.index is not None
+                            and candidates.device.index
+                            != expected_device.index
+                        )
+                    )
+                    if device_mismatch:
+                        raise ValueError(
+                            'candidate_noise returned a tensor on '
+                            f'{candidates.device}, expected {self.device}'
+                        )
+                    if candidates.dtype != self.dtype:
+                        raise ValueError(
+                            'candidate_noise returned dtype '
+                            f'{candidates.dtype}, expected {self.dtype}'
+                        )
 
                 # Scale and shift: (Batch, N, H, D) * (Batch, 1, H, D) + (Batch, 1, H, D)
                 candidates = candidates * batch_var.unsqueeze(
@@ -207,7 +264,23 @@ class CEMSolver:
                 candidates[:, 0] = batch_mean
 
                 # Evaluate candidates
-                costs = self.cost.get_cost(expanded_infos, candidates)
+                if self.iteration_observer is None:
+                    costs = self.cost.get_cost(expanded_infos, candidates)
+                else:
+                    evaluate = getattr(
+                        self.cost, 'get_cost_and_diagnostics', None
+                    )
+                    if not callable(evaluate):
+                        raise TypeError(
+                            'iteration_observer requires cost to expose '
+                            'get_cost_and_diagnostics'
+                        )
+                    costs, diagnostics = evaluate(expanded_infos, candidates)
+                    self.iteration_observer(
+                        step=step,
+                        batch_start=start_idx,
+                        diagnostics=diagnostics,
+                    )
 
                 assert isinstance(costs, torch.Tensor), (
                     f'Expected cost to be a torch.Tensor, got {type(costs)}'
@@ -278,6 +351,11 @@ class CEMSolver:
             for cb in self.callbacks:
                 cb.end_solve()
                 outputs['callbacks'][cb.output_key] = cb.history
+        if self.iteration_observer is not None:
+            end_solve = getattr(self.iteration_observer, 'end_solve', None)
+            if callable(end_solve):
+                outputs['iteration_observer'] = end_solve()
 
-        print(f'CEM solve time: {time.time() - start_time:.4f} seconds')
+        if self.log_timing:
+            print(f'CEM solve time: {time.time() - start_time:.4f} seconds')
         return outputs

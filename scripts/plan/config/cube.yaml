@@ -62,6 +62,10 @@ eval:
         target_quat:
           value: goal_privileged_block_0_quat
 
+ssp:
+  geometry: null
+  basis: null
+
 output:
   dir: null
   filename: ogb_cube_results.txt

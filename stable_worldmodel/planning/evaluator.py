@@ -74,12 +74,14 @@ class ShootingCostEvaluator(torch.nn.Module):
         constraints: list[Objective] | None = None,
         encode_goal: Callable[[Dynamics, dict], torch.Tensor]
         | None = default_goal_encode,
+        diagnostic: Callable[[dict], dict[str, torch.Tensor]] | None = None,
     ) -> None:
         super().__init__()
         self.model = model
         self.objective = objective
         self.constraints = constraints
         self.encode_goal = encode_goal
+        self.diagnostic = diagnostic
         self.supports_goal_cache = encode_goal is not None
         self._goal_cache: dict[int, torch.Tensor] = {}
         if constraints:
@@ -162,6 +164,32 @@ class ShootingCostEvaluator(torch.nn.Module):
         """Encode goal (if needed), roll out candidates, then score them."""
         info_dict = self._rollout(info_dict, action_candidates)
         return self.objective(info_dict)
+
+    def get_cost_and_diagnostics(
+        self, info_dict: dict, action_candidates: torch.Tensor
+    ) -> tuple[torch.Tensor, dict[str, torch.Tensor]]:
+        """Roll out once and return ranking cost plus detached diagnostics.
+
+        The optional diagnostic is intentionally read-only from the solver's
+        perspective: its tensors are detached before they leave the evaluator
+        and cannot replace the objective used for elite ranking.  Keeping this
+        as a separate opt-in method preserves the ordinary ``get_cost`` path.
+        """
+        if self.diagnostic is None:
+            raise RuntimeError(
+                'get_cost_and_diagnostics requires a configured diagnostic'
+            )
+        info_dict = self._rollout(info_dict, action_candidates)
+        costs = self.objective(info_dict)
+        diagnostics = self.diagnostic(info_dict)
+        if not isinstance(diagnostics, dict):
+            raise TypeError('diagnostic must return a dictionary')
+        detached = {}
+        for name, value in diagnostics.items():
+            if not torch.is_tensor(value):
+                raise TypeError(f'diagnostic {name!r} must be a torch.Tensor')
+            detached[name] = value.detach()
+        return costs, detached
 
     def _get_constraints(
         self, info_dict: dict, action_candidates: torch.Tensor

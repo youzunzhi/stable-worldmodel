@@ -53,6 +53,10 @@ eval:
 compile: false
 bf16: false
 
+ssp:
+  geometry: null
+  basis: null
+
 output:
   dir: null
   filename: pusht_results.txt
