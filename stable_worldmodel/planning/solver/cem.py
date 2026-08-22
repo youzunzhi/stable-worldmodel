@@ -41,7 +41,11 @@ class CEMSolver:
         seed: int = 1234,
         callbacks: list[Callback] | None = None,
         candidate_noise: Callable[..., torch.Tensor] | None = None,
+        candidate_transform: Callable[[torch.Tensor], torch.Tensor]
+        | None = None,
         iteration_observer: Callable[..., None] | None = None,
+        verified_hit_key: str | None = None,
+        return_best_evaluated: bool = False,
         log_timing: bool = True,
     ) -> None:
         self.cost = cost
@@ -54,7 +58,17 @@ class CEMSolver:
         self.torch_gen = torch.Generator(device=device).manual_seed(seed)
         self.callbacks = list(callbacks) if callbacks else []
         self.candidate_noise = candidate_noise
+        self.candidate_transform = candidate_transform
         self.iteration_observer = iteration_observer
+        self.verified_hit_key = verified_hit_key
+        self.return_best_evaluated = bool(return_best_evaluated)
+        if (
+            self.verified_hit_key is not None
+            and self.iteration_observer is None
+        ):
+            raise ValueError(
+                'verified-hit selection requires an iteration observer'
+            )
         self.log_timing = bool(log_timing)
         try:
             self._dtype = next(cost.parameters()).dtype
@@ -133,6 +147,9 @@ class CEMSolver:
             'mean': [],  # History of means
             'var': [],  # History of vars
         }
+        returned_actions = []
+        returned_verified_hits = []
+        return_modes = []
 
         # Batch size is taken from info_dict so callers can solve for a subset of envs
         total_envs = len(next(iter(info_dict.values())))
@@ -193,6 +210,18 @@ class CEMSolver:
 
             # Optimization Loop
             final_batch_cost = None
+            best_cost = torch.full(
+                (current_bs,),
+                float('inf'),
+                device=self.device,
+                dtype=self.dtype,
+            )
+            best_actions = torch.zeros_like(batch_mean)
+            archive_cost = torch.full_like(best_cost, float('inf'))
+            archive_actions = torch.zeros_like(batch_mean)
+            archive_found = torch.zeros(
+                current_bs, device=self.device, dtype=torch.bool
+            )
 
             for cb in self.callbacks:
                 cb.start_batch()
@@ -262,6 +291,19 @@ class CEMSolver:
 
                 # Force the first sample to be the current mean
                 candidates[:, 0] = batch_mean
+                if self.candidate_transform is not None:
+                    transformed = self.candidate_transform(candidates)
+                    if not torch.is_tensor(transformed):
+                        raise TypeError(
+                            'candidate_transform must return a torch.Tensor'
+                        )
+                    if transformed.shape != candidates.shape:
+                        raise ValueError(
+                            'candidate_transform changed candidate shape from '
+                            f'{tuple(candidates.shape)} to '
+                            f'{tuple(transformed.shape)}'
+                        )
+                    candidates = transformed
 
                 # Evaluate candidates
                 if self.iteration_observer is None:
@@ -282,6 +324,18 @@ class CEMSolver:
                         diagnostics=diagnostics,
                     )
 
+                current_vals, current_inds = costs.min(dim=1)
+                current_actions = candidates[
+                    torch.arange(current_bs, device=self.device), current_inds
+                ]
+                replace_best = current_vals < best_cost
+                best_cost = torch.where(replace_best, current_vals, best_cost)
+                best_actions = torch.where(
+                    replace_best[:, None, None],
+                    current_actions,
+                    best_actions,
+                )
+
                 assert isinstance(costs, torch.Tensor), (
                     f'Expected cost to be a torch.Tensor, got {type(costs)}'
                 )
@@ -295,9 +349,67 @@ class CEMSolver:
 
                 # Select Top-K
                 # topk_vals: (Batch, K), topk_inds: (Batch, K)
-                topk_vals, topk_inds = torch.topk(
-                    costs, k=self.topk, dim=1, largest=False
+                hit_bits = None
+                if self.verified_hit_key is not None:
+                    hit_bits = diagnostics.get(self.verified_hit_key)
+                    if (
+                        not torch.is_tensor(hit_bits)
+                        or hit_bits.dtype != torch.bool
+                        or hit_bits.shape != costs.shape
+                    ):
+                        raise ValueError(
+                            f'diagnostic {self.verified_hit_key!r} must be a '
+                            'boolean tensor matching costs'
+                        )
+                    hit_costs = costs.masked_fill(~hit_bits, float('inf'))
+                    iteration_hit_cost, iteration_hit_ind = hit_costs.min(
+                        dim=1
+                    )
+                    iteration_has_hit = torch.isfinite(iteration_hit_cost)
+                    iteration_hit_actions = candidates[
+                        torch.arange(current_bs, device=self.device),
+                        iteration_hit_ind,
+                    ]
+                    replace_archive = iteration_has_hit & (
+                        iteration_hit_cost < archive_cost
+                    )
+                    archive_cost = torch.where(
+                        replace_archive, iteration_hit_cost, archive_cost
+                    )
+                    archive_actions = torch.where(
+                        replace_archive[:, None, None],
+                        iteration_hit_actions,
+                        archive_actions,
+                    )
+                    archive_found |= iteration_has_hit
+
+                    # Stable two-pass ordering implements the exact tuple
+                    # ``(not hit, cost, candidate index)`` without relying on
+                    # an arbitrary large numeric penalty.
+                    cost_order = torch.argsort(costs, dim=1, stable=True)
+                    ordered_hits = hit_bits.gather(1, cost_order)
+                    priority_order = torch.argsort(
+                        (~ordered_hits).to(torch.int8), dim=1, stable=True
+                    )
+                    topk_inds = cost_order.gather(1, priority_order)[
+                        :, : self.topk
+                    ]
+                    topk_vals = costs.gather(1, topk_inds)
+                else:
+                    topk_vals, topk_inds = torch.topk(
+                        costs, k=self.topk, dim=1, largest=False
+                    )
+
+                after_selection = getattr(
+                    self.iteration_observer, 'after_selection', None
                 )
+                if callable(after_selection):
+                    after_selection(
+                        step=step,
+                        batch_start=start_idx,
+                        diagnostics=diagnostics,
+                        topk_inds=topk_inds,
+                    )
 
                 # Gather Top-K Candidates
                 # We need to select the specific candidates corresponding to topk_inds
@@ -339,10 +451,41 @@ class CEMSolver:
             mean[start_idx:end_idx] = batch_mean
             var[start_idx:end_idx] = batch_var
 
+            if self.verified_hit_key is not None:
+                selected = torch.where(
+                    archive_found[:, None, None],
+                    archive_actions,
+                    best_actions,
+                )
+                returned_actions.append(selected.detach().cpu())
+                returned_verified_hits.extend(
+                    archive_found.detach().cpu().tolist()
+                )
+                return_modes.extend(
+                    [
+                        'verified_hit_archive'
+                        if bool(value)
+                        else 'best_evaluated_candidate'
+                        for value in archive_found.detach().cpu().tolist()
+                    ]
+                )
+            elif self.return_best_evaluated:
+                returned_actions.append(best_actions.detach().cpu())
+                returned_verified_hits.extend([False] * current_bs)
+                return_modes.extend(['best_evaluated_candidate'] * current_bs)
+
             # Store history/metadata
             outputs['costs'].extend(final_batch_cost)
 
-        outputs['actions'] = mean.detach().cpu()
+        outputs['distribution_mean'] = mean.detach().cpu()
+        outputs['actions'] = (
+            torch.cat(returned_actions, dim=0)
+            if returned_actions
+            else mean.detach().cpu()
+        )
+        if returned_actions:
+            outputs['returned_verified_hit'] = returned_verified_hits
+            outputs['return_mode'] = return_modes
         outputs['mean'] = [mean.detach().cpu()]
         outputs['var'] = [var.detach().cpu()]
 

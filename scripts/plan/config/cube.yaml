@@ -63,8 +63,11 @@ eval:
           value: goal_privileged_block_0_quat
 
 ssp:
+  version: 1
   geometry: null
   basis: null
+  action_stats: null
+  identity: false
 
 output:
   dir: null

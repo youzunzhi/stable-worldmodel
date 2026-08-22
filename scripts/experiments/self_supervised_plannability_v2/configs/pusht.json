@@ -1,0 +1,87 @@
+{
+  "protocol_id": "self-supervised-plannability-v2",
+  "task": "pusht",
+  "epsilon_task": 1.5,
+  "action_effect_seed": 26082211,
+  "replicate_seeds": [
+    260822,
+    260823,
+    260824
+  ],
+  "dataset": {
+    "path": "/public/home/xsy0001/workspace/data/stable-worldmodel/hf/datasets/quentinll--lewm-pusht/655cd446b9929369d7d406001da85c15d1457850/pusht_expert_train.h5",
+    "expected_bytes": 46300921856,
+    "repository": "quentinll/lewm-pusht",
+    "revision": "655cd446b9929369d7d406001da85c15d1457850",
+    "pixels_column": "pixels",
+    "action_column": "action",
+    "episode_column": "episode_idx",
+    "step_column": "step_idx",
+    "group_rule": "episode_idx // 101"
+  },
+  "checkpoint": {
+    "path": "/public/home/xsy0001/workspace/code/stable-worldmodel/outputs/worktrees/lewm-dagger-pusht/outputs/experiments/lewm-dagger-pusht-v3/runs/checkpoints/lewm-dagger-pusht-m0-seed3072/weights_epoch_10.pt",
+    "sha256": "e4f14a2276918bcb34876fb8d86d16dbd8683ae6077a13a2275dee008a68c775",
+    "config_sha256": "c4a21dab4e6ab5803e9ae159bc7345104e4fe083116580fa5719357aea0af5b8"
+  },
+  "clear_manifests": [
+    "results/clear_eval/v0.5/manifests/pusht/moderate-seed42-n100.json",
+    "results/clear_eval/v0.5/manifests/pusht/strict-seed42-n100.json"
+  ],
+  "runtime": {
+    "encode_batch_size": 128,
+    "action_effect_batch_size": 64
+  },
+  "locked": {
+    "latent_dim": 192,
+    "parameter_dim": 32,
+    "goal_offset": 25,
+    "split_seed": 260822,
+    "split_fractions": [
+      0.7,
+      0.15,
+      0.15
+    ],
+    "train_pairs": 800,
+    "validation_pairs": 256,
+    "test_pairs": 512,
+    "batch_size": 1,
+    "num_samples": 300,
+    "n_steps": 30,
+    "topk": 30,
+    "var_scale": 1,
+    "horizon": 5,
+    "receding_horizon": 5,
+    "action_block": 5,
+    "trajectory_hit_horizon": 5,
+    "raw_action_low": -1,
+    "raw_action_high": 1,
+    "action_effect_sigma": 0.5,
+    "late_hit_iterations": 5,
+    "hit_mass_beta": 0.25,
+    "outer_pair_batch": 32,
+    "directions": 16,
+    "planner_tapes": 2,
+    "sigma": 0.5,
+    "learning_rate": 0.03,
+    "adam_betas": [
+      0.9,
+      0.999
+    ],
+    "adam_epsilon": 1e-8,
+    "epochs": 4,
+    "outer_steps": 100,
+    "checkpoint_interval": 10,
+    "validation_interval": 10,
+    "validation_seeds": [
+      42,
+      43,
+      44,
+      45,
+      46
+    ],
+    "selection_standard_errors": 1,
+    "bootstrap_replicates": 10000,
+    "analysis_seed": 20260822
+  }
+}

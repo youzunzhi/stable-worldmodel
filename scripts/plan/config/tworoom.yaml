@@ -53,8 +53,11 @@ compile: false
 bf16: false
 
 ssp:
+  version: 1
   geometry: null
   basis: null
+  action_stats: null
+  identity: false
 
 output:
   dir: null

@@ -258,8 +258,127 @@ def run(cfg: DictConfig):
             )
             model.predictor = torch.compile(model.predictor)
         config = swm.PlanConfig(**cfg.plan_config)
+        diagnostic = None
+        solver_kwargs = {}
+        ssp_version = int(cfg.get('ssp', {}).get('version', 1))
         ssp_geometry_path = cfg.get('ssp', {}).get('geometry')
-        if ssp_geometry_path:
+        ssp_v2_identity = bool(cfg.get('ssp', {}).get('identity', False))
+        if ssp_version == 2:
+            from scripts.experiments.self_supervised_plannability_v2.contracts import (
+                PROTOCOL_ID as SSP_V2_PROTOCOL_ID,
+            )
+            from scripts.experiments.self_supervised_plannability_v2.geometry import (
+                ClipConsistentActionTransform,
+                RotatedSearchCost,
+                TrajectoryHitDiagnostic,
+            )
+
+            if clear_manifest is None:
+                raise ValueError('SSP-v2 execution requires a CLEAR manifest')
+            torch.backends.cudnn.benchmark = False
+            torch.backends.cudnn.deterministic = True
+            torch.backends.cuda.matmul.allow_tf32 = False
+            torch.backends.cudnn.allow_tf32 = False
+            torch.use_deterministic_algorithms(True)
+            basis_path = Path(cfg.ssp.basis).expanduser().resolve()
+            action_stats_path = (
+                Path(cfg.ssp.action_stats).expanduser().resolve()
+            )
+            basis = torch.from_numpy(np.load(basis_path)).float()
+            action_stats = json.loads(action_stats_path.read_text())
+            process_mean = np.asarray(process['action'].mean_).reshape(-1)
+            process_std = np.asarray(process['action'].scale_).reshape(-1)
+            if not np.allclose(
+                process_mean,
+                np.asarray(action_stats['mean']),
+                rtol=0,
+                atol=1e-6,
+            ) or not np.allclose(
+                process_std,
+                np.asarray(action_stats['std']),
+                rtol=0,
+                atol=1e-6,
+            ):
+                raise ValueError(
+                    'SSP-v2 action statistics do not match evaluation '
+                    'normalization'
+                )
+            if ssp_v2_identity:
+                if ssp_geometry_path:
+                    raise ValueError(
+                        'SSP-v2 identity must not load a learned geometry'
+                    )
+                theta = torch.zeros(32)
+                geometry_path = None
+                geometry = None
+                geometry_task = clear_manifest['task']
+                replicate_seed = None
+                selected_step = 0
+            else:
+                if not ssp_geometry_path:
+                    raise ValueError('SSP-v2 learned arm requires geometry')
+                geometry_path = Path(ssp_geometry_path).expanduser().resolve()
+                geometry = torch.load(
+                    geometry_path, map_location='cpu', weights_only=True
+                )
+                if geometry.get('protocol_id') != SSP_V2_PROTOCOL_ID:
+                    raise ValueError('SSP-v2 geometry protocol mismatch')
+                geometry_task = geometry['task']
+                if geometry_task != clear_manifest['task']:
+                    raise ValueError(
+                        'SSP-v2 geometry task does not match CLEAR task'
+                    )
+                theta = geometry['center'].float()
+                replicate_seed = int(geometry['replicate_seed'])
+                selected_step = int(geometry['step'])
+            objective = RotatedSearchCost(basis, theta)
+            threshold = {'pusht': 1.5, 'cube': 1.0, 'tworoom': 1.5}[
+                clear_manifest['task']
+            ]
+            diagnostic = TrajectoryHitDiagnostic(threshold, config.horizon)
+
+            class _VerifiedHitExecutionObserver:
+                def __call__(self, **kwargs):
+                    del kwargs
+
+            solver_kwargs = {
+                'candidate_transform': ClipConsistentActionTransform(
+                    torch.tensor(action_stats['mean']),
+                    torch.tensor(action_stats['std']),
+                    action_block=config.action_block,
+                    raw_low=float(action_stats['raw_low']),
+                    raw_high=float(action_stats['raw_high']),
+                ),
+                'iteration_observer': _VerifiedHitExecutionObserver(),
+                'verified_hit_key': 'hit_bits',
+                'return_best_evaluated': True,
+            }
+            ssp_provenance = {
+                'protocol_id': SSP_V2_PROTOCOL_ID,
+                'geometry_mode': 'identity-zero-theta'
+                if ssp_v2_identity
+                else 'promoted-learned',
+                'geometry_path': (
+                    None if geometry_path is None else str(geometry_path)
+                ),
+                'geometry_sha256': (
+                    None
+                    if geometry_path is None
+                    else manifest_sha256(geometry_path)
+                ),
+                'basis_path': str(basis_path),
+                'basis_sha256': manifest_sha256(basis_path),
+                'action_stats_path': str(action_stats_path),
+                'action_stats_sha256': manifest_sha256(action_stats_path),
+                'task': geometry_task,
+                'replicate_seed': replicate_seed,
+                'selected_step': selected_step,
+                'center': theta.tolist(),
+                'verified_hit_archive': True,
+                'trajectory_aware_hit': True,
+                'clip_consistent_candidates': True,
+            }
+        elif ssp_geometry_path:
             from scripts.experiments.self_supervised_plannability.contracts import (
                 PROTOCOL_ID as SSP_PROTOCOL_ID,
             )
@@ -294,8 +413,12 @@ def run(cfg: DictConfig):
             }
         else:
             objective = hydra.utils.instantiate(cfg.objective)
-        cost = swm.planning.ShootingCostEvaluator(model, objective)
-        solver = hydra.utils.instantiate(cfg.solver, cost=cost)
+        cost = swm.planning.ShootingCostEvaluator(
+            model, objective, diagnostic=diagnostic
+        )
+        solver = hydra.utils.instantiate(
+            cfg.solver, cost=cost, **solver_kwargs
+        )
         policy = swm.policy.WorldModelPolicy(
             solver=solver, config=config, process=process, transform=transform
         )
