@@ -12,11 +12,11 @@ from scripts.plan.clear_protocol import (
     install_success_criterion,
     load_manifest,
     manifest_sha256,
+    reacher_joint_error,
     resolve_manifest_pairs,
     validate_policy_seed,
     validate_solver_config,
 )
-
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
@@ -46,6 +46,18 @@ def _manifest(task='pusht', protocol='moderate'):
             'cube_position_threshold_m': 0.03,
             'cube_orientation_threshold_deg': 15,
             'cube_sustained_steps': 3,
+        },
+        ('moderate', 'reacher'): {
+            'reacher_angle_mode': 'shoulder-periodic',
+            'reacher_joint_threshold_rad': 0.05,
+            'reacher_sustained_steps': None,
+        },
+        ('strict', 'reacher'): {
+            'reacher_angle_mode': None,
+            'reacher_endpoint_threshold_m': 0.01,
+            'reacher_joint_threshold_rad': 0.05,
+            'reacher_success_mode': 'endpoint',
+            'reacher_sustained_steps': 2,
         },
         ('moderate', 'tworoom'): {
             'tworoom_collision_mode': 'swept',
@@ -138,6 +150,46 @@ class _FakeCube:
         return None
 
 
+class _FakeGeomPositions:
+    def __init__(self, physics):
+        self.physics = physics
+
+    def __getitem__(self, key):
+        name, coordinate_slice = key
+        assert name == 'finger'
+        position = np.asarray(
+            [self.physics.data.qpos[0], self.physics.data.qpos[1], 0.0]
+        )
+        return position[coordinate_slice]
+
+
+class _FakeReacherPhysics:
+    def __init__(self):
+        self.data = SimpleNamespace(qpos=np.zeros(2), qvel=np.zeros(2))
+        self.named = SimpleNamespace(
+            data=SimpleNamespace(geom_xpos=_FakeGeomPositions(self))
+        )
+
+    def forward(self):
+        return None
+
+
+class _FakeReacher:
+    def __init__(self):
+        physics = _FakeReacherPhysics()
+        task = SimpleNamespace(target_qpos=np.zeros(2))
+        self.env = SimpleNamespace(physics=physics, task=task)
+
+    def _is_terminated(self, step):
+        return True
+
+    def set_target_qpos(self, target_qpos):
+        self.env.task.target_qpos = np.asarray(target_qpos)
+
+    def step(self, action):
+        return np.zeros(1), 0.0, self._is_terminated(None), False, {}
+
+
 def _world(env):
     wrapped = SimpleNamespace(unwrapped=env)
     return SimpleNamespace(envs=SimpleNamespace(envs=[wrapped]))
@@ -198,6 +250,39 @@ def test_cube_symmetry_accepts_equivalent_quarter_turn():
     assert cube_symmetry_angle_deg(identity, quarter_turn_z)[0] < 1e-6
 
 
+def test_reacher_joint_error_wraps_only_the_unbounded_shoulder():
+    current = np.array([-np.pi + 0.01, -2.7])
+    target = np.array([np.pi - 0.01, 2.7])
+    error = reacher_joint_error(current, target, 'shoulder-periodic')
+    assert error[0] == pytest.approx(0.02)
+    assert error[1] == pytest.approx(5.4)
+
+
+def test_reacher_moderate_uses_topology_correct_joint_match():
+    env = _FakeReacher()
+    env.env.physics.data.qpos[:] = np.array([-np.pi + 0.01, 0.4])
+    env.env.task.target_qpos = np.array([np.pi - 0.01, 0.4])
+    install_success_criterion(_world(env), _manifest(task='reacher'))
+    assert env.step(np.zeros(2))[2]
+
+    env.env.physics.data.qpos[1] = -2.7
+    env.env.task.target_qpos[1] = 2.7
+    assert not env.step(np.zeros(2))[2]
+
+
+def test_reacher_strict_scores_endpoint_and_requires_two_steps():
+    env = _FakeReacher()
+    install_success_criterion(
+        _world(env), _manifest(task='reacher', protocol='strict')
+    )
+    env.set_target_qpos(np.array([0.0, 0.0]))
+    env.env.physics.data.qpos[:] = np.array([0.1, 0.0])
+    assert not env.step(np.zeros(2))[2]
+    env.env.physics.data.qpos[:] = np.array([0.0, 0.0])
+    assert not env.step(np.zeros(2))[2]
+    assert env.step(np.zeros(2))[2]
+
+
 def test_manifest_rows_must_match_episode_and_step_identity():
     dataset = SimpleNamespace(
         get_col_data=lambda key: {
@@ -253,6 +338,25 @@ def test_bundled_tworoom_manifest_matches_registry(protocol):
     assert (
         manifest_sha256(path)
         == registry['manifests'][f'tworoom/{protocol}/seed42']
+    )
+
+
+@pytest.mark.parametrize('protocol', ['moderate', 'strict'])
+def test_bundled_reacher_manifest_matches_registry(protocol):
+    registry = json.loads(
+        (REPO_ROOT / 'scripts/experiments/clear_eval.json').read_text()
+    )
+    path = (
+        REPO_ROOT
+        / 'results/clear_eval/v0.5/manifests/reacher'
+        / f'{protocol}-seed42-n100.json'
+    )
+    manifest = load_manifest(path)
+    assert manifest['task'] == 'reacher'
+    assert len(manifest['pairs']) == 100
+    assert (
+        manifest_sha256(path)
+        == registry['manifests'][f'reacher/{protocol}/seed42']
     )
 
 

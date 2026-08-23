@@ -12,11 +12,6 @@ import hydra
 import numpy as np
 import stable_pretraining as spt
 import torch
-from omegaconf import DictConfig, OmegaConf
-from sklearn import preprocessing
-from torchvision.transforms import v2 as transforms
-import stable_worldmodel as swm
-
 from clear_protocol import (
     CLEAR_LEWM_REVISION,
     CLEAR_LEWM_VERSION,
@@ -30,6 +25,11 @@ from clear_protocol import (
     validate_policy_seed,
     validate_solver_config,
 )
+from omegaconf import DictConfig, OmegaConf
+from sklearn import preprocessing
+from torchvision.transforms import v2 as transforms
+
+import stable_worldmodel as swm
 
 
 def img_transform(cfg, dtype=torch.float32):
@@ -92,7 +92,7 @@ def non_pixel_hdf5_keys(dataset_name):
     with h5py.File(path, 'r') as dataset:
         return [
             key
-            for key in dataset.keys()
+            for key in dataset
             if key not in ('ep_len', 'ep_offset')
             and not key.startswith('pixels')
         ]
@@ -163,6 +163,7 @@ def run(cfg: DictConfig):
         expected_env = {
             'pusht': 'swm/PushT-v1',
             'cube': 'swm/OGBCube-v0',
+            'reacher': 'swm/ReacherDMControl-v0',
             'tworoom': 'swm/TwoRoom-v1',
         }[clear_manifest['task']]
         if cfg.world.env_name != expected_env:

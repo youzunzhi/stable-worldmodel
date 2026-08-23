@@ -18,6 +18,12 @@
     "pusht/strict/seed0": "f68292d80db3469ff3fa4d8c0c6bb7e6914199426f778129c06e78313a47366f",
     "pusht/strict/seed1": "141d579c9501c9c4af260917c2e60724c6ac98ab03e656217f2063480310fe30",
     "pusht/strict/seed42": "2042018fc346927af5da75cce2565db8476121d1db67a99d0fc50f218eddcbc9",
+    "reacher/moderate/seed0": "f47cccfbe9abdf5fd9345e05d4c1827a0e923d9ebfdf7acd55f66d3744a079fe",
+    "reacher/moderate/seed1": "87acf32a019f1c9ef63449dd573a5f845d45c772f6de425e83aeca976d154565",
+    "reacher/moderate/seed42": "1ab745023ffc673aeef2f073aa7b7d1ba2ab00cd0caf39cc392a6a6ff54d387c",
+    "reacher/strict/seed0": "6567b97591086cef276b635ae8f5c8417c957b23b775c698e6051c3f79268640",
+    "reacher/strict/seed1": "dca6577cd36b9ec00cfbfa0236c08bd47fe0ef2b76cc68978ab927e000801aa4",
+    "reacher/strict/seed42": "01c4d061dfbd50a431f4bcb14cda6d00a11dc0841d3ebfeaae4fe22b9361cc65",
     "tworoom/moderate/seed0": "2fea3d51e85b1a93c284f566bbd9714eb70d013507554bd581b851b33ad4643a",
     "tworoom/moderate/seed1": "a46e008facb0427a97dadde11e39f105f9ac3fb138627b254fcd9cbb83ec8805",
     "tworoom/moderate/seed42": "216250de76495a17a58bb16538b678408063798c3e4f55381943b79214ac83f6",
@@ -42,6 +48,14 @@
       "official_lewm": 71,
       "random": 7
     },
+    "reacher/moderate/seed42": {
+      "official_lewm": 40,
+      "random": 5
+    },
+    "reacher/strict/seed42": {
+      "official_lewm": 51,
+      "random": 7
+    },
     "tworoom/moderate/seed42": {
       "official_lewm": 81,
       "random": 6
@@ -52,6 +66,12 @@
     }
   },
   "official_checkpoints": {
+    "reacher": {
+      "repository": "quentinll/lewm-reacher",
+      "revision": "62adae4b71dc474ddf8f794c476ebfe737a743ca",
+      "config_sha256": "2564086e961e7b5c7c04dffc451091115b389a590645ff19653c64fd0bc16e09",
+      "weights_sha256": "eb70b1fd5409f8f81875d62f5ee5a20dd220a3128a477de66b5760f475f0f469"
+    },
     "tworoom": {
       "repository": "quentinll/lewm-tworooms",
       "revision": "77adaae0bc31deab21c93740d1f8bb947cd0bdec",

@@ -20,11 +20,15 @@ import numpy as np
 try:
     from .clear_tworoom import (
         install_tworoom_success,
+    )
+    from .clear_tworoom import (
         topology_audit_records as _topology_audit_records,
     )
 except ImportError:  # Direct execution via scripts/plan/eval_wm.py.
     from clear_tworoom import (
         install_tworoom_success,
+    )
+    from clear_tworoom import (
         topology_audit_records as _topology_audit_records,
     )
 
@@ -32,7 +36,7 @@ except ImportError:  # Direct execution via scripts/plan/eval_wm.py.
 CLEAR_LEWM_VERSION = '0.5.0'
 CLEAR_LEWM_REVISION = 'df026185a36bd9997c69d94753854db0b1a46f54'
 CLEAR_MANIFEST_SCHEMA = 'clear-lewm-manifest-v1'
-CLEAR_TASKS = {'pusht', 'cube', 'tworoom'}
+CLEAR_TASKS = {'pusht', 'cube', 'reacher', 'tworoom'}
 CLEAR_PROTOCOLS = {'moderate', 'strict'}
 CLEAR_SOLVER = {
     'batch_size': 1,
@@ -84,6 +88,20 @@ _V05_TASK_PROTOCOLS = {
         'cube_orientation_threshold_deg': 15,
         'cube_symmetry_aware': True,
         'cube_sustained_steps': 3,
+        'sustained_steps': 1,
+    },
+    ('moderate', 'reacher'): {
+        'reacher_angle_mode': 'shoulder-periodic',
+        'reacher_joint_threshold_rad': 0.05,
+        'reacher_sustained_steps': None,
+        'sustained_steps': 1,
+    },
+    ('strict', 'reacher'): {
+        'reacher_angle_mode': None,
+        'reacher_endpoint_threshold_m': 0.01,
+        'reacher_joint_threshold_rad': 0.05,
+        'reacher_success_mode': 'endpoint',
+        'reacher_sustained_steps': 2,
         'sustained_steps': 1,
     },
     ('moderate', 'tworoom'): {
@@ -289,6 +307,35 @@ def seed_runtime(seed: int) -> None:
         torch.cuda.manual_seed_all(seed)
 
 
+def _wrapped_angle_error(
+    current: np.ndarray, target: np.ndarray
+) -> np.ndarray:
+    delta = np.asarray(current, dtype=np.float64) - np.asarray(
+        target, dtype=np.float64
+    )
+    return np.abs(np.arctan2(np.sin(delta), np.cos(delta)))
+
+
+def reacher_joint_error(
+    current: np.ndarray, target: np.ndarray, mode: str
+) -> np.ndarray:
+    """Return joint errors under the topology used by DMC Reacher."""
+    raw = np.abs(
+        np.asarray(current, dtype=np.float64)
+        - np.asarray(target, dtype=np.float64)
+    )
+    if mode == 'raw':
+        return raw
+    wrapped = _wrapped_angle_error(current, target)
+    if mode == 'all-periodic':
+        return wrapped
+    if mode == 'shoulder-periodic':
+        result = raw.copy()
+        result[..., 0] = wrapped[..., 0]
+        return result
+    raise ValueError(f'Unknown Reacher angle mode: {mode}')
+
+
 def _cube_symmetry_matrices() -> np.ndarray:
     matrices = []
     identity = np.eye(3, dtype=np.float64)
@@ -434,6 +481,78 @@ def _install_cube_success(world, protocol: dict) -> None:
         patch_environment(wrapped.unwrapped)
 
 
+def _install_reacher_success(world, protocol: dict) -> None:
+    def patch_environment(env) -> None:
+        original_step = env.step
+        original_set_target = env.set_target_qpos
+        env._clear_lewm_hold_count = 0
+        env._clear_lewm_target_finger_pos = None
+
+        def suppress_upstream_termination(self, step):
+            return False
+
+        def set_target_qpos(self, target_qpos):
+            result = original_set_target(target_qpos)
+            self._clear_lewm_hold_count = 0
+            if protocol.get('reacher_success_mode', 'joint') == 'endpoint':
+                physics = self.env.physics
+                saved_qpos = np.asarray(physics.data.qpos).copy()
+                saved_qvel = np.asarray(physics.data.qvel).copy()
+                physics.data.qpos[:] = np.asarray(target_qpos)
+                physics.data.qvel[:] = 0.0
+                physics.forward()
+                self._clear_lewm_target_finger_pos = np.asarray(
+                    physics.named.data.geom_xpos['finger', :2]
+                ).copy()
+                physics.data.qpos[:] = saved_qpos
+                physics.data.qvel[:] = saved_qvel
+                physics.forward()
+            return result
+
+        def step(self, action):
+            observation, reward, _, truncated, info = original_step(action)
+            if protocol.get('reacher_success_mode', 'joint') == 'endpoint':
+                if self._clear_lewm_target_finger_pos is None:
+                    raise RuntimeError(
+                        'Reacher endpoint target was not initialized'
+                    )
+                current = np.asarray(
+                    self.env.physics.named.data.geom_xpos['finger', :2]
+                )
+                endpoint_error = float(
+                    np.linalg.norm(
+                        current - self._clear_lewm_target_finger_pos
+                    )
+                )
+                success = (
+                    endpoint_error <= protocol['reacher_endpoint_threshold_m']
+                )
+            else:
+                qpos = np.asarray(self.env.physics.data.qpos)
+                target = np.asarray(self.env.task.target_qpos)
+                errors = reacher_joint_error(
+                    qpos, target, protocol['reacher_angle_mode']
+                )
+                success = bool(
+                    np.max(errors) < protocol['reacher_joint_threshold_rad']
+                )
+            self._clear_lewm_hold_count = (
+                self._clear_lewm_hold_count + 1 if success else 0
+            )
+            terminated = self._clear_lewm_hold_count >= _hold_steps(
+                protocol, 'reacher'
+            )
+            info['clear_lewm_hold_count'] = self._clear_lewm_hold_count
+            return observation, reward, terminated, truncated, info
+
+        env._is_terminated = MethodType(suppress_upstream_termination, env)
+        env.set_target_qpos = MethodType(set_target_qpos, env)
+        env.step = MethodType(step, env)
+
+    for wrapped in world.envs.envs:
+        patch_environment(wrapped.unwrapped)
+
+
 def install_success_criterion(world, manifest: dict) -> None:
     """Install the selected CLEAR v0.5 success rule on every raw env."""
     protocol = manifest['protocol']
@@ -441,6 +560,8 @@ def install_success_criterion(world, manifest: dict) -> None:
         _install_pusht_success(world, protocol)
     elif manifest['task'] == 'cube':
         _install_cube_success(world, protocol)
+    elif manifest['task'] == 'reacher':
+        _install_reacher_success(world, protocol)
     elif manifest['task'] == 'tworoom':
         install_tworoom_success(world, protocol)
     else:
