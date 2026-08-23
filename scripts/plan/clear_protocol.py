@@ -52,6 +52,14 @@ def topology_audit_records() -> list[dict]:
     return _topology_audit_records()
 
 
+_REACHER_RUNTIME_AUDIT_RECORDS: list[dict] = []
+
+
+def reacher_runtime_audit_records() -> list[dict]:
+    """Expose per-environment upstream-termination diagnostics."""
+    return [dict(record) for record in _REACHER_RUNTIME_AUDIT_RECORDS]
+
+
 _V05_SHARED_PROTOCOL = {
     'goal_offset': 25,
     'eval_budget': 50,
@@ -481,18 +489,54 @@ def _install_cube_success(world, protocol: dict) -> None:
         patch_environment(wrapped.unwrapped)
 
 
-def _install_reacher_success(world, protocol: dict) -> None:
-    def patch_environment(env) -> None:
+def _install_reacher_success(
+    world, protocol: dict, suppress_internal_termination: bool
+) -> None:
+    _REACHER_RUNTIME_AUDIT_RECORDS.clear()
+
+    def patch_environment(env, environment_index: int) -> None:
         original_step = env.step
         original_set_target = env.set_target_qpos
         env._clear_lewm_hold_count = 0
         env._clear_lewm_target_finger_pos = None
+        runtime_audit = {
+            'environment_index': environment_index,
+            'internal_termination_mode': (
+                'suppressed-local-fix'
+                if suppress_internal_termination
+                else 'upstream-v0.5'
+            ),
+            'upstream_termination_signals': 0,
+        }
+        _REACHER_RUNTIME_AUDIT_RECORDS.append(runtime_audit)
+
+        def install_task_termination_patch(self) -> None:
+            task = self.env.task
+            if not hasattr(task, 'get_termination'):
+                return
+            mode = runtime_audit['internal_termination_mode']
+            if (
+                getattr(task, '_clear_lewm_internal_termination_mode', None)
+                == mode
+            ):
+                return
+            original_get_termination = task.get_termination
+
+            def audited_get_termination(task_self, physics):
+                result = original_get_termination(physics)
+                if result is not None:
+                    runtime_audit['upstream_termination_signals'] += 1
+                return None if suppress_internal_termination else result
+
+            task.get_termination = MethodType(audited_get_termination, task)
+            task._clear_lewm_internal_termination_mode = mode
 
         def suppress_upstream_termination(self, step):
             return False
 
         def set_target_qpos(self, target_qpos):
             result = original_set_target(target_qpos)
+            install_task_termination_patch(self)
             self._clear_lewm_hold_count = 0
             if protocol.get('reacher_success_mode', 'joint') == 'endpoint':
                 physics = self.env.physics
@@ -510,6 +554,7 @@ def _install_reacher_success(world, protocol: dict) -> None:
             return result
 
         def step(self, action):
+            install_task_termination_patch(self)
             observation, reward, _, truncated, info = original_step(action)
             if protocol.get('reacher_success_mode', 'joint') == 'endpoint':
                 if self._clear_lewm_target_finger_pos is None:
@@ -548,12 +593,18 @@ def _install_reacher_success(world, protocol: dict) -> None:
         env._is_terminated = MethodType(suppress_upstream_termination, env)
         env.set_target_qpos = MethodType(set_target_qpos, env)
         env.step = MethodType(step, env)
+        install_task_termination_patch(env)
 
-    for wrapped in world.envs.envs:
-        patch_environment(wrapped.unwrapped)
+    for environment_index, wrapped in enumerate(world.envs.envs):
+        patch_environment(wrapped.unwrapped, environment_index)
 
 
-def install_success_criterion(world, manifest: dict) -> None:
+def install_success_criterion(
+    world,
+    manifest: dict,
+    *,
+    suppress_reacher_internal_termination: bool = False,
+) -> None:
     """Install the selected CLEAR v0.5 success rule on every raw env."""
     protocol = manifest['protocol']
     if manifest['task'] == 'pusht':
@@ -561,7 +612,9 @@ def install_success_criterion(world, manifest: dict) -> None:
     elif manifest['task'] == 'cube':
         _install_cube_success(world, protocol)
     elif manifest['task'] == 'reacher':
-        _install_reacher_success(world, protocol)
+        _install_reacher_success(
+            world, protocol, suppress_reacher_internal_termination
+        )
     elif manifest['task'] == 'tworoom':
         install_tworoom_success(world, protocol)
     else:

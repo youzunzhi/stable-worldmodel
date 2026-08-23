@@ -18,6 +18,7 @@ from clear_protocol import (
     install_success_criterion,
     load_manifest,
     manifest_sha256,
+    reacher_runtime_audit_records,
     resolve_manifest_pairs,
     seed_runtime,
     topology_audit_records,
@@ -159,6 +160,16 @@ def run(cfg: DictConfig):
     clear_manifest = (
         load_manifest(clear_manifest_path) if clear_manifest_path else None
     )
+    reacher_runtime_fix = bool(
+        cfg.eval.get('reacher_internal_termination_fix', False)
+    )
+    if reacher_runtime_fix and (
+        clear_manifest is None or clear_manifest['task'] != 'reacher'
+    ):
+        raise ValueError(
+            'eval.reacher_internal_termination_fix is only valid for a '
+            'fixed-manifest CLEAR Reacher evaluation'
+        )
     if clear_manifest is not None:
         expected_env = {
             'pusht': 'swm/PushT-v1',
@@ -292,7 +303,11 @@ def run(cfg: DictConfig):
     # index columns (episode_idx/step_idx) from get_row_data, but get_col_data
     # exposes them (and both are already cached from the checks above).
     if clear_manifest is not None:
-        install_success_criterion(world, clear_manifest)
+        install_success_criterion(
+            world,
+            clear_manifest,
+            suppress_reacher_internal_termination=reacher_runtime_fix,
+        )
 
     # The planner operates in normalized dataset coordinates and may produce
     # values outside the environment's declared action space after inverse
@@ -407,6 +422,15 @@ def run(cfg: DictConfig):
         and checkpoint_source_path.is_file()
         else None
     )
+    reacher_runtime = None
+    if clear_manifest is not None and clear_manifest['task'] == 'reacher':
+        reacher_runtime = reacher_runtime_audit_records()
+        for record, pair in zip(
+            reacher_runtime, clear_manifest['pairs'], strict=True
+        ):
+            record['pair_id'] = pair['pair_id']
+            record['episode_id'] = pair['episode_id']
+            record['start_step'] = pair['start_step']
     structured = {
         'checkpoint': (
             'random' if checkpoint_path is None else str(checkpoint_path)
@@ -447,6 +471,14 @@ def run(cfg: DictConfig):
                 'cpu_threads': torch.get_num_threads(),
                 'solver_contract_matched': clear_solver_contract_matched,
                 'solver_ablation_opt_in': solver_ablation,
+                'runtime_contract': {
+                    'reacher_internal_termination_mode': (
+                        'suppressed-local-fix'
+                        if reacher_runtime_fix
+                        else 'upstream-v0.5'
+                    ),
+                    'reference_compatible': not reacher_runtime_fix,
+                },
             }
             if clear_manifest is not None
             else None
@@ -457,6 +489,7 @@ def run(cfg: DictConfig):
             and clear_manifest['task'] == 'tworoom'
             else None
         ),
+        'reacher_runtime': jsonable(reacher_runtime),
         'resolved_config': OmegaConf.to_container(cfg, resolve=True),
     }
     structured_path = results_path.with_suffix(results_path.suffix + '.json')

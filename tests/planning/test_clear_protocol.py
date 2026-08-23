@@ -13,6 +13,7 @@ from scripts.plan.clear_protocol import (
     load_manifest,
     manifest_sha256,
     reacher_joint_error,
+    reacher_runtime_audit_records,
     resolve_manifest_pairs,
     validate_policy_seed,
     validate_solver_config,
@@ -190,6 +191,35 @@ class _FakeReacher:
         return np.zeros(1), 0.0, self._is_terminated(None), False, {}
 
 
+class _FakeInternalTerminationTask:
+    def __init__(self):
+        self.target_qpos = np.zeros(2)
+
+    def get_termination(self, physics):
+        error = np.abs(physics.data.qpos - self.target_qpos)
+        return 0.0 if np.all(error < 0.05) else None
+
+
+class _FakeActionRepeatReacher(_FakeReacher):
+    """Model dm-control's reset-on-step-after-LAST behavior."""
+
+    def __init__(self):
+        super().__init__()
+        self.env.task = _FakeInternalTerminationTask()
+        self._reset_next_step = False
+        self.internal_reset_count = 0
+
+    def step(self, action):
+        for _ in range(2):
+            if self._reset_next_step:
+                self.env.physics.data.qpos[:] = 1.0
+                self._reset_next_step = False
+                self.internal_reset_count += 1
+            if self.env.task.get_termination(self.env.physics) is not None:
+                self._reset_next_step = True
+        return np.zeros(1), 0.0, self._is_terminated(None), False, {}
+
+
 def _world(env):
     wrapped = SimpleNamespace(unwrapped=env)
     return SimpleNamespace(envs=SimpleNamespace(envs=[wrapped]))
@@ -281,6 +311,43 @@ def test_reacher_strict_scores_endpoint_and_requires_two_steps():
     env.env.physics.data.qpos[:] = np.array([0.0, 0.0])
     assert not env.step(np.zeros(2))[2]
     assert env.step(np.zeros(2))[2]
+
+
+def test_reacher_upstream_mode_records_internal_auto_reset():
+    env = _FakeActionRepeatReacher()
+    install_success_criterion(
+        _world(env), _manifest(task='reacher', protocol='strict')
+    )
+    env.set_target_qpos(np.zeros(2))
+    assert not env.step(np.zeros(2))[2]
+    assert env.internal_reset_count == 1
+    assert reacher_runtime_audit_records() == [
+        {
+            'environment_index': 0,
+            'internal_termination_mode': 'upstream-v0.5',
+            'upstream_termination_signals': 1,
+        }
+    ]
+
+
+def test_reacher_runtime_fix_suppresses_internal_auto_reset():
+    env = _FakeActionRepeatReacher()
+    install_success_criterion(
+        _world(env),
+        _manifest(task='reacher', protocol='strict'),
+        suppress_reacher_internal_termination=True,
+    )
+    env.set_target_qpos(np.zeros(2))
+    assert not env.step(np.zeros(2))[2]
+    assert env.step(np.zeros(2))[2]
+    assert env.internal_reset_count == 0
+    assert reacher_runtime_audit_records() == [
+        {
+            'environment_index': 0,
+            'internal_termination_mode': 'suppressed-local-fix',
+            'upstream_termination_signals': 4,
+        }
+    ]
 
 
 def test_manifest_rows_must_match_episode_and_step_identity():
