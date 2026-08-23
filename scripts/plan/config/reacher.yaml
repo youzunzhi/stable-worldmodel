@@ -59,4 +59,5 @@ compile: false
 bf16: false
 
 output:
+  dir: null
   filename: dmc_results.txt

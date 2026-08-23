@@ -1,5 +1,7 @@
 from pathlib import Path
 
+from omegaconf import OmegaConf
+
 from scripts.experiments.registry import get_experiment
 
 
@@ -28,3 +30,12 @@ def test_lewm_reacher_uses_pinned_hdf5_and_ten_epochs():
         'trainer.max_epochs=10',
     )
     assert experiment.eval_defaults == ('--config-name=reacher',)
+
+
+def test_reacher_eval_config_accepts_isolated_output_directory():
+    config = OmegaConf.load(
+        Path(__file__).parents[2] / 'scripts/plan/config/reacher.yaml'
+    )
+
+    assert 'dir' in config.output
+    assert config.output.dir is None
