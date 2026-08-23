@@ -16,6 +16,9 @@ physical rollout loop. It changes only the evaluation contract:
   succeeds;
 - Strict Cube scores cube-center position within 3 cm and orientation within
   15 degrees modulo 24 proper cube rotations for 3 steps;
+- Moderate Reacher scores topology-correct joint error below 0.05 rad, wrapping
+  the unbounded shoulder but not the bounded wrist; the first hit succeeds;
+- Strict Reacher scores fingertip endpoint distance within 1 cm for 2 steps;
 - Moderate TwoRoom uses continuous swept-disk collision and succeeds within
   16 px on clean cross-room pairs;
 - Strict TwoRoom additionally requires a legal door crossing, the goal side,
@@ -25,10 +28,15 @@ physical rollout loop. It changes only the evaluation contract:
 - CEM 300 samples, 30 elites, 30 iterations, solver batch size 1.
 - Python, NumPy, Torch, CUDA, and policy seed 42; Torch CPU threads 1.
 
-Upstream v0.5 also defines Reacher. This adapter supports PushT, Cube, and
-TwoRoom, the three tasks in our trained-checkpoint registry. Use the upstream
-evaluator for Reacher rather than labeling an unsupported local run as
-CLEAR-LeWM v0.5.
+The adapter supports all four v0.5 tasks: PushT, Cube, Reacher, and TwoRoom.
+Reacher has two explicitly recorded runtime modes. The default
+`upstream-v0.5` mode reproduces CLEAR-LeWM's released adapter behavior. The
+opt-in `eval.reacher_internal_termination_fix=true` mode suppresses the
+underlying dm-control qpos termination so `action_repeat=2` cannot auto-reset
+between the two inner simulator steps of one externally scored policy step.
+The opt-in mode retains the same manifest and planning contract but records
+`reference_compatible=false`; it is a local corrected-runtime comparison, not
+a published v0.5 parity result.
 
 This is intentionally a reproduction with our runtime, not a claim that our
 newer package and numerical stack are byte-identical to CLEAR-LeWM's published
@@ -61,14 +69,27 @@ scripts/experiments/eval.sh \
   --manifest /path/to/CLEAR-LeWM/manifests/v0.5/pusht/strict-seed42-n100.json
 ```
 
-Run the same pair for `moderate`, and for `cube` or `tworoom`. The pinned
+Run the same pair for `moderate`, and for `cube`, `reacher`, or `tworoom`. The
+pinned
 official TwoRoom checkpoint is `quentinll/lewm-tworooms` revision
 `77adaae0bc31deab21c93740d1f8bb947cd0bdec`; its source `weights.pt` SHA-256 is
 `566f223624ea4bfb39dbfe6ae731198dd6ea73b7b8919fed6b1ecafca810f7dd`.
+The pinned official Reacher checkpoint is `quentinll/lewm-reacher` revision
+`62adae4b71dc474ddf8f794c476ebfe737a743ca`; its source `weights.pt` SHA-256 is
+`eb70b1fd5409f8f81875d62f5ee5a20dd220a3128a477de66b5760f475f0f469`.
 Each result JSON records the
 manifest SHA-256, embedded criterion, exact pair rows, resolved config,
 checkpoint/config SHA-256, optional checkpoint provenance, dataset path,
 per-episode outcomes, runtime duration, and TwoRoom route diagnostics.
+
+For the corrected Reacher runtime variant, append the explicit override:
+
+```bash
+eval.reacher_internal_termination_fix=true
+```
+
+Reacher result JSONs include the runtime-mode label, reference-compatibility
+flag, and upstream termination-signal count for every fixed pair.
 
 Omit `--no-video` when rollout videos are needed. The flag affects only video
 collection and encoding; metrics and structured result files are still saved.
