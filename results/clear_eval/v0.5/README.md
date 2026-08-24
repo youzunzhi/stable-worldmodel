@@ -17,7 +17,7 @@ epoch-10 weights.
 | PushT | [96/100](raw/clear-v05-61c41d0-pusht-moderate-trained-seed3072-policyseed42/results.txt.json) | [85/100](raw/clear-v05-61c41d0-pusht-strict-trained-seed3072-policyseed42/results.txt.json) |
 | Cube | [47/100](raw/clear-v05-61c41d0-cube-moderate-trained-seed3072-policyseed42/results.txt.json) | [28/100](raw/clear-v05-61c41d0-cube-strict-trained-seed3072-policyseed42/results.txt.json) |
 | TwoRoom | [88/100](raw/clear-v05-53ca790-tworoom-moderate-trained-epoch10-seed3072-policyseed42/results.txt.json) | [81/100](raw/clear-v05-53ca790-tworoom-strict-trained-epoch10-seed3072-policyseed42/results.txt.json) |
-| Reacher (corrected B runtime) | [80/100](raw/trained-b-suppressed-fix-moderate-seed3072-policyseed42/results.txt.json) | [81/100](raw/trained-b-suppressed-fix-strict-seed3072-policyseed42/results.txt.json) |
+| Reacher | [80/100](raw/trained-internal-termination-suppressed-moderate-seed3072-policyseed42/results.txt.json) | [81/100](raw/trained-internal-termination-suppressed-strict-seed3072-policyseed42/results.txt.json) |
 
 These are task-specific success rates, not a single interchangeable metric.
 Moderate and Strict use the success predicates encoded by their respective
@@ -30,7 +30,7 @@ fixed manifests.
 | PushT | [88/100](raw/clear-v05-61c41d0-pusht-moderate-official-policyseed42/results.txt.json) | [71/100](raw/clear-v05-61c41d0-pusht-strict-official-policyseed42/results.txt.json) |
 | Cube | [52/100](raw/clear-v05-61c41d0-cube-moderate-official-policyseed42/results.txt.json) | [22/100](raw/clear-v05-61c41d0-cube-strict-official-policyseed42/results.txt.json) |
 | TwoRoom | [80/100](raw/clear-v05-53ca790-tworoom-moderate-official-policyseed42/results.txt.json) | [57/100](raw/clear-v05-53ca790-tworoom-strict-official-policyseed42/results.txt.json) |
-| Reacher (corrected B runtime) | [77/100](raw/official-b-suppressed-fix-moderate-seed42/results.txt.json) | [79/100](raw/official-b-suppressed-fix-strict-seed42/results.txt.json) |
+| Reacher | [77/100](raw/official-internal-termination-suppressed-moderate-seed42/results.txt.json) | [79/100](raw/official-internal-termination-suppressed-strict-seed42/results.txt.json) |
 
 PushT official exactly reproduces the upstream seed-42 reference. Official
 Cube is a runtime drift: local `52/22` versus upstream `51/25`; both local runs
@@ -38,12 +38,11 @@ satisfy the exact manifest, solver, and CPU-thread contract. Official TwoRoom
 Strict matches upstream; Moderate differs by one pair while retaining valid
 topology audits.
 
-Reacher is reported only under the corrected B runtime supported by this
-codebase. B suppresses the underlying dm-control qpos termination during the
-outer CLEAR action-repeat step and records
-`reacher_internal_termination_mode=suppressed-local-fix` with
-`reference_compatible=false`. It must not be presented as an exact reproduction
-of the released upstream-v0.5 A runtime.
+For Reacher, the evaluator suppresses dm-control's task-level qpos termination
+during each outer CLEAR action-repeat step. This prevents an internal automatic
+reset before CLEAR success scoring. Because the released upstream v0.5 runtime
+leaves that termination active, these scores use corrected termination
+semantics and are not exact upstream-runtime reproductions.
 
 ## Partial controls and solver ablation
 
@@ -75,8 +74,9 @@ validated stages:
 
 - PushT and Cube: `fba769e6444d29b9790b68413d6f447e0a3aac05`.
 - TwoRoom: `53ca79025322f6a8b598ea144d07bacc17eb73b3`.
-- Reacher B evaluation: `665e01d532392148ff2683664205ece389da8abd`;
-  the B-only implementation was subsequently promoted to `main` in
+- Reacher evaluation with dm-control internal termination suppressed:
+  `665e01d532392148ff2683664205ece389da8abd`; this behavior was subsequently
+  made the sole supported Reacher implementation on `main` in
   `211ea6b9d8cf2bd118a5a15226f520f37129a2dc`.
 
 Project-trained checkpoint SHA-256 values:
