@@ -235,6 +235,86 @@ def convert_hdf5_to_image_format(
                         img.save(img_dir / f'ep_{ep_idx}_step_{step_idx}.jpeg')
 
 
+class TestCollectResetFrame:
+    """Regression coverage for reset rows and terminal action sentinels."""
+
+    @pytest.fixture
+    def temp_cache_dir(self, tmp_path):
+        return tmp_path
+
+    def test_first_frame_matches_reset_state(self, temp_cache_dir):
+        world = World(
+            env_name='swm/TwoRoom-v1',
+            num_envs=1,
+            image_shape=(32, 32),
+            max_episode_steps=6,
+            render_target=True,
+        )
+        world.set_policy(RandomPolicy(seed=0))
+
+        world.reset(seed=0)
+        reset_state = np.array(world.infos['state'][0]).copy()
+
+        h5_path = temp_cache_dir / 'datasets' / 'reset_frame.h5'
+        world.collect(
+            h5_path, episodes=1, seed=0, format='hdf5', progress=False
+        )
+        world.envs.close()
+
+        with h5py.File(h5_path, 'r') as f:
+            first_state = f['state'][0]
+
+        np.testing.assert_allclose(first_state, reset_state.squeeze())
+
+    def test_action_has_single_trailing_nan(self, temp_cache_dir):
+        world = World(
+            env_name='swm/TwoRoom-v1',
+            num_envs=1,
+            image_shape=(32, 32),
+            max_episode_steps=15,
+            render_target=True,
+        )
+        world.set_policy(RandomPolicy(seed=0))
+
+        h5_path = temp_cache_dir / 'datasets' / 'trailing_nan.h5'
+        world.collect(
+            h5_path, episodes=3, seed=0, format='hdf5', progress=False
+        )
+        world.envs.close()
+
+        with h5py.File(h5_path, 'r') as f:
+            action = f['action'][:]
+            ep_offsets = f['ep_offset'][:]
+            ep_lengths = f['ep_len'][:]
+
+        nan_rows = np.where(np.isnan(action).any(axis=1))[0]
+        assert len(nan_rows) == len(ep_offsets)
+        for offset, length in zip(ep_offsets, ep_lengths):
+            assert (offset + length - 1) in nan_rows
+            assert not np.isnan(action[offset : offset + length - 1]).any()
+
+    def test_short_episode_has_reset_and_terminal_frames(self, temp_cache_dir):
+        world = World(
+            env_name='swm/TwoRoom-v1',
+            num_envs=1,
+            image_shape=(32, 32),
+            max_episode_steps=1,
+            render_target=True,
+        )
+        world.set_policy(RandomPolicy(seed=0))
+
+        h5_path = temp_cache_dir / 'datasets' / 'short_episode.h5'
+        world.collect(
+            h5_path, episodes=2, seed=0, format='hdf5', progress=False
+        )
+        world.envs.close()
+
+        with h5py.File(h5_path, 'r') as f:
+            ep_lengths = f['ep_len'][:]
+
+        assert (ep_lengths >= 2).all()
+
+
 class TestImageDatasetReal:
     """Test ImageDataset with real collected data."""
 
