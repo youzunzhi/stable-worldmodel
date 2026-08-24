@@ -28,6 +28,13 @@ eval:
   num_eval: 50
   goal_offset_steps: 25
   eval_budget: 50
+  video: true
+  # Optional fixed CLEAR-LeWM v0.5 manifest. When set, its pair list and
+  # selected success criterion replace random row sampling.
+  manifest: null
+  # Permit a non-CEM solver on fixed CLEAR pairs. Such a run is an ablation,
+  # not a protocol-conformant CLEAR result, and is marked as such in JSON.
+  solver_ablation: false
   img_size: 224
   dataset_name: dmc/reacher_random.h5
   callables:
@@ -44,5 +51,9 @@ eval:
         target_qpos:
           value: goal_qpos
 
+compile: false
+bf16: false
+
 output:
+  dir: null
   filename: dmc_results.txt

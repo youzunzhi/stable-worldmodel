@@ -12,17 +12,13 @@ import hydra
 import numpy as np
 import stable_pretraining as spt
 import torch
-from omegaconf import DictConfig, OmegaConf
-from sklearn import preprocessing
-from torchvision.transforms import v2 as transforms
-import stable_worldmodel as swm
-
 from clear_protocol import (
     CLEAR_LEWM_REVISION,
     CLEAR_LEWM_VERSION,
     install_success_criterion,
     load_manifest,
     manifest_sha256,
+    reacher_runtime_audit_records,
     resolve_manifest_pairs,
     seed_runtime,
     topology_audit_records,
@@ -30,6 +26,11 @@ from clear_protocol import (
     validate_policy_seed,
     validate_solver_config,
 )
+from omegaconf import DictConfig, OmegaConf
+from sklearn import preprocessing
+from torchvision.transforms import v2 as transforms
+
+import stable_worldmodel as swm
 
 
 def img_transform(cfg, dtype=torch.float32):
@@ -92,7 +93,7 @@ def non_pixel_hdf5_keys(dataset_name):
     with h5py.File(path, 'r') as dataset:
         return [
             key
-            for key in dataset.keys()
+            for key in dataset
             if key not in ('ep_len', 'ep_offset')
             and not key.startswith('pixels')
         ]
@@ -163,6 +164,7 @@ def run(cfg: DictConfig):
         expected_env = {
             'pusht': 'swm/PushT-v1',
             'cube': 'swm/OGBCube-v0',
+            'reacher': 'swm/ReacherDMControl-v0',
             'tworoom': 'swm/TwoRoom-v1',
         }[clear_manifest['task']]
         if cfg.world.env_name != expected_env:
@@ -406,6 +408,15 @@ def run(cfg: DictConfig):
         and checkpoint_source_path.is_file()
         else None
     )
+    reacher_runtime = None
+    if clear_manifest is not None and clear_manifest['task'] == 'reacher':
+        reacher_runtime = reacher_runtime_audit_records()
+        for record, pair in zip(
+            reacher_runtime, clear_manifest['pairs'], strict=True
+        ):
+            record['pair_id'] = pair['pair_id']
+            record['episode_id'] = pair['episode_id']
+            record['start_step'] = pair['start_step']
     structured = {
         'checkpoint': (
             'random' if checkpoint_path is None else str(checkpoint_path)
@@ -446,6 +457,14 @@ def run(cfg: DictConfig):
                 'cpu_threads': torch.get_num_threads(),
                 'solver_contract_matched': clear_solver_contract_matched,
                 'solver_ablation_opt_in': solver_ablation,
+                'runtime_contract': (
+                    {
+                        'reacher_internal_termination_mode': 'suppressed-local-fix',
+                        'reference_compatible': False,
+                    }
+                    if clear_manifest['task'] == 'reacher'
+                    else None
+                ),
             }
             if clear_manifest is not None
             else None
@@ -456,6 +475,7 @@ def run(cfg: DictConfig):
             and clear_manifest['task'] == 'tworoom'
             else None
         ),
+        'reacher_runtime': jsonable(reacher_runtime),
         'resolved_config': OmegaConf.to_container(cfg, resolve=True),
     }
     structured_path = results_path.with_suffix(results_path.suffix + '.json')
