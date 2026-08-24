@@ -160,16 +160,6 @@ def run(cfg: DictConfig):
     clear_manifest = (
         load_manifest(clear_manifest_path) if clear_manifest_path else None
     )
-    reacher_runtime_fix = bool(
-        cfg.eval.get('reacher_internal_termination_fix', False)
-    )
-    if reacher_runtime_fix and (
-        clear_manifest is None or clear_manifest['task'] != 'reacher'
-    ):
-        raise ValueError(
-            'eval.reacher_internal_termination_fix is only valid for a '
-            'fixed-manifest CLEAR Reacher evaluation'
-        )
     if clear_manifest is not None:
         expected_env = {
             'pusht': 'swm/PushT-v1',
@@ -303,11 +293,7 @@ def run(cfg: DictConfig):
     # index columns (episode_idx/step_idx) from get_row_data, but get_col_data
     # exposes them (and both are already cached from the checks above).
     if clear_manifest is not None:
-        install_success_criterion(
-            world,
-            clear_manifest,
-            suppress_reacher_internal_termination=reacher_runtime_fix,
-        )
+        install_success_criterion(world, clear_manifest)
 
     # The planner operates in normalized dataset coordinates and may produce
     # values outside the environment's declared action space after inverse
@@ -471,14 +457,14 @@ def run(cfg: DictConfig):
                 'cpu_threads': torch.get_num_threads(),
                 'solver_contract_matched': clear_solver_contract_matched,
                 'solver_ablation_opt_in': solver_ablation,
-                'runtime_contract': {
-                    'reacher_internal_termination_mode': (
-                        'suppressed-local-fix'
-                        if reacher_runtime_fix
-                        else 'upstream-v0.5'
-                    ),
-                    'reference_compatible': not reacher_runtime_fix,
-                },
+                'runtime_contract': (
+                    {
+                        'reacher_internal_termination_mode': 'suppressed-local-fix',
+                        'reference_compatible': False,
+                    }
+                    if clear_manifest['task'] == 'reacher'
+                    else None
+                ),
             }
             if clear_manifest is not None
             else None

@@ -39,3 +39,4 @@ def test_reacher_eval_config_accepts_isolated_output_directory():
 
     assert 'dir' in config.output
     assert config.output.dir is None
+    assert 'reacher_internal_termination_fix' not in config.eval

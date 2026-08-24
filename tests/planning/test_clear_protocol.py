@@ -313,29 +313,11 @@ def test_reacher_strict_scores_endpoint_and_requires_two_steps():
     assert env.step(np.zeros(2))[2]
 
 
-def test_reacher_upstream_mode_records_internal_auto_reset():
-    env = _FakeActionRepeatReacher()
-    install_success_criterion(
-        _world(env), _manifest(task='reacher', protocol='strict')
-    )
-    env.set_target_qpos(np.zeros(2))
-    assert not env.step(np.zeros(2))[2]
-    assert env.internal_reset_count == 1
-    assert reacher_runtime_audit_records() == [
-        {
-            'environment_index': 0,
-            'internal_termination_mode': 'upstream-v0.5',
-            'upstream_termination_signals': 1,
-        }
-    ]
-
-
-def test_reacher_runtime_fix_suppresses_internal_auto_reset():
+def test_reacher_success_suppresses_internal_auto_reset():
     env = _FakeActionRepeatReacher()
     install_success_criterion(
         _world(env),
         _manifest(task='reacher', protocol='strict'),
-        suppress_reacher_internal_termination=True,
     )
     env.set_target_qpos(np.zeros(2))
     assert not env.step(np.zeros(2))[2]

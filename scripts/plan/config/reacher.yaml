@@ -35,10 +35,6 @@ eval:
   # Permit a non-CEM solver on fixed CLEAR pairs. Such a run is an ablation,
   # not a protocol-conformant CLEAR result, and is marked as such in JSON.
   solver_ablation: false
-  # Local diagnostic/corrected runtime variant. False preserves exact CLEAR
-  # v0.5 behavior; true suppresses dm-control's internal qpos termination so
-  # action_repeat cannot auto-reset inside one externally scored policy step.
-  reacher_internal_termination_fix: false
   img_size: 224
   dataset_name: dmc/reacher_random.h5
   callables:

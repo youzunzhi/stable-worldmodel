@@ -489,9 +489,7 @@ def _install_cube_success(world, protocol: dict) -> None:
         patch_environment(wrapped.unwrapped)
 
 
-def _install_reacher_success(
-    world, protocol: dict, suppress_internal_termination: bool
-) -> None:
+def _install_reacher_success(world, protocol: dict) -> None:
     _REACHER_RUNTIME_AUDIT_RECORDS.clear()
 
     def patch_environment(env, environment_index: int) -> None:
@@ -501,11 +499,7 @@ def _install_reacher_success(
         env._clear_lewm_target_finger_pos = None
         runtime_audit = {
             'environment_index': environment_index,
-            'internal_termination_mode': (
-                'suppressed-local-fix'
-                if suppress_internal_termination
-                else 'upstream-v0.5'
-            ),
+            'internal_termination_mode': 'suppressed-local-fix',
             'upstream_termination_signals': 0,
         }
         _REACHER_RUNTIME_AUDIT_RECORDS.append(runtime_audit)
@@ -526,7 +520,6 @@ def _install_reacher_success(
                 result = original_get_termination(physics)
                 if result is not None:
                     runtime_audit['upstream_termination_signals'] += 1
-                return None if suppress_internal_termination else result
 
             task.get_termination = MethodType(audited_get_termination, task)
             task._clear_lewm_internal_termination_mode = mode
@@ -602,8 +595,6 @@ def _install_reacher_success(
 def install_success_criterion(
     world,
     manifest: dict,
-    *,
-    suppress_reacher_internal_termination: bool = False,
 ) -> None:
     """Install the selected CLEAR v0.5 success rule on every raw env."""
     protocol = manifest['protocol']
@@ -612,9 +603,7 @@ def install_success_criterion(
     elif manifest['task'] == 'cube':
         _install_cube_success(world, protocol)
     elif manifest['task'] == 'reacher':
-        _install_reacher_success(
-            world, protocol, suppress_reacher_internal_termination
-        )
+        _install_reacher_success(world, protocol)
     elif manifest['task'] == 'tworoom':
         install_tworoom_success(world, protocol)
     else:

@@ -29,14 +29,12 @@ physical rollout loop. It changes only the evaluation contract:
 - Python, NumPy, Torch, CUDA, and policy seed 42; Torch CPU threads 1.
 
 The adapter supports all four v0.5 tasks: PushT, Cube, Reacher, and TwoRoom.
-Reacher has two explicitly recorded runtime modes. The default
-`upstream-v0.5` mode reproduces CLEAR-LeWM's released adapter behavior. The
-opt-in `eval.reacher_internal_termination_fix=true` mode suppresses the
-underlying dm-control qpos termination so `action_repeat=2` cannot auto-reset
-between the two inner simulator steps of one externally scored policy step.
-The opt-in mode retains the same manifest and planning contract but records
-`reference_compatible=false`; it is a local corrected-runtime comparison, not
-a published v0.5 parity result.
+Reacher always suppresses the underlying dm-control qpos termination so
+`action_repeat=2` cannot auto-reset between the two inner simulator steps of
+one externally scored policy step. This corrected runtime is the only
+supported Reacher path. It retains the same manifest and planning contract,
+but records `reference_compatible=false`; it is not a published v0.5 parity
+result.
 
 This is intentionally a reproduction with our runtime, not a claim that our
 newer package and numerical stack are byte-identical to CLEAR-LeWM's published
@@ -82,14 +80,9 @@ manifest SHA-256, embedded criterion, exact pair rows, resolved config,
 checkpoint/config SHA-256, optional checkpoint provenance, dataset path,
 per-episode outcomes, runtime duration, and TwoRoom route diagnostics.
 
-For the corrected Reacher runtime variant, append the explicit override:
-
-```bash
-eval.reacher_internal_termination_fix=true
-```
-
-Reacher result JSONs include the runtime-mode label, reference-compatibility
-flag, and upstream termination-signal count for every fixed pair.
+Reacher result JSONs include the fixed runtime-mode label,
+reference-compatibility flag, and upstream termination-signal count for every
+fixed pair.
 
 Omit `--no-video` when rollout videos are needed. The flag affects only video
 collection and encoding; metrics and structured result files are still saved.
