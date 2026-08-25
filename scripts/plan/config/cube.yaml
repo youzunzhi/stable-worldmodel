@@ -64,6 +64,7 @@ eval:
 
 ssp:
   version: 1
+  threshold: null
   geometry: null
   basis: null
   action_stats: null

@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+#SBATCH --partition=gpu
+#SBATCH --qos=user_xsy0001
+#SBATCH --gres=gpu:1
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=64G
+#SBATCH --time=2-00:00:00
+#SBATCH --array=0-39
+
+set -euo pipefail
+export CUBLAS_WORKSPACE_CONFIG=:4096:8
+
+: "${SSP_V2_5_REPO_ROOT:?}"
+: "${SSP_V2_5_PYTHON:?}"
+: "${SSP_V2_5_PREPARATION_ROOT:?}"
+: "${SSP_V2_5_FORMAL_ROOT:?}"
+: "${SSP_V2_5_COMMIT:?}"
+
+tasks=(tworoom pusht cube reacher)
+geometries=(identity identity identity-repeat identity-repeat 260822 260822 260823 260823 260824 260824)
+protocols=(moderate strict moderate strict moderate strict moderate strict moderate strict)
+index="${SLURM_ARRAY_TASK_ID:?}"
+task_index=$((index / 10))
+cell_index=$((index % 10))
+task="${tasks[${task_index}]}"
+geometry="${geometries[${cell_index}]}"
+protocol="${protocols[${cell_index}]}"
+
+cd "${SSP_V2_5_REPO_ROOT}"
+test "$(git rev-parse HEAD)" = "${SSP_V2_5_COMMIT}"
+test -z "$(git status --porcelain)"
+export PYTHONPATH="${SSP_V2_5_REPO_ROOT}${PYTHONPATH:+:${PYTHONPATH}}"
+export OMP_NUM_THREADS=1
+
+"${SSP_V2_5_PYTHON}" - "${task}" "${geometry}" "${protocol}" <<'PY'
+import json
+import os
+import sys
+from pathlib import Path
+
+from scripts.experiments.self_supervised_plannability_v2_5.clear import run_clear_cell
+
+repo = Path.cwd()
+task, geometry, protocol = sys.argv[1:]
+config = json.loads(
+    (
+        repo
+        / 'scripts'
+        / 'experiments'
+        / 'self_supervised_plannability_v2_5'
+        / 'configs'
+        / f'{task}.json'
+    ).read_text()
+)
+result = run_clear_cell(
+    config=config,
+    repo_root=repo,
+    preparation_dir=Path(os.environ['SSP_V2_5_PREPARATION_ROOT']) / task,
+    formal_root=os.environ['SSP_V2_5_FORMAL_ROOT'],
+    geometry=geometry,
+    protocol=protocol,
+)
+print(json.dumps({'completed': result['completed_trajectories']}, sort_keys=True))
+PY

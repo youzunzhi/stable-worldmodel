@@ -264,19 +264,45 @@ def run(cfg: DictConfig):
         solver_kwargs = {}
         ssp_version = int(cfg.get('ssp', {}).get('version', 1))
         ssp_geometry_path = cfg.get('ssp', {}).get('geometry')
-        ssp_v2_identity = bool(cfg.get('ssp', {}).get('identity', False))
-        if ssp_version == 2:
-            from scripts.experiments.self_supervised_plannability_v2.contracts import (
-                PROTOCOL_ID as SSP_V2_PROTOCOL_ID,
-            )
-            from scripts.experiments.self_supervised_plannability_v2.geometry import (
-                ClipConsistentActionTransform,
-                RotatedSearchCost,
-                TrajectoryHitDiagnostic,
-            )
+        ssp_identity = bool(cfg.get('ssp', {}).get('identity', False))
+        if ssp_version in {2, 25}:
+            if ssp_version == 25:
+                from scripts.experiments.self_supervised_plannability_v2_5.contracts import (
+                    PROTOCOL_ID as SSP_PROTOCOL_ID,
+                )
+                from scripts.experiments.self_supervised_plannability_v2_5.contracts import (
+                    THRESHOLDS as SSP_THRESHOLDS,
+                )
+                from scripts.experiments.self_supervised_plannability_v2_5.geometry import (
+                    ClipConsistentActionTransform,
+                    RotatedSearchCost,
+                    TrajectoryHitDiagnostic,
+                )
+
+                ssp_label = 'SSP-v2.5'
+                verifier_description = (
+                    'trajectory-aware float32 mean-MSE strict binary'
+                )
+            else:
+                from scripts.experiments.self_supervised_plannability_v2.contracts import (
+                    PROTOCOL_ID as SSP_PROTOCOL_ID,
+                )
+                from scripts.experiments.self_supervised_plannability_v2.contracts import (
+                    THRESHOLDS as SSP_THRESHOLDS,
+                )
+                from scripts.experiments.self_supervised_plannability_v2.geometry import (
+                    ClipConsistentActionTransform,
+                    RotatedSearchCost,
+                    TrajectoryHitDiagnostic,
+                )
+
+                ssp_label = 'SSP-v2'
+                verifier_description = (
+                    'trajectory-aware float32 sum-SSE strict binary'
+                )
 
             if clear_manifest is None:
-                raise ValueError('SSP-v2 execution requires a CLEAR manifest')
+                raise ValueError(f'{ssp_label} execution requires a manifest')
             torch.backends.cudnn.benchmark = False
             torch.backends.cudnn.deterministic = True
             torch.backends.cuda.matmul.allow_tf32 = False
@@ -302,13 +328,13 @@ def run(cfg: DictConfig):
                 atol=1e-6,
             ):
                 raise ValueError(
-                    'SSP-v2 action statistics do not match evaluation '
+                    f'{ssp_label} action statistics do not match evaluation '
                     'normalization'
                 )
-            if ssp_v2_identity:
+            if ssp_identity:
                 if ssp_geometry_path:
                     raise ValueError(
-                        'SSP-v2 identity must not load a learned geometry'
+                        f'{ssp_label} identity must not load learned geometry'
                     )
                 theta = torch.zeros(32)
                 geometry_path = None
@@ -318,25 +344,28 @@ def run(cfg: DictConfig):
                 selected_step = 0
             else:
                 if not ssp_geometry_path:
-                    raise ValueError('SSP-v2 learned arm requires geometry')
+                    raise ValueError(f'{ssp_label} learned arm needs geometry')
                 geometry_path = Path(ssp_geometry_path).expanduser().resolve()
                 geometry = torch.load(
                     geometry_path, map_location='cpu', weights_only=True
                 )
-                if geometry.get('protocol_id') != SSP_V2_PROTOCOL_ID:
-                    raise ValueError('SSP-v2 geometry protocol mismatch')
+                if geometry.get('protocol_id') != SSP_PROTOCOL_ID:
+                    raise ValueError(f'{ssp_label} geometry protocol mismatch')
                 geometry_task = geometry['task']
                 if geometry_task != clear_manifest['task']:
                     raise ValueError(
-                        'SSP-v2 geometry task does not match CLEAR task'
+                        f'{ssp_label} geometry task does not match CLEAR task'
                     )
                 theta = geometry['center'].float()
                 replicate_seed = int(geometry['replicate_seed'])
                 selected_step = int(geometry['step'])
             objective = RotatedSearchCost(basis, theta)
-            threshold = {'pusht': 1.5, 'cube': 1.0, 'tworoom': 1.5}[
-                clear_manifest['task']
-            ]
+            task = clear_manifest['task']
+            threshold = SSP_THRESHOLDS[task]
+            if ssp_version == 25:
+                configured_threshold = float(cfg.ssp.threshold)
+                if configured_threshold != threshold:
+                    raise ValueError('SSP-v2.5 verifier threshold mismatch')
             diagnostic = TrajectoryHitDiagnostic(threshold, config.horizon)
 
             class _VerifiedHitExecutionObserver:
@@ -356,9 +385,9 @@ def run(cfg: DictConfig):
                 'return_best_evaluated': True,
             }
             ssp_provenance = {
-                'protocol_id': SSP_V2_PROTOCOL_ID,
+                'protocol_id': SSP_PROTOCOL_ID,
                 'geometry_mode': 'identity-zero-theta'
-                if ssp_v2_identity
+                if ssp_identity
                 else 'promoted-learned',
                 'geometry_path': (
                     None if geometry_path is None else str(geometry_path)
@@ -373,6 +402,8 @@ def run(cfg: DictConfig):
                 'action_stats_path': str(action_stats_path),
                 'action_stats_sha256': manifest_sha256(action_stats_path),
                 'task': geometry_task,
+                'verifier': verifier_description,
+                'epsilon_task': threshold,
                 'replicate_seed': replicate_seed,
                 'selected_step': selected_step,
                 'center': theta.tolist(),
