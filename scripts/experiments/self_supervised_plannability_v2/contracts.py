@@ -12,14 +12,27 @@ from pathlib import Path
 from typing import Any
 
 PROTOCOL_ID = 'self-supervised-plannability-v2'
-FORMAL_TASKS = ('tworoom', 'pusht')
+FORMAL_TASKS = ('tworoom', 'pusht', 'reacher')
 DIAGNOSTIC_TASKS = ('cube',)
 TASKS = FORMAL_TASKS + DIAGNOSTIC_TASKS
-THRESHOLDS = {'pusht': 1.5, 'cube': 1.0, 'tworoom': 1.5}
+THRESHOLDS = {
+    'pusht': 1.5,
+    'cube': 1.0,
+    'tworoom': 1.5,
+    'reacher': 0.7,
+}
 ACTION_EFFECT_SEEDS = {
     'pusht': 26082211,
     'cube': 26082212,
     'tworoom': 26082213,
+    'reacher': 26082514,
+}
+REACHER_THRESHOLD_REGISTRATION = {
+    'source_experiment': 'find-goal-threshold',
+    'registered_value': 0.7,
+    'registered_before_ssp_v2_reacher_outcomes': True,
+    'ssp_verifier_distance': 'float32 sum_D((predicted-goal)^2)',
+    'comparison': '<',
 }
 REPLICATE_SEEDS = (260822, 260823, 260824)
 VALIDATION_SEEDS = (42, 43, 44, 45, 46)
@@ -131,6 +144,15 @@ def validate_config(config: dict) -> None:
     if float(config.get('epsilon_task')) != THRESHOLDS[task]:
         raise SSPV2Failure(
             'SSP_V2_INPUT_HASH_MISMATCH', 'task threshold is not locked'
+        )
+    if (
+        task == 'reacher'
+        and config.get('threshold_registration')
+        != REACHER_THRESHOLD_REGISTRATION
+    ):
+        raise SSPV2Failure(
+            'SSP_V2_INPUT_HASH_MISMATCH',
+            'Reacher threshold registration is not locked',
         )
     if int(config.get('action_effect_seed')) != ACTION_EFFECT_SEEDS[task]:
         raise ValueError('action-effect seed is not locked')

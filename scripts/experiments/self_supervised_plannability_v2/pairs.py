@@ -208,18 +208,18 @@ def prepare_task(
     write_json(root / 'source.json', source)
     write_json(root / 'environment.json', environment_identity())
     shutil.copyfile(config_path, root / 'pre_registered_config.json')
-    write_json(
-        root / 'protocol.json',
-        {
-            'protocol_id': PROTOCOL_ID,
-            'formal_evidence': bool(formal),
-            'task': config['task'],
-            'epsilon_task': config['epsilon_task'],
-            'verifier': 'trajectory-aware float32 sum-SSE strict binary',
-            'planner_return': 'verified-hit-archive-else-best-evaluated',
-            'locked': config['locked'],
-        },
-    )
+    protocol = {
+        'protocol_id': PROTOCOL_ID,
+        'formal_evidence': bool(formal),
+        'task': config['task'],
+        'epsilon_task': config['epsilon_task'],
+        'verifier': 'trajectory-aware float32 sum-SSE strict binary',
+        'planner_return': 'verified-hit-archive-else-best-evaluated',
+        'locked': config['locked'],
+    }
+    if 'threshold_registration' in config:
+        protocol['threshold_registration'] = config['threshold_registration']
+    write_json(root / 'protocol.json', protocol)
 
     dataset = Path(config['dataset']['path']).expanduser().resolve()
     checkpoint = Path(config['checkpoint']['path']).expanduser().resolve()

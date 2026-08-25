@@ -6,9 +6,9 @@ Protocol ID: `self-supervised-plannability-v2`
 
 Short name: `SSP-v2`
 
-Source branch: `codex/self-supervised-plannability`
+Source branch: `codex/ssp-reacher`
 
-Tasks promoted to formal training: `tworoom`, `pusht`
+Tasks promoted to formal training: `tworoom`, `pusht`, `reacher`
 
 Task held out from the v2 go/no-go claim: `cube`
 
@@ -30,6 +30,11 @@ Cube is not a formal go/no-go task because its pointwise latent verifier has no
 feasible operating point under the preceding threshold study. It may be run
 later as a declared mechanistic diagnostic, but cannot decide SSP-v2.
 
+Reacher is a task extension registered before any SSP-v2 Reacher outcome. It
+uses `epsilon_task=0.7`, fixed from the preceding `find-goal-threshold`
+analysis as explicitly registered for this experiment. This threshold is not
+retuned from SSP-v2 training, validation, held-out, or CLEAR observations.
+
 ## 2. Frozen components and information firewall
 
 For start observation `o_t`, goal observation `o_g`, and normalized action
@@ -50,7 +55,7 @@ y(A) = 1[min_{h=1..5} sum_D((z_hat_h(A) - z_g)^2) < epsilon_task].
 
 The comparison is strict `<`; accumulation is float32 sum-SSE over all 192
 latent coordinates. Thresholds remain PushT `1.5`, Cube `1.0`, and TwoRoom
-`1.5`.
+`1.5`; Reacher is locked at `0.7` for this extension.
 
 Only `y(A)` may enter success gating, archive state, outer reward, or formal
 internal evaluation. For failed candidates, `d0=1.6` and `d0=100` remain
@@ -250,12 +255,12 @@ it does not erase the internal search result.
 
 ## 10. Formal launch order and terminal codes
 
-For TwoRoom and PushT:
+For TwoRoom, PushT, and Reacher:
 
 1. repository tests, formatting, clean committed revision;
 2. create-only formal preparation with full dataset/checkpoint/config hashes;
 3. nonformal real-checkpoint diagnostic and progressive overfit;
-4. six create-only formal training replicates;
+4. three create-only formal optimizer replicates per task;
 5. frozen validation selection;
 6. one-shot paired held-out profile;
 7. conditional CLEAR promotion.

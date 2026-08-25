@@ -2,10 +2,23 @@
 
 from __future__ import annotations
 
+import json
+from pathlib import Path
+
 import numpy as np
+import pytest
 import torch
 from gymnasium.spaces import Box
+from omegaconf import OmegaConf
 
+from scripts.experiments.self_supervised_plannability_v2.contracts import (
+    ACTION_EFFECT_SEEDS,
+    FORMAL_TASKS,
+    REACHER_THRESHOLD_REGISTRATION,
+    THRESHOLDS,
+    SSPV2Failure,
+    validate_config,
+)
 from scripts.experiments.self_supervised_plannability_v2.es import (
     select_validation_checkpoint,
 )
@@ -23,6 +36,58 @@ from scripts.experiments.self_supervised_plannability_v2.noise import (
 from stable_worldmodel.planning import GoalMSE
 from stable_worldmodel.planning.solver import CEMSolver
 from stable_worldmodel.policy import PlanConfig
+
+REPO_ROOT = Path(__file__).parents[2]
+
+
+def _reacher_config() -> dict:
+    path = (
+        REPO_ROOT
+        / 'scripts/experiments/self_supervised_plannability_v2/configs'
+        / 'reacher.json'
+    )
+    return json.loads(path.read_text())
+
+
+def test_reacher_is_a_locked_formal_ssp_v2_task():
+    config = _reacher_config()
+    validate_config(config)
+
+    assert 'reacher' in FORMAL_TASKS
+    assert THRESHOLDS['reacher'] == 0.7
+    assert config['epsilon_task'] == 0.7
+    assert config['action_effect_seed'] == ACTION_EFFECT_SEEDS['reacher']
+    assert config['threshold_registration'] == REACHER_THRESHOLD_REGISTRATION
+    assert config['dataset']['revision'] == (
+        'e70a080d0d04c6072123c9ebd343acf7fff28dbf'
+    )
+    assert config['checkpoint']['sha256'] == (
+        'e23682a16e772469d7dc76ed2c6f303e0fd31d6f6ccff4cb751566bf5d3cfec5'
+    )
+    assert [
+        Path(value).parent.name for value in config['clear_manifests']
+    ] == [
+        'reacher',
+        'reacher',
+    ]
+
+
+def test_reacher_threshold_cannot_drift_from_point_seven():
+    config = _reacher_config()
+    config['epsilon_task'] = 0.700001
+
+    with pytest.raises(SSPV2Failure, match='task threshold is not locked'):
+        validate_config(config)
+
+
+def test_reacher_eval_config_exposes_the_shared_ssp_switches():
+    config = OmegaConf.load(REPO_ROOT / 'scripts/plan/config/reacher.yaml')
+
+    assert config.ssp.version == 1
+    assert config.ssp.geometry is None
+    assert config.ssp.basis is None
+    assert config.ssp.action_stats is None
+    assert config.ssp.identity is False
 
 
 def _basis(seed: int = 1) -> torch.Tensor:
