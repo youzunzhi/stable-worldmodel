@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from pathlib import Path
 
-
 PUSHT_REVISION = '655cd446b9929369d7d406001da85c15d1457850'
 PUSHT_TRAIN_DATASET = (
     Path('converted') / PUSHT_REVISION / 'pusht_expert_train.lance'
@@ -25,6 +24,13 @@ CUBE_DATASET = (
 # v0.5 identifies it by a metadata fingerprint rather than a repository
 # revision; both training and evaluation use the same immutable local file.
 TWOROOM_DATASET = Path('tworoom') / 'tworoom.h5'
+
+REACHER_DATA_REVISION = 'e70a080d0d04c6072123c9ebd343acf7fff28dbf'
+REACHER_DATASET = (
+    Path('hf/datasets/quentinll--lewm-reacher')
+    / REACHER_DATA_REVISION
+    / 'reacher.h5'
+)
 
 
 @dataclass(frozen=True)
@@ -68,6 +74,18 @@ EXPERIMENTS = {
             'trainer.max_epochs=10',
         ),
         eval_defaults=('--config-name=tworoom',),
+    ),
+    ('lewm', 'reacher'): ExperimentSpec(
+        train_script=Path('scripts/train/lewm.py'),
+        eval_script=Path('scripts/plan/eval_wm.py'),
+        train_dataset=REACHER_DATASET,
+        eval_dataset=REACHER_DATASET,
+        train_defaults=(
+            'data=dmc',
+            'launcher=local',
+            'trainer.max_epochs=10',
+        ),
+        eval_defaults=('--config-name=reacher',),
     ),
 }
 

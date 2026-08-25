@@ -186,6 +186,7 @@ class GradientSolver(torch.nn.Module):
                 self.horizon,
                 n_envs=total_envs,
                 action_dim=self.action_dim,
+                device=self.device,
             )
             self.init_action(total_envs, init_action)
 
